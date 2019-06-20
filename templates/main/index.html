@@ -18,6 +18,12 @@
             <h2>Checkout form</h2>
             <p class="lead">Below is an example form.</p>
             <hr class="mb-4">
+            <div>
+                <form method="post">{% csrf_token %}
+                    {{ form.as_p }}
+                    <button class="btn btn-primary" type="submit">Continue to checkout</button>
+                </form>
+            </div>
         </div>
     </div>
 
