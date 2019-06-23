@@ -24,6 +24,32 @@
                     <button class="btn btn-primary" type="submit">Continue to checkout</button>
                 </form>
             </div>
+            <div>
+                {% if providers %}
+                <table border="1px">
+                    <thead>
+                    <tr>
+                        <td>Место</td>
+                        <td>Фото</td>
+                        <td>Имя</td>
+                        <td>Описание</td>
+                        <td>Чем торгует</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for p in providers %}
+                    <tr>
+                        <td>{{ p.space }}</td>
+                        <td><img src="{{ p.picture }}" alt="ВК картинка"></td>
+                        <td><a href="{{p.vk_link}}">{{ p.name }}</a></td>
+                        <td>{{ p.description }}</td>
+                        <td>{{ p.product_type }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
         </div>
     </div>
 
