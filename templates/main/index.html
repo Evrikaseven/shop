@@ -13,11 +13,54 @@
 </head>
 <body class="bg-light">
     <div class=container">
-        <div class="py-5 text-center">
+        <div class="py-5">
             <!-- img class="d-block mx-auto mb-4" src="solid.svg" alt="" width="72" height="72" -->
             <h2>Checkout form</h2>
             <p class="lead">Below is an example form.</p>
             <hr class="mb-4">
+        </div>
+        <form method="post">
+            <div class="form-group row">
+                <label for="inputName" class="col-sm-2 col-form-label">Имя</label>
+                <div class="col-sm-10">
+                    <input type="text" name= {{ form.name.name }} class="form-control" placeholder="name">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputSpace" class="col-sm-2 col-form-label">Место</label>
+                <div class="col-sm-10">
+                    <input type="text" name= {{ form.name.space }} class="form-control"  placeholder="Место">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-primary">Continue to checkout</button>
+                </div>
+            </div>
+        </form>
+        <div>
+            {% if providers %}<table border="1px" class="table">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Место</th>
+                    <th scope="col">Фото</th>
+                    <th scope="col">Имя</th>
+                    <th scope="col">Описание</th>
+                    <th scope="col">Чем торгует</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for p in providers %}<tr>
+                    <td>{{ p.space }}</td>
+                    <td><img src="{{ p.picture }}" alt="ВК картинка"></td>
+                    <td><a href="{{p.vk_link}}">{{ p.name }}</a></td>
+                    <td>{{ p.description }}</td>
+                    <td>{{ p.product_type }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
         </div>
     </div>
 
