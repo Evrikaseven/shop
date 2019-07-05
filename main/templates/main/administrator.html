@@ -7,4 +7,66 @@
 <p>
     <h1>Страница Администратора</h1>
 </p>
+        <div>
+            {% if providers %}<table border="1px" class="table">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Место</th>
+                    <th scope="col">Фото</th>
+                    <th scope="col">Имя</th>
+                    <th scope="col">Описание</th>
+                    <th scope="col">Чем торгует</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for p in providers %}<tr>
+                    <td>{{ p.space }}</td>
+                    <td><img src="{{ p.picture }}" alt="ВК картинка"></td>
+                    <td><a href="{{p.vk_link}}">{{ p.name }}</a></td>
+                    <td>{{ p.description }}</td>
+                    <td>{{ p.product_type }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+
+        <div>
+            {% if users %}<table border="1px" class="table">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Логин</th>
+                    <th scope="col">Имя</th>
+                    <th scope="col">Фамилия</th>
+                    <th scope="col">Роль</th>
+                    <th scope="col">Телефон</th>
+                    <th scope="col">Адрес</th>
+                    <th scope="col">Дата рождения</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.first_name }}</td>
+                    <td>{{ user.last_name }}</td>
+                    {% if user.role == 3 %}
+                        <td> Администратор </td>
+                    {% elif user.role == 2 %}
+                        <td> Сборщик </td>
+                    {% elif user.role == 1 %}
+                        <td> Закупщик </td>
+                    {% else %}
+                        <td> Заказчик </td>
+                    {% endif %}
+                    <td>{{ user.phone }}</td>
+                    <td>{{ user.location }}</td>
+                    <td>{{ user.birth_date }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
 {% endblock content %}
