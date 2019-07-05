@@ -18,7 +18,26 @@
     <p>
         <a href="{% url 'main:password_change' %}">Смена пароля</a>
     </p>
-</p>
+
+
+    {% if pers_area_url == 'administrator' %}
+    <p>
+        <a href="{% url 'main:administrator' %}">Личный кабинет</a>
+    </p>
+    {% elif pers_area_url == 'sborschik' %}
+    <p>
+        <a href="{% url 'main:sborschik' %}">Личный кабинет</a>
+    </p>
+    {% elif pers_area_url == 'zakupschik' %}
+    <p>
+        <a href="{% url 'main:zakupschik' %}">Личный кабинет</a>
+    </p>
+    {% else %} {# 'zakazschik' #}
+    <p>
+        <a href="{% url 'main:zakazschik' %}">Личный кабинет</a>
+    </p>
+    {% endif %}
+
 {% else %}
     <p>
         <a href="{% url 'main:login' %}">Войти</a>

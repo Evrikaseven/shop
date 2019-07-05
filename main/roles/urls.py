@@ -8,8 +8,8 @@ from .views import (
 
 
 urlpatterns = [
-    path('zakazschik/', ZakazschikMainView.as_view(), name='zakazschik'),
-    path('zakupschik/', ZakupschikMainView.as_view(), name='zakupschik'),
-    path('sborschik/', SborschikMainView.as_view(), name='sborschik'),
-    path('administrator/', AdministratorMainView.as_view(), name='administrator'),
+    path('zakazschik/', ZakazschikMainView.as_view(), name=ZakazschikMainView.url_name),
+    path('zakupschik/', ZakupschikMainView.as_view(), name=ZakupschikMainView.url_name),
+    path('sborschik/', SborschikMainView.as_view(), name=SborschikMainView.url_name),
+    path('administrator/', AdministratorMainView.as_view(), name=AdministratorMainView.url_name),
 ]
