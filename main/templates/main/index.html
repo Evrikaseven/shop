@@ -18,7 +18,12 @@
     <p>
         <a href="{% url 'main:password_change' %}">Смена пароля</a>
     </p>
-</p>
+
+    {% if user_role and user_role %}
+    <p>
+
+    </p>
+    {% endif %}
 {% else %}
     <p>
         <a href="{% url 'main:login' %}">Войти</a>
