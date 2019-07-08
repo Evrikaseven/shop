@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Поставщики{% endblock title %}
+
+{% block content %}
+
+<div>
+    {#{% if providers %}#}
+    <h2>Поставщики</h2>
+    <table border="1px" class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">Место</th>
+            <th scope="col">Фото</th>
+            <th scope="col">Имя</th>
+            <th scope="col">Описание</th>
+            <th scope="col">Чем торгует</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for p in providers %}
+        <tr>
+            <td>{{ p.space }}</td>
+            <td><img src="{{ p.picture }}" alt="ВК картинка"></td>
+            <td><a href="{{p.vk_link}}">{{ p.name }}</a></td>
+            <td>{{ p.description }}</td>
+            <td>{{ p.product_type }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {#{% endif %}#}
+</div>
+
+{% endblock content %}
