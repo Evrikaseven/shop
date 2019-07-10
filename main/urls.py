@@ -2,8 +2,16 @@ from django.urls import path, include
 from . import views as main_views
 from .roles import urls as roles_urls
 from .accounts import urls as accounts_urls
+from rest_framework.routers import DefaultRouter
 
 app_name = 'main'
+
+
+router = DefaultRouter()
+router.register('users', main_views.UsersResourceView)
+router.register('orders', main_views.OrdersResourceView)
+router.register('providers', main_views.ProvidersResourceView)
+
 
 urlpatterns = [
     path('', main_views.IndexView.as_view(), name='index'),
@@ -15,4 +23,6 @@ urlpatterns = [
     path('products/', main_views.ProductsListView.as_view(), name='products'),
     path('buyouts/', main_views.BuyoutsListView.as_view(), name='buyouts'),
     path('help/', main_views.HelpView.as_view(), name='help'),
+
+    path('api/', include(router.urls))
 ]

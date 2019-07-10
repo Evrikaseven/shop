@@ -1,3 +1,4 @@
+from enum import EnumMeta
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from main.core.mixins import WithTimestampMixin, WithUserMixin
@@ -13,7 +14,7 @@ class Provider(models.Model):
     product_type = models.CharField(max_length=256, null=True, blank=True)
 
 
-class Roles(object):
+class Roles(EnumMeta):
     ZAKAZSCHIK = 0
     SBORSCHIK = 1
     ZAKUPSCHIK = 2
@@ -38,11 +39,23 @@ class User(AbstractUser):
     role = models.PositiveIntegerField(choices=ROLES, default=Roles.ZAKAZSCHIK)
 
 
+class OrderStatuses(EnumMeta):
+    CREATED = 0
+    PAID = 1
+    CLOSED = 2
+
+
 class Order(WithTimestampMixin, WithUserMixin, models.Model):
     image = models.ImageField(blank=True, null=True)
     place = models.CharField(max_length=150, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    cost = models.DecimalField(max_digits=10, decimal_places=2)
     order_comment = models.TextField(max_length=255, null=True, blank=True)
     customer_comment = models.TextField(max_length=255, null=True, blank=True)
+
+    ORDER_STATUSES = (
+        (OrderStatuses.CREATED, 'Создан'),
+        (OrderStatuses.PAID, 'Оплачен'),
+        (OrderStatuses.CLOSED, 'Закрыт'),
+    )
+    status = models.PositiveIntegerField(default=OrderStatuses.CREATED, choices=ORDER_STATUSES)
 

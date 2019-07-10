@@ -3,6 +3,8 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from . import models as _models
+from . import serializers as _serializers
+from rest_framework.viewsets import ModelViewSet
 from main.roles import views as roles_views
 
 
@@ -84,7 +86,17 @@ class HelpView(TemplateView):
         return context
 
 
-class OrderView(CreateView):
-    template_name = 'main/order.html'
-    form_class = _models.Order
-    # success_url = 'main/'
+# Resources
+class ProvidersResourceView(ModelViewSet):
+    queryset = _models.Provider.objects.all()
+    serializer_class = _serializers.ProviderSerializer
+
+
+class UsersResourceView(ModelViewSet):
+    queryset = _models.User.objects.all()
+    serializer_class = _serializers.UserSerializer
+
+
+class OrdersResourceView(ModelViewSet):
+    queryset = _models.Order.objects.all()
+    serializer_class = _serializers.OrderSerializer
