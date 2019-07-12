@@ -2,15 +2,30 @@
 
 {#{% block auth %}#}
 {% block content %}
-<h2>Вход</h2>
-{% if user.is_authenticated %}
-<p>Пользователь: {{ user.username }}</p>
-{% else %}
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="hidden" name="next" value="{{ next }}">
-    <input type="submit" value="Войти">
-</form>
-{% endif %}
+  <div class="container">
+    <h1 class="h3 mb-3 font-weight-normal">Вход</h1>
+    {% if user.is_authenticated %}
+        <p>Пользователь: {{ user.username }}</p>
+    {% else %}
+    <form class="form-signin" method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div class="form-group row">
+                {% if field.errors %}
+                    <div class="alert alert-danger">
+                        {{ field.error }}
+                    </div>
+                {% endif %}
+
+                <label class="col-sm-2 col-form-label">{{ field.label }}</label>
+                {{ field }}
+            </div>
+        {% endfor %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" >Войти</button>
+        </div>
+    </form>
+    {% endif %}
+</div>
 {% endblock %}

@@ -1,10 +1,35 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Регистрация</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Зарегистрировать</button>
-  </form>
+<div class="container">
+    <h1 class="h3 mb-3 font-weight-normal">Вход</h1>
+
+    <form class="form-signin" method="post">
+        {% csrf_token %}
+        <ul>
+            <li>Ваш пароль не должен совпадать с вашим именем или другой персональной информацией или быть слишком похожим на неё.</li>
+            <li>Ваш пароль должен содержать как минимум 8 символов.</li>
+            <li>Ваш пароль не может быть одним из широко распространённых паролей.</li>
+            <li>Ваш пароль не может состоять только из цифр.</li>
+        </ul>
+    <br>
+        {% for field in form %}
+            <div class="form-group row">
+                {% if field.errors %}
+                    <div class="alert alert-danger">
+                        {{ field.error }}
+                    </div>
+                {% endif %}
+
+                <label class="col-sm-2 col-form-label">{{ field.label }}</label>
+                {{ field }}
+            </div>
+        {% endfor %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" >Зарегистрировать</button>
+        </div>
+    </form>
+
+</div>
+
 {% endblock %}
