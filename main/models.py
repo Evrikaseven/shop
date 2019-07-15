@@ -1,7 +1,7 @@
 from enum import EnumMeta
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from main.core.mixins import WithTimestampMixin, WithUserMixin
+from main.core.models import ModelWithTimestamp, ModelWithUser
 
 
 # Create your models here.
@@ -39,16 +39,28 @@ class User(AbstractUser):
     role = models.PositiveIntegerField(choices=ROLES, default=Roles.ZAKAZSCHIK)
 
 
+def get_path_to_order_images(instance, name):
+    return 'order_{}'.format(instance.id)
+
+
 class OrderStatuses(EnumMeta):
     CREATED = 0
     PAID = 1
     CLOSED = 2
 
 
-class Order(WithTimestampMixin, WithUserMixin, models.Model):
-    image = models.ImageField(blank=True, null=True)
+class OrderManager(models.Manager):
+
+    def get_list(self):
+        return Order.objects.filter(active=True)
+
+
+class Order(ModelWithTimestamp, ModelWithUser):
+    objects = OrderManager()
+    # image = models.ImageField(upload_to=get_path_to_order_images)
     place = models.CharField(max_length=150, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.PositiveIntegerField(default=0)
     order_comment = models.TextField(max_length=255, null=True, blank=True)
     customer_comment = models.TextField(max_length=255, null=True, blank=True)
 
@@ -58,4 +70,15 @@ class Order(WithTimestampMixin, WithUserMixin, models.Model):
         (OrderStatuses.CLOSED, 'Закрыт'),
     )
     status = models.PositiveIntegerField(default=OrderStatuses.CREATED, choices=ORDER_STATUSES)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ('created_date', )
+
+
+class OrderImage(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
+    image = models.ImageField(upload_to=get_path_to_order_images)
+    comment = models.CharField(max_length=255, null=True, blank=True)
+    selected = models.BooleanField(default=True)
 
