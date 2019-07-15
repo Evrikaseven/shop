@@ -5,7 +5,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from . import models as _models
 from . import serializers as _serializers
 from rest_framework.viewsets import ModelViewSet
-from main.roles import views as roles_views
+from main.roles.zakazschik.views import ZakazschikMainView
+from main.roles.zakupschik.views import ZakupschikMainView
+from main.roles.sborschik.views import SborschikMainView
+from main.roles.administrator.views import AdministratorMainView
 
 
 class IndexView(TemplateView):
@@ -20,13 +23,13 @@ class IndexView(TemplateView):
         context['user_role'] = role
 
         if role == _models.Roles.ZAKAZSCHIK:
-            role_url = roles_views.ZakazschikMainView.url_name
+            role_url = ZakazschikMainView.url_name
         elif role == _models.Roles.ZAKUPSCHIK:
-            role_url = roles_views.ZakupschikMainView.url_name
+            role_url = ZakupschikMainView.url_name
         elif role == _models.Roles.SBORSCHIK:
-            role_url = roles_views.SborschikMainView.url_name
+            role_url = SborschikMainView.url_name
         else:
-            role_url = roles_views.AdministratorMainView.url_name
+            role_url = AdministratorMainView.url_name
 
         context['pers_area_url'] = role_url
         return context

@@ -1,15 +1,13 @@
-from django.urls import path
-from .views import (
-    ZakazschikMainView,
-    ZakupschikMainView,
-    SborschikMainView,
-    AdministratorMainView,
-)
+from django.urls import path, include
+from .zakazschik import urls as zakazschik_urls
+from .zakupschik import urls as zakupschik_urls
+from .sborschik import urls as sborschik_urls
+from .administrator import urls as administrator_urls
 
 
 urlpatterns = [
-    path('zakazschik/', ZakazschikMainView.as_view(), name=ZakazschikMainView.url_name),
-    path('zakupschik/', ZakupschikMainView.as_view(), name=ZakupschikMainView.url_name),
-    path('sborschik/', SborschikMainView.as_view(), name=SborschikMainView.url_name),
-    path('administrator/', AdministratorMainView.as_view(), name=AdministratorMainView.url_name),
+    path('zakazschik/', include(zakazschik_urls)),
+    path('zakupschik/', include(zakupschik_urls)),
+    path('sborschik/', include(sborschik_urls)),
+    path('administrator/', include(administrator_urls)),
 ]

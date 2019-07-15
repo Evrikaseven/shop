@@ -4,7 +4,12 @@
 
 
 {% block content %}
-<p>
-    <h1>Страница Закупщика</h1>
-</p>
+    <div class="container">
+        <h1 class="h3 mb-3 font-weight-normal">
+            <a href="{% url 'main:zakupschik_individual_orders' %}">Индивидуальные заказы</a>
+        </h1>
+        <h1 class="h3 mb-3 font-weight-normal">
+            <a href="{% url 'main:zakupschik_joint_orders' %}">Совместные заказы</a>
+        </h1>
+    </div>
 {% endblock content %}
