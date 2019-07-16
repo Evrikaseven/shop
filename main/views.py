@@ -70,7 +70,7 @@ class OrdersListView(TemplateView):
 class OrderCreateView(CreateView):
     template_name = 'main/order_details.html'
     form_class = OrderForm
-    success_url = '/signup/done/'
+    success_url = '/order_details/'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

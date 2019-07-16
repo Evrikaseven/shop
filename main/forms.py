@@ -1,5 +1,7 @@
 from django import forms
-from .models import Provider, Order
+from django.db import transaction
+from .models import Provider, Order, OrderImage
+from main.core import widgets as custom_widgets, form_fields as custom_form_fields
 
 
 class ProviderForm(forms.ModelForm):
@@ -16,8 +18,9 @@ class ProviderForm(forms.ModelForm):
 
 
 class OrderForm(forms.ModelForm):
-    images = forms.ImageField(label='Изображение товара',
-                              widget=forms.widgets.ClearableFileInput(attrs={'multiple': True}))
+    images = custom_form_fields.MultipleFilesField(required=False,
+                                                   label='Изображение товара',
+                                                   widget=custom_widgets.ClearableMultiFileInput())
     # place = forms.CharField()
     # price = forms.DecimalField()
     # quantity = forms.IntegerField()
@@ -28,8 +31,17 @@ class OrderForm(forms.ModelForm):
         model = Order
         fields = ('images', 'place', 'order_comment', 'customer_comment', 'price', 'quantity')
 
-    def clean(self):
-        return self.cleaned_data
+    @transaction.atomic
+    def save(self, commit=True):
+        if self.instance.pk:
+            # Here check for existing images
+            pass
+
+        instance = super().save(commit=commit)
+        for image in self.cleaned_data['images']:
+            img = OrderImage(image=image, order=instance)
+            img.save()
+        return instance
 
 
 

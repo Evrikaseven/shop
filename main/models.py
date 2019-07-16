@@ -40,7 +40,7 @@ class User(AbstractUser):
 
 
 def get_path_to_order_images(instance, name):
-    return 'order_{}'.format(instance.id)
+    return 'order_{}/{}'.format(instance.order.pk, name)
 
 
 class OrderStatuses(EnumMeta):
@@ -51,13 +51,12 @@ class OrderStatuses(EnumMeta):
 
 class OrderManager(models.Manager):
 
-    def get_list(self):
-        return Order.objects.filter(active=True)
+    def get_list(self, **kwargs):
+        return Order.objects.filter(active=True, **kwargs)
 
 
 class Order(ModelWithTimestamp, ModelWithUser):
     objects = OrderManager()
-    # image = models.ImageField(upload_to=get_path_to_order_images)
     place = models.CharField(max_length=150, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField(default=0)
@@ -74,6 +73,9 @@ class Order(ModelWithTimestamp, ModelWithUser):
 
     class Meta:
         ordering = ('created_date', )
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
 
 class OrderImage(models.Model):
