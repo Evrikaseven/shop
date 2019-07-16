@@ -5,10 +5,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from . import models as _models
 from . import serializers as _serializers
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
 from main.roles.zakazschik.views import ZakazschikMainView
 from main.roles.zakupschik.views import ZakupschikMainView
 from main.roles.sborschik.views import SborschikMainView
 from main.roles.administrator.views import AdministratorMainView
+from .forms import OrderForm
 
 
 class IndexView(TemplateView):
@@ -65,6 +67,17 @@ class OrdersListView(TemplateView):
         return context
 
 
+class OrderCreateView(CreateView):
+    template_name = 'main/order_details.html'
+    form_class = OrderForm
+    success_url = '/signup/done/'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.form_class
+        return context
+
+
 class BuyoutsListView(TemplateView):
     template_name = 'main/buyouts_list.html'
 
@@ -93,13 +106,16 @@ class HelpView(TemplateView):
 class ProvidersResourceView(ModelViewSet):
     queryset = _models.Provider.objects.all()
     serializer_class = _serializers.ProviderSerializer
+    permission_classes = (IsAuthenticated,)
 
 
 class UsersResourceView(ModelViewSet):
     queryset = _models.User.objects.all()
     serializer_class = _serializers.UserSerializer
+    permission_classes = (IsAuthenticated,)
 
 
 class OrdersResourceView(ModelViewSet):
     queryset = _models.Order.objects.all()
     serializer_class = _serializers.OrderSerializer
+    permission_classes = (IsAuthenticated,)

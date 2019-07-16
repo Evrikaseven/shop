@@ -16,15 +16,20 @@ class ProviderForm(forms.ModelForm):
 
 
 class OrderForm(forms.ModelForm):
-    image = forms.ImageField(label='Изображение товара')
-    place = forms.CharField()
-    price = forms.DecimalField()
-    cost = forms.DecimalField()
+    images = forms.ImageField(label='Изображение товара',
+                              widget=forms.widgets.ClearableFileInput(attrs={'multiple': True}))
+    # place = forms.CharField()
+    # price = forms.DecimalField()
+    # quantity = forms.IntegerField()
     order_comment = forms.CharField(widget=forms.Textarea)
     customer_comment = forms.CharField(widget=forms.Textarea)
 
     class Meta:
         model = Order
+        fields = ('images', 'place', 'order_comment', 'customer_comment', 'price', 'quantity')
+
+    def clean(self):
+        return self.cleaned_data
 
 
 
