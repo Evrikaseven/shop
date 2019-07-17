@@ -1,10 +1,15 @@
 {% extends 'base.html' %}
 
-{% block title %}Заказчик{% endblock title %}
-
+{% block title %}Опты{% endblock title %}
 
 {% block content %}
-<p>
-    <h1>Страница Заказчика</h1>
-</p>
+<div class="container">
+    <h1 class="h3 mb-3 font-weight-normal">Главная</h1>
+    <nav class="nav flex-column">
+        <a class="nav-link active" href="{% url 'main:new_order' %}">Заказы</a>
+        <a class="nav-link" href="{% url 'main:buyouts' %}">Выкупы</a>
+        <a class="nav-link" href="{% url 'main:providers' %}">Поставщики</a>
+        <a class="nav-link" href="{% url 'main:help' %}">Помощь</a>
+    </nav>
+</div>
 {% endblock content %}
