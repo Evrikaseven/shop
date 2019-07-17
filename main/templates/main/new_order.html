@@ -8,17 +8,19 @@
 
 
     <div class="container">
-        <h2 class="text-center">Список заказов</h2>
+        <h2 class="text-center">Сделать новый заказ</h2>
         <hr class="mb-4">
+        <button class="btn btn-outline-secondary mb-4" data-toggle="collapse" data-target="#hide-me" aria-expanded="true">Правила оформления заказа</button>
+        <div id="hide-me" class="collapse in">
+            <p class="mb-5">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+        </div>
 
-        <h4>Оформить заказ</h4>
-        <hr class="mb-4">
-        <form class="needs-validation" novalidate="">
+        <form class="needs-validation" id="order" novalidate="">
             <div class="form-group row">
                       <label for="example-text-input" class="col-2 col-form-label">Фото товара</label>
                       <div class="col-10 custom-file">
                           <input type="file" class="custom-file-input">
-                          <label class="custom-file-label text-truncate" for="inputGroupFile01">Choose file</label>
+                          <label class="custom-file-label text-truncate" for="inputGroupFile01">выберите файл</label>
                       </div>
             </div>
 
@@ -30,24 +32,22 @@
             </div>
 
             <div class="form-group row">
-                 <label for="example-text-input" class="col-2 col-form-label">Цена</label>
+                 <label for="price-input" class="col-2 col-form-label">Цена</label>
                   <div class="col-10">
-                        <input class="form-control" type="number" placeholder="укажите цену" required="">
+                        <input class="form-control" id="price-input" type="number" placeholder="укажите цену" required="">
                   </div>
             </div>
 
             <div class="form-group row">
-                 <label for="example-text-input" class="col-2 col-form-label">Количество</label>
+                 <label for="count-input" class="col-2 col-form-label">Количество</label>
                   <div class="col-10">
-                        <input class="form-control" type="number" value="1" placeholder="укажите цену" required="">
+                        <input class="form-control" id="count-input" type="number" value="1" required="">
                   </div>
             </div>
 
             <div class="form-group row">
-                 <label for="example-text-input" class="col-2 col-form-label">Сумма</label>
-                  <div class="col-10">
-                        <input class="form-control" type="text" placeholder="укажите цену" required="">
-                  </div>
+                 <label for="example-text-input" class="col-2 col-form-label">Сумма заказа</label>
+                  <div class="col-10 col-form-label" id="check_sum">0</div>
             </div>
 
             <hr class="mb-4">
@@ -60,16 +60,25 @@
                 <textarea class="form-control" id="comment" placeholder="заметка по товару и пр." rows="3"></textarea>
               </div>
             <div class="mb-4 text-center">
-                <button class="btn btn-secondary" type="submit">Заказать</button>
-                <button class="btn btn-secondary" type="submit">Отмена</button>
+                <button class="btn btn-outline-dark" type="submit">Заказать</button>
+                <button class="btn btn-outline-dark" type="submit">Отмена</button>
             </div>
           </form>
         </div>
 </div>
 <script>
-$('.custom-file-input').on('change', function() {
-   let fileName = $(this).val().split('\\').pop();
-   $(this).next('.custom-file-label').addClass("selected").html(fileName);
-});
+    $('.custom-file-input').on('change', function() {
+       let fileName = $(this).val().split('\\').pop();
+       $(this).next('.custom-file-label').addClass("selected").html(fileName);
+    });
+
+    $(function() {
+      $('#order').change(function(){
+        let sum =  parseInt($("#price-input").val(), 10) * parseInt($("#count-input").val(), 10);
+
+        $('#check_sum').html( sum + sum / 10);
+      });
+    });
+
 </script>
 {% endblock content %}
