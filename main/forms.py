@@ -31,6 +31,10 @@ class OrderForm(forms.ModelForm):
         model = Order
         fields = ('images', 'place', 'order_comment', 'customer_comment', 'price', 'quantity')
 
+    def clean_place(self):
+        value = self.cleaned_data['place']
+        return value.strip().replace(' ', '')
+
     @transaction.atomic
     def save(self, commit=True):
         if self.instance.pk:
