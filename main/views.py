@@ -72,10 +72,22 @@ class OrderCreateView(CreateView):
     form_class = OrderForm
     success_url = '/order_details/'
 
+    def __init__(self):
+        self.user = None
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.user
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = self.form_class
         return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user = request.user
+        return super().dispatch(request, *args, **kwargs)
 
 
 class BuyoutsListView(TemplateView):
