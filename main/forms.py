@@ -24,12 +24,12 @@ class OrderForm(forms.ModelForm):
     # place = forms.CharField()
     # price = forms.DecimalField()
     # quantity = forms.IntegerField()
-    order_comment = forms.CharField(widget=forms.Textarea)
-    customer_comment = forms.CharField(widget=forms.Textarea)
+    #order_comment = forms.CharField(widget=forms.Textarea)
+    #customer_comment = forms.CharField(widget=forms.Textarea)
 
     class Meta:
         model = Order
-        fields = ('images', 'place', 'order_comment', 'customer_comment', 'price', 'quantity')
+        fields = ('images', 'place', 'price', 'quantity', 'order_comment', 'customer_comment')
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
