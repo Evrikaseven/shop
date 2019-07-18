@@ -1,7 +1,14 @@
 from enum import EnumMeta
+import os.path
+import shutil
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import pre_delete
+from django.conf import settings
 from main.core.models import ModelWithTimestamp, ModelWithUser
+
+
+MEDIA_DIR_PREFFIX = 'order_'
 
 
 # Create your models here.
@@ -40,7 +47,7 @@ class User(AbstractUser):
 
 
 def get_path_to_order_images(instance, name):
-    return 'order_{}/{}'.format(instance.order.pk, name)
+    return '{}{}/{}'.format(MEDIA_DIR_PREFFIX, instance.order.pk, name)
 
 
 class OrderStatuses(EnumMeta):
@@ -78,9 +85,17 @@ class Order(ModelWithTimestamp, ModelWithUser):
         super().save(*args, **kwargs)
 
 
+def delete_order_images_on_disc(sender, **kwargs):
+    instance = kwargs['instance']
+    directory_to_be_removed = os.path.join(settings.MEDIA_ROOT, "{}{}".format(MEDIA_DIR_PREFFIX, instance.id))
+    shutil.rmtree(directory_to_be_removed)
+
+
 class OrderImage(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(upload_to=get_path_to_order_images)
     comment = models.CharField(max_length=255, null=True, blank=True)
     selected = models.BooleanField(default=True)
 
+
+pre_delete.connect(delete_order_images_on_disc, sender=Order)
