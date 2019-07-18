@@ -4,32 +4,43 @@
 
 {% block content %}
 
-<div>
-    <h2>Список заказов</h2>
-    {% comment %}
-    <table border="1px" class="table">
-        <thead class="thead-dark">
+<style></style>
+
+    <div class="container">
+    <h2 class="text-center mt-3 mb-5">Текущие заказы</h2>
+    <table class="table table-hover table-striped" id="OrdersTable">
+        <thead>
         <tr>
+            <th scope="col">#</th>
             <th scope="col">Место</th>
             <th scope="col">Фото</th>
-            <th scope="col">Имя</th>
-            <th scope="col">Описание</th>
-            <th scope="col">Чем торгует</th>
+            <th scope="col">Цена</th>
+            <th scope="col">Количество</th>
+            <th scope="col">Комментарий к заказу</th>
+            <th scope="col">Свой комментарий</th>
         </tr>
         </thead>
         <tbody>
-        {% for p in providers %}
+        {% for o in orders %}
         <tr>
-            <td>{{ p.space }}</td>
-            <td><img src="{{ p.picture }}" alt="ВК картинка"></td>
-            <td><a href="{{p.vk_link}}">{{ p.name }}</a></td>
-            <td>{{ p.description }}</td>
-            <td>{{ p.product_type }}</td>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ o.place }}</td>
+            <td>{{ o.image }}</td>
+            <td>{{ o.price }}</td>
+            <td>{{ o.quantity }}</td>
+            <td>{{ o.order_comment }}</td>
+            <td>{{ o.customer_comment }}</td>
         </tr>
         {% endfor %}
         </tbody>
     </table>
-    {% endcomment %}
-</div>
 
+</div>
+<script>
+    $('#OrdersTable').on('click', 'tbody > tr > td', function ()
+    {
+        // 'this' refers to the current <td>, if you need information out of it
+        window.open('http://example.com');
+    });
+</script>
 {% endblock content %}
