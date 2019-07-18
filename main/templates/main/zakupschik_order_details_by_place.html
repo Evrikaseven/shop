@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Заказы на место{% endblock title %}
+
+
+{% block content %}
+    <div class="container">
+        {% for order in orders %}
+            <div><h1>Заказ {{ order.id }}</h1></div>
+            <div><h2>Заказчик:</h2> {{ order.created_by.username }}</div>
+            <div>Цена: {{ order.price }}</div>
+            <div>Количество: {{ order.quantity }}</div>
+            <div>Комментарий к заказу:  {{ order.order_comment }}</div>
+            <div>Комментарий аказчика: {{ order.customer_comment }}</div>
+            <div>Статус: {{ order.status }}</div>
+            {% for image in order.orderimage_set.all %}
+                <div>
+                    <span><input type="checkbox" checked="{{ image.selected }}" value="{{ image.id }}"></span>
+                    <span><img src="{{ MEDIA_URL }}{{ image.image  }}" height="100" width="200"></span>
+                    <span><input type="text" value="{{ image.comment }}"></span>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+{% endblock content %}

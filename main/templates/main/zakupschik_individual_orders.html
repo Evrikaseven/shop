@@ -5,5 +5,8 @@
 
 {% block content %}
     <div class="container">
+        {% for place in places %}
+            <div><a href="{% url 'main:zakupschik_order_details_by_place' place=place %}">{{ place }}</a></div>
+        {% endfor %}
     </div>
 {% endblock content %}
