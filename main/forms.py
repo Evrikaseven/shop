@@ -31,11 +31,23 @@ class OrderForm(forms.ModelForm):
         model = Order
         fields = ('images', 'place', 'order_comment', 'customer_comment', 'price', 'quantity')
 
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+
+    def clean_place(self):
+        value = self.cleaned_data['place']
+        return value.strip().replace(' ', '')
+
     @transaction.atomic
     def save(self, commit=True):
-        if self.instance.pk:
+        if not self.instance.pk:
+            self.instance.updated_by = self.user
+            self.instance.created_by = self.user
+        else:
             # Here check for existing images
-            pass
+            self.instance.updated_by = self.user
 
         instance = super().save(commit=commit)
         for image in self.cleaned_data['images']:

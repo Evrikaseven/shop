@@ -59,7 +59,7 @@ class Order(ModelWithTimestamp, ModelWithUser):
     objects = OrderManager()
     place = models.CharField(max_length=150, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.PositiveIntegerField(default=0)
+    quantity = models.PositiveIntegerField(default=1)
     order_comment = models.TextField(max_length=255, null=True, blank=True)
     customer_comment = models.TextField(max_length=255, null=True, blank=True)
 
