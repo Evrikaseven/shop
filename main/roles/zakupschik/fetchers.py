@@ -1,4 +1,5 @@
-from main.models import Order, OrderStatuses
+from main.models import Order
+from main.core.constants import OrderStatuses
 
 
 class ZakupschikFetcher(object):

@@ -1,4 +1,3 @@
-from enum import EnumMeta
 import os.path
 import shutil
 from django.db import models
@@ -6,6 +5,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import pre_delete
 from django.conf import settings
 from main.core.models import ModelWithTimestamp, ModelWithUser
+from main.core.constants import OrderStatuses, Roles
 
 
 MEDIA_DIR_PREFFIX = 'order_'
@@ -19,14 +19,6 @@ class Provider(models.Model):
     description = models.TextField(null=True, blank=True)
     picture = models.CharField(max_length=256, null=True, blank=True)
     product_type = models.CharField(max_length=256, null=True, blank=True)
-
-
-class Roles(EnumMeta):
-    ZAKAZSCHIK = 0
-    SBORSCHIK = 1
-    ZAKUPSCHIK = 2
-    ADMINISTRATOR = 3
-
 
 class User(AbstractUser):
     phone = models.CharField(max_length=20, blank=True, null=True)
@@ -48,12 +40,6 @@ class User(AbstractUser):
 
 def get_path_to_order_images(instance, name):
     return '{}{}/{}'.format(MEDIA_DIR_PREFFIX, instance.order.pk, name)
-
-
-class OrderStatuses(EnumMeta):
-    CREATED = 0
-    PAID = 1
-    CLOSED = 2
 
 
 class OrderManager(models.Manager):
@@ -85,7 +71,7 @@ class Order(ModelWithTimestamp, ModelWithUser):
         super().save(*args, **kwargs)
 
 
-def delete_order_images_on_disc(sender, **kwargs):
+def remove_order_images_from_disc(sender, **kwargs):
     instance = kwargs['instance']
     directory_to_be_removed = os.path.join(settings.MEDIA_ROOT, "{}{}".format(MEDIA_DIR_PREFFIX, instance.id))
     shutil.rmtree(directory_to_be_removed)
@@ -98,4 +84,4 @@ class OrderImage(models.Model):
     selected = models.BooleanField(default=True)
 
 
-pre_delete.connect(delete_order_images_on_disc, sender=Order)
+pre_delete.connect(remove_order_images_from_disc, sender=Order)
