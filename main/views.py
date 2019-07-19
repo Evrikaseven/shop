@@ -1,8 +1,9 @@
 
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from main.core.mixins import LoginRolesRequiredMixin
 from . import models as _models
+from .core.constants import Roles
 from . import serializers as _serializers
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
@@ -21,14 +22,14 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        role = _models.Roles.ADMINISTRATOR if self.user.is_staff else getattr(self.user, 'role', None)
+        role = Roles.ADMINISTRATOR if self.user.is_staff else getattr(self.user, 'role', None)
         context['user_role'] = role
 
-        if role == _models.Roles.ZAKAZSCHIK:
+        if role == Roles.ZAKAZSCHIK:
             role_url = ZakazschikMainView.url_name
-        elif role == _models.Roles.ZAKUPSCHIK:
+        elif role == Roles.ZAKUPSCHIK:
             role_url = ZakupschikMainView.url_name
-        elif role == _models.Roles.SBORSCHIK:
+        elif role == Roles.SBORSCHIK:
             role_url = SborschikMainView.url_name
         else:
             role_url = AdministratorMainView.url_name
@@ -41,7 +42,7 @@ class IndexView(TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class ProvidersListView(LoginRequiredMixin, TemplateView):
+class ProvidersListView(LoginRolesRequiredMixin, TemplateView):
     template_name = 'main/providers_list.html'
 
     def get_context_data(self, **kwargs):
@@ -50,7 +51,7 @@ class ProvidersListView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class UsersListView(LoginRequiredMixin, TemplateView):
+class UsersListView(LoginRolesRequiredMixin, TemplateView):
     template_name = 'main/users_list.html'
 
     def get_context_data(self, **kwargs):
@@ -59,7 +60,7 @@ class UsersListView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class OrdersListView(TemplateView):
+class OrdersListView(LoginRolesRequiredMixin, TemplateView):
     template_name = 'main/orders_list.html'
 
     def get_context_data(self, **kwargs):
@@ -67,7 +68,7 @@ class OrdersListView(TemplateView):
         return context
 
 
-class OrderCreateView(CreateView):
+class OrderCreateView(LoginRolesRequiredMixin, CreateView):
     template_name = 'main/order_details.html'
     form_class = OrderForm
     success_url = '/order_details/'
@@ -90,7 +91,7 @@ class OrderCreateView(CreateView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class BuyoutsListView(TemplateView):
+class BuyoutsListView(LoginRolesRequiredMixin, TemplateView):
     template_name = 'main/buyouts_list.html'
 
     def get_context_data(self, **kwargs):
@@ -98,7 +99,7 @@ class BuyoutsListView(TemplateView):
         return context
 
 
-class ProductsListView(TemplateView):
+class ProductsListView(LoginRolesRequiredMixin, TemplateView):
     template_name = 'main/products_list.html'
 
     def get_context_data(self, **kwargs):
@@ -115,19 +116,19 @@ class HelpView(TemplateView):
 
 
 # Resources
-class ProvidersResourceView(ModelViewSet):
+class ProvidersResourceView(LoginRolesRequiredMixin, ModelViewSet):
     queryset = _models.Provider.objects.all()
     serializer_class = _serializers.ProviderSerializer
     permission_classes = (IsAuthenticated,)
 
 
-class UsersResourceView(ModelViewSet):
+class UsersResourceView(LoginRolesRequiredMixin, ModelViewSet):
     queryset = _models.User.objects.all()
     serializer_class = _serializers.UserSerializer
     permission_classes = (IsAuthenticated,)
 
 
-class OrdersResourceView(ModelViewSet):
+class OrdersResourceView(LoginRolesRequiredMixin, ModelViewSet):
     queryset = _models.Order.objects.all()
     serializer_class = _serializers.OrderSerializer
     permission_classes = (IsAuthenticated,)

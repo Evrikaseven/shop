@@ -1,7 +1,7 @@
 from django.views.generic.base import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from main.core.mixins import LoginRolesRequiredMixin
 
 
-class AdministratorMainView(LoginRequiredMixin, TemplateView):
+class AdministratorMainView(LoginRolesRequiredMixin, TemplateView):
     template_name = 'main/administrator.html'
     url_name = 'administrator'
