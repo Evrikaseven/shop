@@ -10,26 +10,27 @@
     }
 </style>
 
+
+    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Список заказов за 30 дней</h3>
     <div class="container">
-    <h2 class="text-center mt-3 mb-5">Текущие заказы</h2>
-    <table class="table table-hover table-striped" id="OrdersTable">
-        <thead>
+    <table class="table table-sm table-hover " id="OrdersTable">
+        <thead class="thead-light">
         <tr>
-            <th scope="col">#</th>
-            <th scope="col">Место</th>
-            <th scope="col">Фото</th>
+            <th scope="col">Заказан</th>
+            <th scope="col"># Заказа</th>
+            <th scope="col">Поставщик</th>
             <th scope="col">Цена</th>
-            <th scope="col">Количество</th>
+            <th scope="col">Кол-во</th>
             <th scope="col">Комментарий к заказу</th>
-            <th scope="col">Свой комментарий</th>
+            <th scope="col">Примечание</th>
         </tr>
         </thead>
         <tbody>
         {% for o in orders %}
         <tr>
-            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ o.created_date }}</td>
+            <td scope="row">Заказ #{{ o.id }}</td>
             <td>{{ o.place }}</td>
-            <td>{{ o.image }}</td>
             <td>{{ o.price }}</td>
             <td>{{ o.quantity }}</td>
             <td>{{ o.order_comment }}</td>
