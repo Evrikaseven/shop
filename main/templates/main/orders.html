@@ -4,13 +4,6 @@
 
 {% block content %}
 
-<style>
-    td {
-    cursor: pointer;
-    }
-</style>
-
-
     <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Список заказов за 30 дней</h3>
     <div class="container">
     <table class="table table-sm table-hover " id="OrdersTable">
@@ -39,7 +32,9 @@
         {% endfor %}
         </tbody>
     </table>
-
+        {% for o in orders %}
+            <div><a href="{% url 'main:zakupschik_order_details_by_place' place=place %}">{{ place }}</a></div>
+        {% endfor %}
 </div>
 <script>
     $('#OrdersTable').on('click', 'tbody > tr > td', function ()

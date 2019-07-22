@@ -27,7 +27,18 @@ class NewOrderView(LoginRolesRequiredMixin, CreateView):
 
 
 class OrdersListView(LoginRolesRequiredMixin, TemplateView):
-    template_name = 'main/orders_list.html'
+    template_name = 'main/orders.html'
+    required_roles = (Roles.ZAKAZSCHIK,)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['orders'] = _models.Order.objects.all()
+        return context
+
+
+class OrderDetailsView(LoginRolesRequiredMixin, TemplateView):
+    template_name = 'main/order_details.html'
+    url_name = 'order_details'
     required_roles = (Roles.ZAKAZSCHIK,)
 
     def get_context_data(self, **kwargs):
