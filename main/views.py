@@ -9,7 +9,6 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from main.roles.zakazschik.views import ZakazschikMainView
 from main.roles.zakupschik.views import ZakupschikMainView
-from main.roles.sborschik.views import SborschikMainView
 from main.roles.administrator.views import AdministratorMainView
 from .forms import OrderForm
 
@@ -29,8 +28,6 @@ class IndexView(TemplateView):
             role_url = ZakazschikMainView.url_name
         elif role == Roles.ZAKUPSCHIK:
             role_url = ZakupschikMainView.url_name
-        elif role == Roles.SBORSCHIK:
-            role_url = SborschikMainView.url_name
         else:
             role_url = AdministratorMainView.url_name
 
@@ -57,6 +54,7 @@ class UsersListView(LoginRolesRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['users'] = _models.User.objects.all()
+        context['roles'] = Roles
         return context
 
 

@@ -1,15 +1,16 @@
-from enum import EnumMeta
-
-class Roles(EnumMeta):
-    ZAKAZSCHIK = 0
-    SBORSCHIK = 1
-    ZAKUPSCHIK = 2
-    ADMINISTRATOR = 3
+from .types import EnumMetaWithStrings
 
 
-class OrderStatuses(EnumMeta):
-    CREATED = 0
-    PAID = 1
-    CLOSED = 2
+class Roles(metaclass=EnumMetaWithStrings):
+    UNREGISTERED = 0, 'Незарегистрирован'
+    ZAKAZSCHIK = 1, 'Заказчик'
+    ZAKUPSCHIK = 2, 'Закупщик'
+    ADMINISTRATOR = 3, 'Администратор'
+
+
+class OrderStatuses(metaclass=EnumMetaWithStrings):
+    CREATED = 0, 'Создан'
+    PAID = 1, 'Оплачен'
+    CLOSED = 2, 'Закрыт'
 
 

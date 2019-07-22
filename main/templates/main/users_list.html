@@ -25,14 +25,14 @@
             <td>{{ user.username }}</td>
             <td>{{ user.first_name }}</td>
             <td>{{ user.last_name }}</td>
-            {% if user.role == 3 %}
-            <td> Администратор</td>
-            {% elif user.role == 2 %}
-            <td> Сборщик</td>
-            {% elif user.role == 1 %}
-            <td> Закупщик</td>
+            {% if user.role == roles.ADMINISTRATOR %}
+                <td> {{ roles.ADMINISTRATOR_STR }} </td>
+            {% elif user.role == roles.ZAKUPSCHIK %}
+                <td> {{ roles.ZAKUPSCHIK_STR }} </td>
+            {% elif user.role == roles.ZAKAZSCHIK %}
+                <td> {{ roles.ZAKAZSCHIK_STR }} </td>
             {% else %}
-            <td> Заказчик</td>
+                <td> {{ roles.UNREGISTERED_STR }} </td>
             {% endif %}
             <td>{{ user.phone }}</td>
             <td>{{ user.location }}</td>
