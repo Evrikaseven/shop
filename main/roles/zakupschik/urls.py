@@ -3,7 +3,7 @@ import main.roles.zakupschik.views as views
 
 
 urlpatterns = [
-    path('main/', views.ZakupschikMainView.as_view(), name=views.ZakupschikMainView.url_name),
+    path('', views.ZakupschikMainView.as_view(), name=views.ZakupschikMainView.url_name),
     path('individual_orders/', views.ZakupschikIndividualOrdersView.as_view(),
          name=views.ZakupschikIndividualOrdersView.url_name),
     path('individual_orders/<slug:place>/', views.ZakupschikOrdersByPlacesView.as_view(),

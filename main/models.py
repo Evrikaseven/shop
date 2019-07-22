@@ -25,17 +25,13 @@ class User(AbstractUser):
     location = models.CharField(max_length=255, blank=True, null=True)
     birth_date = models.DateField(blank=True, null=True)
 
-    ZAKAZSCHIK = 'Заказчик'
-    SBORSCHIK = 'Сборщик'
-    ZAKUPSCHIK = 'Закупщик'
-    ADMINISTRATOR = 'Администратор'
     ROLES = (
-        (Roles.ZAKAZSCHIK, ZAKAZSCHIK),
-        (Roles.SBORSCHIK, SBORSCHIK),
-        (Roles.ZAKUPSCHIK, ZAKUPSCHIK),
-        (Roles.ADMINISTRATOR, ADMINISTRATOR),
+        (Roles.UNREGISTERED, Roles.UNREGISTERED_STR),
+        (Roles.ZAKAZSCHIK, Roles.ZAKAZSCHIK_STR),
+        (Roles.ZAKUPSCHIK, Roles.ZAKUPSCHIK_STR),
+        (Roles.ADMINISTRATOR, Roles.ADMINISTRATOR_STR),
     )
-    role = models.PositiveIntegerField(choices=ROLES, default=Roles.ZAKAZSCHIK)
+    role = models.PositiveIntegerField(choices=ROLES, default=Roles.UNREGISTERED)
 
 
 def get_path_to_order_images(instance, name):
@@ -57,9 +53,9 @@ class Order(ModelWithTimestamp, ModelWithUser):
     customer_comment = models.TextField(max_length=255, null=True, blank=True)
 
     ORDER_STATUSES = (
-        (OrderStatuses.CREATED, 'Создан'),
-        (OrderStatuses.PAID, 'Оплачен'),
-        (OrderStatuses.CLOSED, 'Закрыт'),
+        (OrderStatuses.CREATED, OrderStatuses.CREATED_STR),
+        (OrderStatuses.PAID, OrderStatuses.PAID_STR),
+        (OrderStatuses.CLOSED, OrderStatuses.CLOSED_STR),
     )
     status = models.PositiveIntegerField(default=OrderStatuses.CREATED, choices=ORDER_STATUSES)
     active = models.BooleanField(default=True)

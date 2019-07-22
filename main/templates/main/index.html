@@ -24,8 +24,6 @@
                             <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:logout' %}">Выход</a>
                             {% if pers_area_url == 'administrator' %}
                                 <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:administrator' %}">Личный кабинет</a>
-                            {% elif pers_area_url == 'sborschik' %}
-                                <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:sborschik' %}">Личный кабинет</a>
                             {% elif pers_area_url == 'zakupschik' %}
                                 <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:zakupschik' %}">Личный кабинет</a>
                             {% else %} {# 'zakazschik' #}
