@@ -70,7 +70,7 @@ class Order(ModelWithTimestamp, ModelWithUser):
 def remove_order_images_from_disc(sender, **kwargs):
     instance = kwargs['instance']
     directory_to_be_removed = os.path.join(settings.MEDIA_ROOT, "{}{}".format(MEDIA_DIR_PREFFIX, instance.id))
-    shutil.rmtree(directory_to_be_removed)
+    shutil.rmtree(directory_to_be_removed, ignore_errors=True)
 
 
 class OrderImage(models.Model):

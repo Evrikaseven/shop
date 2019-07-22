@@ -1,5 +1,6 @@
 from django import forms
 from django.db import transaction
+from django.core.exceptions import ValidationError
 from .models import Provider, Order, OrderImage
 from main.core import widgets as custom_widgets, form_fields as custom_form_fields
 
@@ -35,6 +36,11 @@ class OrderForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
+        # if self.instance.pk:
+        #     order = Order.objects.get(pk=self.instance.pk)
+        #     self.fields['images'].initial = OrderImage.objects.filter(order=order)
+        #     self.fields['images'].choices = OrderImage.objects.filter(order=order)
+        #     self.fields['images'].queryset = OrderImage.objects.filter(order=order)
 
     def clean_place(self):
         value = self.cleaned_data['place']
@@ -42,18 +48,17 @@ class OrderForm(forms.ModelForm):
 
     @transaction.atomic
     def save(self, commit=True):
-        if not self.instance.pk:
-            self.instance.updated_by = self.user
-            self.instance.created_by = self.user
-        else:
-            # Here check for existing images
-            self.instance.updated_by = self.user
+        super().save(commit=commit)
 
-        instance = super().save(commit=commit)
+        if not self.instance.created_by:
+            self.instance.created_by = self.user
+        self.instance.updated_by = self.user
+        self.instance.save()
+
         for image in self.cleaned_data['images']:
-            img = OrderImage(image=image, order=instance)
+            img = OrderImage(image=image, order=self.instance)
             img.save()
-        return instance
+        return self.instance
 
 
 

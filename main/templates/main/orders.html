@@ -22,7 +22,7 @@
         {% for o in orders %}
         <tr>
             <td>{{ o.created_date }}</td>
-            <td scope="row">Заказ #{{ o.id }}</td>
+            <td scope="row">Заказ #<a href="{% url 'main:order_details' pk=o.id %}">{{ o.id }}</a></td>
             <td>{{ o.place }}</td>
             <td>{{ o.price }}</td>
             <td>{{ o.quantity }}</td>
@@ -32,15 +32,14 @@
         {% endfor %}
         </tbody>
     </table>
-        {% for o in orders %}
-            <div><a href="{% url 'main:zakupschik_order_details_by_place' place=place %}">{{ place }}</a></div>
-        {% endfor %}
 </div>
-<script>
-    $('#OrdersTable').on('click', 'tbody > tr > td', function ()
-    {
-        // 'this' refers to the current <td>, if you need information out of it
-        window.open('http://example.com');
-    });
-</script>
+
+<!--<script>-->
+<!--    $('#OrdersTable').on('click', 'tbody > tr > td', function ()-->
+<!--    {-->
+<!--        // 'this' refers to the current <td>, if you need information out of it-->
+<!--        window.open('http://example.com');-->
+<!--    });-->
+<!--</script>-->
+
 {% endblock content %}
