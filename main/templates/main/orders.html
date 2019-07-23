@@ -4,13 +4,6 @@
 
 {% block content %}
 
-<style>
-    td {
-    cursor: pointer;
-    }
-</style>
-
-
     <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Список заказов за 30 дней</h3>
     <div class="container">
     <table class="table table-sm table-hover " id="OrdersTable">
@@ -29,7 +22,7 @@
         {% for o in orders %}
         <tr>
             <td>{{ o.created_date }}</td>
-            <td scope="row">Заказ #{{ o.id }}</td>
+            <td scope="row">Заказ #<a href="{% url 'main:order_details' pk=o.id %}">{{ o.id }}</a></td>
             <td>{{ o.place }}</td>
             <td>{{ o.price }}</td>
             <td>{{ o.quantity }}</td>
@@ -39,13 +32,14 @@
         {% endfor %}
         </tbody>
     </table>
-
 </div>
-<script>
-    $('#OrdersTable').on('click', 'tbody > tr > td', function ()
-    {
-        // 'this' refers to the current <td>, if you need information out of it
-        window.open('http://example.com');
-    });
-</script>
+
+<!--<script>-->
+<!--    $('#OrdersTable').on('click', 'tbody > tr > td', function ()-->
+<!--    {-->
+<!--        // 'this' refers to the current <td>, if you need information out of it-->
+<!--        window.open('http://example.com');-->
+<!--    });-->
+<!--</script>-->
+
 {% endblock content %}
