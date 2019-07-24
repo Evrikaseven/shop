@@ -3,6 +3,7 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 from .models import Provider, Order, OrderImage
 from main.core import widgets as custom_widgets, form_fields as custom_form_fields
+from main.core.constants import Roles
 
 
 class ProviderForm(forms.ModelForm):
@@ -22,19 +23,18 @@ class OrderForm(forms.ModelForm):
     images = custom_form_fields.MultipleFilesField(required=False,
                                                    label='Изображение товара',
                                                    widget=custom_widgets.ClearableMultiFileInput())
-    # place = forms.CharField()
-    # price = forms.DecimalField()
-    # quantity = forms.IntegerField()
-    #order_comment = forms.CharField(widget=forms.Textarea)
-    #customer_comment = forms.CharField(widget=forms.Textarea)
+    status = forms.ChoiceField(required=False, choices=Order.ORDER_STATUSES)
 
     class Meta:
         model = Order
-        fields = ('images', 'place', 'price', 'quantity', 'order_comment', 'customer_comment')
+        fields = ('images', 'place', 'price', 'quantity', 'order_comment', 'customer_comment', 'status')
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+
+        if getattr(self.user, 'role', Roles.UNREGISTERED) not in (Roles.ZAKUPSCHIK, Roles.ADMINISTRATOR):
+            self.fields.pop('status')
 
         # if self.instance.pk:
         #     order = Order.objects.get(pk=self.instance.pk)

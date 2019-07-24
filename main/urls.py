@@ -25,6 +25,12 @@ urlpatterns = [
     path('buyouts/', main_views.BuyoutsListView.as_view(), name='buyouts'),
     path('help/', main_views.HelpView.as_view(), name='help'),
 
+    path('new_order/', main_views.NewOrderView.as_view(), name='new_order'),
+    path('orders/', main_views.OrdersListView.as_view(), name='orders'),
+    path('orders/<int:pk>/', main_views.OrderDetailsView.as_view(),
+         name=main_views.OrderDetailsView.url_name),
+    path('order_created/<int:pk>', main_views.OrderCreatedView.as_view(), name='order_created'),
+
     path('api/', include(router.urls))
 ]
 

@@ -1,6 +1,8 @@
 
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
+from django.urls import reverse_lazy
+
 from main.core.mixins import LoginRolesRequiredMixin
 from . import models as _models
 from .core.constants import Roles
@@ -58,13 +60,17 @@ class UsersListView(LoginRolesRequiredMixin, TemplateView):
         return context
 
 
-class OrderCreateView(LoginRolesRequiredMixin, CreateView):
-    template_name = 'main/order_details.html'
+class NewOrderView(LoginRolesRequiredMixin, CreateView):
+    template_name = 'main/new_order.html'
     form_class = OrderForm
-    success_url = '/order_details/'
+    success_url = reverse_lazy('main:order_created')
+    required_roles = (Roles.ZAKAZSCHIK,)
 
     def __init__(self):
         self.user = None
+
+    def get_success_url(self):
+        return reverse_lazy('main:order_created', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -74,6 +80,62 @@ class OrderCreateView(LoginRolesRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = self.form_class
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user = request.user
+        return super().dispatch(request, *args, **kwargs)
+
+
+class OrderCreatedView(LoginRolesRequiredMixin, TemplateView):
+    template_name = 'main/order_created.html'
+    required_roles = (Roles.ZAKAZSCHIK,)
+
+    def __init__(self):
+        self.order_id = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['order_id'] = self.order_id
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.order_id = kwargs.pop('pk', None)
+        return super().dispatch(request, *args, **kwargs)
+
+
+class OrdersListView(LoginRolesRequiredMixin, TemplateView):
+    template_name = 'main/orders.html'
+    required_roles = (Roles.ZAKAZSCHIK,)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['orders'] = _models.Order.objects.all()
+        return context
+
+
+class OrderDetailsView(LoginRolesRequiredMixin, UpdateView):
+    template_name = 'main/order_details.html'
+    url_name = 'order_details'
+    form_class = OrderForm
+    required_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+    model = _models.Order
+
+    def __init__(self):
+        self.user = None
+
+    def get_success_url(self):
+        return reverse_lazy('main:order_details', kwargs={'pk': self.kwargs['pk']})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['roles'] = Roles
+        context['user_role'] = self.user.role
         return context
 
     def dispatch(self, request, *args, **kwargs):
