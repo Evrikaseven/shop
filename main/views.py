@@ -12,7 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from main.roles.zakazschik.views import ZakazschikMainView
 from main.roles.zakupschik.views import ZakupschikMainView
 from main.roles.administrator.views import AdministratorMainView
-from .forms import OrderForm
+from .forms import OrderForm, UserForm
 
 
 class IndexView(TemplateView):
@@ -58,6 +58,17 @@ class UsersListView(LoginRolesRequiredMixin, TemplateView):
         context['users'] = _models.User.objects.all()
         context['roles'] = Roles
         return context
+
+
+class UserDetailsView(LoginRolesRequiredMixin, UpdateView):
+    template_name = 'main/user_details.html'
+    url_name = 'user_details'
+    form_class = UserForm
+    required_roles = (Roles.UNREGISTERED, Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+    model = _models.User
+
+    def get_success_url(self):
+        return reverse_lazy('main:user_details', kwargs={'pk': self.kwargs['pk']})
 
 
 class NewOrderView(LoginRolesRequiredMixin, CreateView):
@@ -106,12 +117,23 @@ class OrderCreatedView(LoginRolesRequiredMixin, TemplateView):
 
 class OrdersListView(LoginRolesRequiredMixin, TemplateView):
     template_name = 'main/orders.html'
-    required_roles = (Roles.ZAKAZSCHIK,)
+    required_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+
+    def __init__(self):
+        self.user = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['orders'] = _models.Order.objects.all()
+        if self.user.role in (Roles.ZAKUPSCHIK, Roles.ADMINISTRATOR):
+            order_qs = _models.Order.objects.get_list()
+        else:
+            order_qs = _models.Order.objects.get_list(created_by=self.user)
+        context['orders'] = order_qs
         return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user = request.user
+        return super().dispatch(request, *args, **kwargs)
 
 
 class OrderDetailsView(LoginRolesRequiredMixin, UpdateView):

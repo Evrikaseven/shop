@@ -9,8 +9,9 @@ class Roles(metaclass=EnumMetaWithStrings):
 
 
 class OrderStatuses(metaclass=EnumMetaWithStrings):
-    CREATED = 0, 'Создан'
+    CREATED = 0, 'Неоплачен'
     PAID = 1, 'Оплачен'
-    CLOSED = 2, 'Закрыт'
-
+    IN_PROGRESS = 2, 'В обработке'
+    READY_TO_ISSUE = 3, 'Готов к выдаче'
+    CLOSED = 4, 'Закрыт'
 

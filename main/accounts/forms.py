@@ -7,7 +7,10 @@ class UserSignUpForm(UserCreationForm):
     username = forms.CharField(label='Логин', required=True)
     phone = forms.CharField(label='Телефон', max_length=20, required=True)
     location = forms.CharField(label='Адрес', max_length=255, required=True)
-    birth_date = forms.DateField(label='Дата рождения', required=True, input_formats=['%d/%m/%Y'])
+    birth_date = forms.DateField(label='Дата рождения', required=True, input_formats=['%d/%m/%Y',
+                                                                                      '%d %m %Y',
+                                                                                      '%d.%m.%Y',
+                                                                                      '%d-%m-%Y'])
 
     class Meta(UserCreationForm.Meta):
         model = User

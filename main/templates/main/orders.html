@@ -9,11 +9,13 @@
     <table class="table table-sm table-hover " id="OrdersTable">
         <thead class="thead-light">
         <tr>
-            <th scope="col">Заказан</th>
             <th scope="col"># Заказа</th>
-            <th scope="col">Поставщик</th>
+            <th scope="col">Дата создания</th>
+            <th scope="col">Покупатель</th>
+            <th scope="col">Место</th>
             <th scope="col">Цена</th>
             <th scope="col">Кол-во</th>
+            <th scope="col">Статус</th>
             <th scope="col">Комментарий к заказу</th>
             <th scope="col">Примечание</th>
         </tr>
@@ -21,11 +23,13 @@
         <tbody>
         {% for o in orders %}
         <tr>
-            <td>{{ o.created_date }}</td>
             <td scope="row">Заказ #<a href="{% url 'main:order_details' pk=o.id %}">{{ o.id }}</a></td>
+            <td>{{ o.created_date }}</td>
+            <td>{{ o.created_by.username }}</td>
             <td>{{ o.place }}</td>
             <td>{{ o.price }}</td>
             <td>{{ o.quantity }}</td>
+            <td>{{ o.status_to_string }}</td>
             <td>{{ o.order_comment }}</td>
             <td>{{ o.customer_comment }}</td>
         </tr>

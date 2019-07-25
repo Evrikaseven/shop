@@ -20,10 +20,11 @@ class Provider(models.Model):
     picture = models.CharField(max_length=256, null=True, blank=True)
     product_type = models.CharField(max_length=256, null=True, blank=True)
 
+
 class User(AbstractUser):
-    phone = models.CharField(max_length=20, blank=True, null=True)
-    location = models.CharField(max_length=255, blank=True, null=True)
-    birth_date = models.DateField(blank=True, null=True)
+    phone = models.CharField('Телефон', max_length=20, blank=True, null=True, )
+    location = models.CharField('Адрес', max_length=255, blank=True, null=True)
+    birth_date = models.DateField('Дата рождения', blank=True, null=True)
 
     ROLES = (
         (Roles.UNREGISTERED, Roles.UNREGISTERED_STR),
@@ -31,7 +32,12 @@ class User(AbstractUser):
         (Roles.ZAKUPSCHIK, Roles.ZAKUPSCHIK_STR),
         (Roles.ADMINISTRATOR, Roles.ADMINISTRATOR_STR),
     )
-    role = models.PositiveIntegerField(choices=ROLES, default=Roles.UNREGISTERED)
+    role = models.PositiveIntegerField('Роль', choices=ROLES, default=Roles.UNREGISTERED)
+
+    @property
+    def role_to_string(self):
+        roles = dict(self.ROLES)
+        return roles[self.role]
 
 
 def get_path_to_order_images(instance, name):
@@ -55,6 +61,8 @@ class Order(ModelWithTimestamp, ModelWithUser):
     ORDER_STATUSES = (
         (OrderStatuses.CREATED, OrderStatuses.CREATED_STR),
         (OrderStatuses.PAID, OrderStatuses.PAID_STR),
+        (OrderStatuses.IN_PROGRESS, OrderStatuses.IN_PROGRESS_STR),
+        (OrderStatuses.READY_TO_ISSUE, OrderStatuses.READY_TO_ISSUE_STR),
         (OrderStatuses.CLOSED, OrderStatuses.CLOSED_STR),
     )
     status = models.PositiveIntegerField(default=OrderStatuses.CREATED, choices=ORDER_STATUSES)
@@ -65,6 +73,11 @@ class Order(ModelWithTimestamp, ModelWithUser):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+    @property
+    def status_to_string(self):
+        statuses = dict(self.ORDER_STATUSES)
+        return statuses[self.status]
 
 
 def remove_order_images_from_disc(sender, **kwargs):
