@@ -158,6 +158,7 @@ class OrderDetailsView(LoginRolesRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['roles'] = Roles
         context['user_role'] = self.user.role
+
         return context
 
     def dispatch(self, request, *args, **kwargs):

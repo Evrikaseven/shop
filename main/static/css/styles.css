@@ -2,6 +2,10 @@
   max-width: 960px;
 }
 
+.table-container {
+  max-width: 1200px;
+}
+
 /*
  * Custom translucent site header
  */
@@ -46,4 +50,15 @@
     margin-bottom: 0;
     background-color: rgba(0,0,0,.03);
     border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+.table-ts{
+    font-size: 14px;
+}
+
+.form-signin {
+    width: 100%;
+    max-width: 520px;
+    padding: 15px;
+    margin: 0 auto;
 }
