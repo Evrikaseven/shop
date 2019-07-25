@@ -61,6 +61,8 @@ class Order(ModelWithTimestamp, ModelWithUser):
     ORDER_STATUSES = (
         (OrderStatuses.CREATED, OrderStatuses.CREATED_STR),
         (OrderStatuses.PAID, OrderStatuses.PAID_STR),
+        (OrderStatuses.IN_PROGRESS, OrderStatuses.IN_PROGRESS_STR),
+        (OrderStatuses.READY_TO_ISSUE, OrderStatuses.READY_TO_ISSUE_STR),
         (OrderStatuses.CLOSED, OrderStatuses.CLOSED_STR),
     )
     status = models.PositiveIntegerField(default=OrderStatuses.CREATED, choices=ORDER_STATUSES)

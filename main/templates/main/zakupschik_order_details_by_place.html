@@ -9,7 +9,7 @@
     {% for order in orders %}
          <div class="d-flex font-weight-normal px-4 my-1 card-header">
              <h5 class="my-1 mr-md-auto">Заказ: <a href="{% url 'main:order_details' pk=order.id %}">{{ order.id }}</a></h5>
-              <div class="my-1 mr-md-3">Статус: {{ order.status }}</div>
+              <div class="my-1 mr-md-3">Статус: {{ order.status_to_string }}</div>
               <a class="btn btn-sm btn-outline-primary" data-toggle="collapse" data-target="#hide-me{{ forloop.counter }}" aria-expanded="true" href="#">Детальная информация</a>
          </div>
 
