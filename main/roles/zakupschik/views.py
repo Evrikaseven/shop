@@ -1,4 +1,5 @@
 from django.views.generic.base import TemplateView
+from django.views.generic.edit import FormView
 from main.core.mixins import LoginRolesRequiredMixin
 from django.conf import settings
 from .fetchers import ZakupschikFetcher
@@ -30,9 +31,6 @@ class ZakupschikOrdersByPlacesView(LoginRolesRequiredMixin, TemplateView):
 
     def __init__(self):
         self.place = None
-
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

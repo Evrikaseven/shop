@@ -8,9 +8,9 @@
 <div class="container px-0">
     {% for order in orders %}
          <div class="d-flex font-weight-normal px-4 my-1 card-header">
-              <h5 class="my-1 mr-md-auto">Заказ: {{ order.id }}</h5>
+             <h5 class="my-1 mr-md-auto">Заказ: <a href="{% url 'main:order_details' pk=order.id %}">{{ order.id }}</a></h5>
               <div class="my-1 mr-md-3">Статус: {{ order.status }}</div>
-              <a class="btn btn-sm btn-outline-primary" data-toggle="collapse" data-target="#hide-me{{ forloop.counter }}" aria-expanded="true" href="#">Обработать</a>
+              <a class="btn btn-sm btn-outline-primary" data-toggle="collapse" data-target="#hide-me{{ forloop.counter }}" aria-expanded="true" href="#">Детальная информация</a>
          </div>
 
          <div id="hide-me{{ forloop.counter }}" class="collapse in container border-right border-left">
@@ -22,11 +22,15 @@
             <div>Комментарий аказчика: {{ order.customer_comment }}</div>
             <hr class="mb-3">
             {% for image in order.orderimage_set.all %}
-                <div>
-                    <span><input type="checkbox" checked="{{ image.selected }}" value="{{ image.id }}"></span>
-                    <span><img src="{{ MEDIA_URL }}{{ image.image  }}" height="100" width="200"></span>
-                    <span><input type="text" value="{{ image.comment }}"></span>
-                </div>
+             <div>
+                 <form method="post" enctype="multipart/form-data">
+                     {% csrf_token %}
+                     <span><input type="checkbox" checked="{{ image.selected }}" value="{{ image.id }} id="id"></span>
+                     <span><img src="{{ MEDIA_URL }}{{ image.image  }}" height="100" width="200"></span>
+                     <span><input type="text" value="{{ image.comment }}"></span>
+                     <button type="submit">Сохранить</button>
+                 </form>
+             </div>
 
             {% endfor %}
         </div>
