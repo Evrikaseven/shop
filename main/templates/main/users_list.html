@@ -5,8 +5,7 @@
 {% block content %}
 
 <div>
-    {#{% if users %}#}
-    <h2>Зарегистрированные пользователи</h2>
+    <h2>Пользователи</h2>
     <table border="1px" class="table">
         <thead class="thead-dark">
         <tr>
@@ -22,18 +21,10 @@
         <tbody>
         {% for user in users %}
         <tr>
-            <td>{{ user.username }}</td>
+            <td><a href="{% url 'main:user_details' pk=user.pk %}">{{ user.username }}</a></td>
             <td>{{ user.first_name }}</td>
             <td>{{ user.last_name }}</td>
-            {% if user.role == roles.ADMINISTRATOR %}
-                <td> {{ roles.ADMINISTRATOR_STR }} </td>
-            {% elif user.role == roles.ZAKUPSCHIK %}
-                <td> {{ roles.ZAKUPSCHIK_STR }} </td>
-            {% elif user.role == roles.ZAKAZSCHIK %}
-                <td> {{ roles.ZAKAZSCHIK_STR }} </td>
-            {% else %}
-                <td> {{ roles.UNREGISTERED_STR }} </td>
-            {% endif %}
+            <td> {{ user.role_to_string }} </td>
             <td>{{ user.phone }}</td>
             <td>{{ user.location }}</td>
             <td>{{ user.birth_date }}</td>
@@ -41,7 +32,6 @@
         {% endfor %}
         </tbody>
     </table>
-    {#{% endif %}#}
 </div>
 
 {% endblock content %}

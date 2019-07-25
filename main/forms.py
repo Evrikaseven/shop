@@ -1,7 +1,11 @@
 from django import forms
 from django.db import transaction
-from django.core.exceptions import ValidationError
-from .models import Provider, Order, OrderImage
+from .models import (
+    Provider,
+    Order,
+    OrderImage,
+    User
+)
 from main.core import widgets as custom_widgets, form_fields as custom_form_fields
 from main.core.constants import Roles
 
@@ -61,4 +65,7 @@ class OrderForm(forms.ModelForm):
         return self.instance
 
 
-
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'birth_date', 'phone', 'location', 'role')

@@ -21,16 +21,19 @@ urlpatterns = [
     path('accounts/', include(accounts_urls)),
     path('providers/', main_views.ProvidersListView.as_view(), name='providers'),
     path('users/', main_views.UsersListView.as_view(), name='users'),
+    path('users/<int:pk>/', main_views.UserDetailsView.as_view(), name=main_views.UserDetailsView.url_name),
     path('products/', main_views.ProductsListView.as_view(), name='products'),
     path('buyouts/', main_views.BuyoutsListView.as_view(), name='buyouts'),
     path('help/', main_views.HelpView.as_view(), name='help'),
 
+    # Order related
     path('new_order/', main_views.NewOrderView.as_view(), name='new_order'),
     path('orders/', main_views.OrdersListView.as_view(), name='orders'),
     path('orders/<int:pk>/', main_views.OrderDetailsView.as_view(),
          name=main_views.OrderDetailsView.url_name),
     path('order_created/<int:pk>', main_views.OrderCreatedView.as_view(), name='order_created'),
 
+    # Django REST framework related
     path('api/', include(router.urls))
 ]
 
