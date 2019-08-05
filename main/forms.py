@@ -47,10 +47,6 @@ class NewOrderForm(forms.ModelForm):
         #     self.fields['images'].choices = OrderImage.objects.filter(order=order)
         #     self.fields['images'].queryset = OrderImage.objects.filter(order=order)
 
-    def clean_place(self):
-        value = self.cleaned_data['place']
-        return value.strip().replace(' ', '')
-
     def clean_images(self):
         images = self.cleaned_data['images']
         if not images:
@@ -104,13 +100,25 @@ class OrderItemForm(forms.ModelForm):
 
     class Meta:
         model = OrderItem
-        fields = ('product_image', 'place', 'price', 'quantity', 'order_comment', 'customer_comment')
+        fields = ('product_image', 'place', 'price', 'quantity', 'status', 'order_comment', 'customer_comment')
 
     def clean_product_image(self):
         image = self.cleaned_data['product_image']
         if not image and not self.instance.pk:
             raise ValidationError('Добавьте фотографию товара')
         return image
+
+    def clean_place(self):
+        value = self.cleaned_data['place'].strip().replace(' ', '')
+        if not value:
+            raise ValidationError('Укажите, пожалуйста, номер места')
+        return value
+
+    def clean_price(self):
+        price = self.cleaned_data['price']
+        if not price:
+            raise ValidationError('Цена не может быть нулевой')
+        return price
 
     @transaction.atomic
     def save(self, commit=True):

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Заказы на место{% endblock title %}
+
+
+{% block content %}
+    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Список товаров для
+        места {{ place }}</h3>
+    <div class="container px-0">
+        {% for order_item in order_items %}
+            <div class="d-flex font-weight-normal px-4 my-1 card-header">
+                <h5 class="my-1 mr-md-auto">
+                    <a href="{% url 'main:order_item_details' pk=order_item.id %}">
+                        <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="100" width="200">
+                    </a>
+                </h5>
+                <div class="my-1 mr-md-3">Статус: {{ order_item.status_to_string }}</div>
+                <a class="btn btn-sm btn-outline-primary" data-toggle="collapse"
+                   data-target="#hide-me{{ forloop.counter }}" aria-expanded="true" href="#">Детальная информация</a>
+            </div>
+
+            <div id="hide-me{{ forloop.counter }}" class="collapse in container border-right border-left">
+                <h5>Заказчик:</h5> {{ order_item.created_by.username }}
+
+                <div class="mb-1">Цена: {{ order_item.price }}</div>
+                <div>Количество: {{ order_item.quantity }}</div>
+                <div>Комментарий к заказу: {{ order_item.order_comment }}</div>
+                <div>Комментарий аказчика: {{ order_item.customer_comment }}</div>
+                <hr class="mb-3">
+            </div>
+        {% endfor %}
+    </div>
+{% endblock content %}
