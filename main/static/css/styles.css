@@ -6,9 +6,6 @@
   max-width: 1200px;
 }
 
-th {
-    text-align: center;;
-}
 
 /*
  * Custom translucent site header
@@ -57,7 +54,7 @@ th {
 }
 
 .table-ts{
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .form-signin {

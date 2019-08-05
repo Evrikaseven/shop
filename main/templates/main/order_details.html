@@ -22,14 +22,14 @@
                         <span class="text-muted">{{ order.price }}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between">
-                        <span>Статус:</span>
+                        <span>Статус заказа:</span>
                         <strong>{{ order.status_to_string }}</strong>
                     </li>
                 </ul>
                 {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
                 <div class="mb-4 text-center">
                     <a href="{% url 'main:order_paying' pk=order.pk %}">
-                        <button class="btn btn-outline-dark" type="submit">Оплатить заказ</button>
+                        <button class="btn btn-outline-dark btn-sm" type="submit">Оплатить заказ</button>
                     </a>
                 </div>
                 {% endif %}
@@ -48,6 +48,7 @@
                         <th scope="col">Место</th>
                         <th scope="col">Количество</th>
                         <th scope="col">Цена</th>
+                        <th scope="col">Статус товара</th>
                         <th scope="col">Коментарий к заказу</th>
                         <th scope="col">Коментарий для себя</th>
                         <th scope="col"></th>
@@ -70,12 +71,13 @@
                             <td>{{ order_item.place }}</td>
                             <td class="text-center">{{ order_item.quantity }}</td>
                             <td class="text-center">{{ order_item.price }}</td>
+                            <td class="text-center">{{ order_item.status_to_string }}</td>
                             <td>{{ order_item.order_comment }}</td>
                             <td>{{ order_item.customer_comment }}</td>
                             {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
                             <td>
                                 <a href="{% url 'main:delete_order_item' pk=order_item.id %}">
-                                    <button class="btn btn-outline-dark mt-3" type="submit">Удалить</button>
+                                    <button class="btn btn-outline-dark btn-sm mt-3" type="submit">Удалить</button>
                                 </a>
                             </td>
                             {% endif %}
