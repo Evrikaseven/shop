@@ -3,20 +3,44 @@
 {% block title %}Заказы{% endblock title %}
 
 {% block content %}
-
-    <div>
-        <div class="container">
+    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
+        Заказ #{{ order.id }}
+    </h3>
+    <div class="container table-container">
+        <div class="row">
+            <div class="col-md-3 order-md-2 mb-4">
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">Заказано товаров</span>
+                    <span class="badge badge-secondary badge-pill">3</span>
+                </h4>
+                <ul class="list-group mb-3">
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Полная цена: </h6>
+                            <small class="text-muted">С учетом наценки</small>
+                        </div>
+                        <span class="text-muted">{{ order.price }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Статус:</span>
+                        <strong>{{ order.status_to_string }}</strong>
+                    </li>
+                </ul>
+                {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
+                <div class="mb-4 text-center">
+                    <a href="{% url 'main:order_paying' pk=order.pk %}">
+                        <button class="btn btn-outline-dark" type="submit">Оплатить заказ</button>
+                    </a>
+                </div>
+                {% endif %}
+               </div>
+        <div class="col-md-9 order-md-1">
 
 {#            {% if user_role == roles.ADMINISTRATOR %}#}
 {#                <form class="needs-validation" id="order" action="" method="POST" enctype="multipart/form-data">#}
 {#                {% csrf_token %}#}
 {#            {% endif %}#}
-
-            <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
-                Заказ #{{ order.id }}
-            </h3>
-
-            <div class="container table-container">
+            <div class="">
                 <table class="table table-sm table-hover " id="OrderItemsTable">
                     <thead class="thead-light table-ts">
                     <tr>
@@ -26,6 +50,7 @@
                         <th scope="col">Цена</th>
                         <th scope="col">Коментарий к заказу</th>
                         <th scope="col">Коментарий для себя</th>
+                        <th scope="col"></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -34,23 +59,23 @@
                             <td>
                                 {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
                                 <a href="{% url 'main:order_item_details' pk=order_item.id %}">
-                                    <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="100"
-                                         width="200">
+                                    <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="150"
+                                         width="150">
                                 </a>
                                 {% else %}
-                                    <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="100"
-                                         width="200">
+                                    <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="150"
+                                         width="150">
                                 {% endif %}
                             </td>
                             <td>{{ order_item.place }}</td>
-                            <td>{{ order_item.quantity }}</td>
-                            <td>{{ order_item.price }}</td>
+                            <td class="text-center">{{ order_item.quantity }}</td>
+                            <td class="text-center">{{ order_item.price }}</td>
                             <td>{{ order_item.order_comment }}</td>
                             <td>{{ order_item.customer_comment }}</td>
                             {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
                             <td>
                                 <a href="{% url 'main:delete_order_item' pk=order_item.id %}">
-                                    <button class="btn btn-outline-dark" type="submit">Удалить</button>
+                                    <button class="btn btn-outline-dark mt-3" type="submit">Удалить</button>
                                 </a>
                             </td>
                             {% endif %}
@@ -59,20 +84,14 @@
                     </tbody>
                 </table>
             </div>
-
+            <hr class="mb-4">
             {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
-            <div>
-                <a href="{% url 'main:new_order_item' pk=order.id %}">Добавить товар</a>
+            <div class="text-center">
+                <a href="{% url 'main:new_order_item' pk=order.id %}">
+                    <button class="btn btn-outline-dark" type="submit">Добавить товар</button>
+                </a>
             </div>
             {% endif %}
-
-            <div>
-                <h4 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Полная
-                    цена: {{ order.price }}</h4>
-            </div>
-
-
-
 
 {#{% if user_role == roles.ADMINISTRATOR %}#}
 {#<div class="form-group row">#}
@@ -83,40 +102,14 @@
 {##}
 {#{% else %}#}
 
-            <div>
-                <h4 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
-                    Статус: {{ order.status_to_string }}</h4>
-            </div>
-
 {#{% endif %}#}
 
-            {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
-            <div class="mb-4 text-center">
-                <a href="{% url 'main:order_paying' pk=order.pk %}">
-                    <button class="btn btn-outline-dark" type="submit">Оплатить заказ</button>
-                </a>
-            </div>
-            {% endif %}
 
+    </div>
 {#        {% if user_role == roles.ADMINISTRATOR %}#}
 {#            </form>#}
 {#        {% endif %}#}
         </div>
     </div>
-    <script>
-        $('.custom-file-input').on('change', function () {
-            let fileName = $(this).val().split('\\').pop();
-            $(this).next('.custom-file-label').addClass("selected").html(fileName);
-        });
-
-        $(function () {
-            $('#order').change(function () {
-                let sum = parseInt($("#price-input").val(), 10) * parseInt($("#count-input").val(), 10);
-
-                $('#check_sum').html(sum + sum / 10);
-            });
-        });
-
-    </script>
 
 {% endblock content %}
