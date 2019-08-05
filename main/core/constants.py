@@ -10,8 +10,20 @@ class Roles(metaclass=EnumMetaWithStrings):
 
 class OrderStatuses(metaclass=EnumMetaWithStrings):
     CREATED = 0, 'Неоплачен'
-    PAID = 1, 'Оплачен'
-    IN_PROGRESS = 2, 'В обработке'
-    READY_TO_ISSUE = 3, 'Готов к выдаче'
-    CLOSED = 4, 'Закрыт'
+    PAYING_TO_BE_CONFIRMED = 1, 'Оплата в процессе подтверждения'
+    PAID = 2, 'Оплата подтверждена'
+    IN_PROGRESS = 3, 'В обработке'
+    READY_TO_ISSUE = 4, 'Готов к выдаче'
+    CLOSED = 5, 'Закрыт'
+
+
+class OrderItemStatuses(metaclass=EnumMetaWithStrings):
+    CREATED = 0, 'Создан'
+    BAUGHT_OUT = 1, 'Выкуплен'
+    NOT_BAUGHT_OUT = 2, 'Не выкуплен'
+
+
+class ShoppingTypes(metaclass=EnumMetaWithStrings):
+    INDIVIDUAL = 0, 'Индивидуальная покупка'
+    JOINT = 1, ' Совместная покупка'
 

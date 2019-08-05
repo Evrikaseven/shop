@@ -1,9 +1,11 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from .models import (
     Provider,
     Order,
-    OrderImage,
+    OrderItem,
+    Product,
     User
 )
 from main.core import widgets as custom_widgets, form_fields as custom_form_fields
@@ -23,15 +25,14 @@ class ProviderForm(forms.ModelForm):
         exclude = []
 
 
-class OrderForm(forms.ModelForm):
-    images = custom_form_fields.MultipleFilesField(required=False,
-                                                   label='Изображение товара',
+class NewOrderForm(forms.ModelForm):
+    images = custom_form_fields.MultipleFilesField(label='Изображение товара',
                                                    widget=custom_widgets.ClearableMultiFileInput())
     status = forms.ChoiceField(required=False, choices=Order.ORDER_STATUSES)
 
     class Meta:
         model = Order
-        fields = ('images', 'place', 'price', 'quantity', 'order_comment', 'customer_comment', 'status')
+        fields = ('images', 'status')
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -50,6 +51,12 @@ class OrderForm(forms.ModelForm):
         value = self.cleaned_data['place']
         return value.strip().replace(' ', '')
 
+    def clean_images(self):
+        images = self.cleaned_data['images']
+        if not images:
+            raise ValidationError('Добавьте фотографию хотя бы одного товара')
+        return images
+
     @transaction.atomic
     def save(self, commit=True):
         super().save(commit=commit)
@@ -60,12 +67,62 @@ class OrderForm(forms.ModelForm):
         self.instance.save()
 
         for image in self.cleaned_data['images']:
-            img = OrderImage(image=image, order=self.instance)
-            img.save()
+            product = Product(image=image, created_by=self.user, updated_by=self.user)
+            product.save()
+            order_item = OrderItem(order=self.instance, product=product, created_by=self.user, updated_by=self.user)
+            order_item.save()
         return self.instance
+
+
+class OrderForm(forms.ModelForm):
+    images = custom_form_fields.MultipleFilesField(label='Изображение товара',
+                                                   widget=custom_widgets.ClearableMultiFileInput())
+    status = forms.ChoiceField(required=False, choices=Order.ORDER_STATUSES)
+
+    class Meta:
+        model = Order
+        fields = ('images', 'status')
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        if getattr(self.user, 'role', Roles.UNREGISTERED) not in (Roles.ZAKUPSCHIK, Roles.ADMINISTRATOR):
+            self.fields.pop('status')
+
+
+class OrderItemForm(forms.ModelForm):
+    product_image = forms.ImageField(label='Изображение товара', required=False)
+
+    def __init__(self, **kwargs):
+        self.order_id = kwargs.pop('order_id', None)
+        self.user = kwargs.pop('user', None)
+        self.is_image_update_forbidden = kwargs.pop('is_image_update_forbidden', None)
+        super().__init__(**kwargs)
+        if self.is_image_update_forbidden:
+            self.fields.pop('product_image')
+
+    class Meta:
+        model = OrderItem
+        fields = ('product_image', 'place', 'price', 'quantity', 'order_comment', 'customer_comment')
+
+    def clean_product_image(self):
+        image = self.cleaned_data['product_image']
+        if not image and not self.instance.pk:
+            raise ValidationError('Добавьте фотографию товара')
+        return image
+
+    @transaction.atomic
+    def save(self, commit=True):
+        if not self.instance.pk:
+            self.instance.order = Order.objects.get(pk=self.order_id)
+            product = Product(image=self.cleaned_data['product_image'], created_by=self.user, updated_by=self.user)
+            product.save()
+            self.instance.product = product
+        return super().save(commit=commit)
 
 
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'birth_date', 'phone', 'location', 'role')
+        fields = ('username', 'first_name', 'last_name', 'email', 'birth_date', 'phone', 'location', 'role')

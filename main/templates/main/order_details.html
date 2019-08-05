@@ -4,75 +4,119 @@
 
 {% block content %}
 
-<div>
-    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Заказ  #{{ order.id }}</h3>
-    <div class="container">
-        <form class="needs-validation" id="order" action="" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group row">
-                      <label for="photo-input" class="col-2 col-form-label">Фото товара</label>
-                      <div class="col-10 custom-file">
-                          <input class="custom-file-input" type="file" name="{{ form.images.name }}" multiple="" id="photo-input">
-                          <label class="custom-file-label text-truncate">выберите файл</label>
-                      </div>
+    <div>
+        <div class="container">
+
+{#            {% if user_role == roles.ADMINISTRATOR %}#}
+{#                <form class="needs-validation" id="order" action="" method="POST" enctype="multipart/form-data">#}
+{#                {% csrf_token %}#}
+{#            {% endif %}#}
+
+            <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
+                Заказ #{{ order.id }}
+            </h3>
+
+            <div class="container table-container">
+                <table class="table table-sm table-hover " id="OrderItemsTable">
+                    <thead class="thead-light table-ts">
+                    <tr>
+                        <th scope="col">Изображение товара</th>
+                        <th scope="col">Место</th>
+                        <th scope="col">Количество</th>
+                        <th scope="col">Цена</th>
+                        <th scope="col">Коментарий к заказу</th>
+                        <th scope="col">Коментарий для себя</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for order_item in order.orderitem_set.all %}
+                        <tr>
+                            <td>
+                                {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
+                                <a href="{% url 'main:order_item_details' pk=order_item.id %}">
+                                    <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="100"
+                                         width="200">
+                                </a>
+                                {% else %}
+                                    <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="100"
+                                         width="200">
+                                {% endif %}
+                            </td>
+                            <td>{{ order_item.place }}</td>
+                            <td>{{ order_item.quantity }}</td>
+                            <td>{{ order_item.price }}</td>
+                            <td>{{ order_item.order_comment }}</td>
+                            <td>{{ order_item.customer_comment }}</td>
+                            {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
+                            <td>
+                                <a href="{% url 'main:delete_order_item' pk=order_item.id %}">
+                                    <button class="btn btn-outline-dark" type="submit">Удалить</button>
+                                </a>
+                            </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
-            <div class="form-group row">
-                 <label for="place-input" class="col-2 col-form-label">Место</label>
-                  <div class="col-10">
-                        <input class="form-control" id="place-input" type="text" name="{{ order.place.name }}" value="{{ order.place }}" placeholder="укажите место" required="" >
-                  </div>
+            {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
+            <div>
+                <a href="{% url 'main:new_order_item' pk=order.id %}">Добавить товар</a>
+            </div>
+            {% endif %}
+
+            <div>
+                <h4 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Полная
+                    цена: {{ order.price }}</h4>
             </div>
 
-            <div class="form-group row">
-                 <label for="price-input" class="col-2 col-form-label">Цена</label>
-                  <div class="col-10">
-                        <input class="form-control" id="price-input" type="number" name="{{ order.price.name }}" value="{{ order.price }}" placeholder="укажите цену" required="" >
-                  </div>
+
+
+
+{#{% if user_role == roles.ADMINISTRATOR %}#}
+{#<div class="form-group row">#}
+{#                 <label for="example-text-input" class="col-2 col-form-label">Статус</label>#}
+{#                  <div class="col-10 col-form-label" id="">0</div>#}
+{#            </div>#}
+{##}
+{##}
+{#{% else %}#}
+
+            <div>
+                <h4 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
+                    Статус: {{ order.status_to_string }}</h4>
             </div>
 
-            <div class="form-group row">
-                 <label for="count-input" class="col-2 col-form-label">Количество</label>
-                  <div class="col-10">
-                        <input class="form-control" id="count-input" type="number" name="{{ order.quantity.name }}" value="{{ order.quantity }}" required="">
-                  </div>
-            </div>
+{#{% endif %}#}
 
-            <div class="form-group row">
-                 <label for="example-text-input" class="col-2 col-form-label">Сумма заказа</label>
-                  <div class="col-10 col-form-label" id="check_sum">0</div>
-            </div>
-
-            <hr class="mb-4">
-              <div class="form-group">
-                <label for="comment_order">Коментарий к заказу</label>
-                <textarea class="form-control" id="comment_order" name="{{ order.order_comment.name }}" placeholder="цвет, размер и пр." rows="3">{{ order.order_comment }}</textarea>
-              </div>
-              <div class="form-group">
-                <label for="comment_customer">Коментарий для себя</label>
-                <textarea class="form-control" id="comment_customer" name="{{ order.customer_comment.name }}" placeholder="заметка по товару и пр." rows="3">{{ order.customer_comment }}</textarea>
-              </div>
+            {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
             <div class="mb-4 text-center">
-                <button class="btn btn-outline-dark" type="submit">Заказать</button>
-                <button class="btn btn-outline-dark" type="">Отмена</button>
+                <a href="{% url 'main:order_paying' pk=order.pk %}">
+                    <button class="btn btn-outline-dark" type="submit">Оплатить заказ</button>
+                </a>
             </div>
-          </form>
+            {% endif %}
+
+{#        {% if user_role == roles.ADMINISTRATOR %}#}
+{#            </form>#}
+{#        {% endif %}#}
         </div>
-</div>
-<script>
-    $('.custom-file-input').on('change', function() {
-       let fileName = $(this).val().split('\\').pop();
-       $(this).next('.custom-file-label').addClass("selected").html(fileName);
-    });
+    </div>
+    <script>
+        $('.custom-file-input').on('change', function () {
+            let fileName = $(this).val().split('\\').pop();
+            $(this).next('.custom-file-label').addClass("selected").html(fileName);
+        });
 
-    $(function() {
-      $('#order').change(function(){
-        let sum =  parseInt($("#price-input").val(), 10) * parseInt($("#count-input").val(), 10);
+        $(function () {
+            $('#order').change(function () {
+                let sum = parseInt($("#price-input").val(), 10) * parseInt($("#count-input").val(), 10);
 
-        $('#check_sum').html( sum + sum / 10);
-      });
-    });
+                $('#check_sum').html(sum + sum / 10);
+            });
+        });
 
-</script>
+    </script>
 
 {% endblock content %}

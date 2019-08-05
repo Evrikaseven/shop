@@ -6,37 +6,29 @@
 
     <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Список заказов за 30 дней</h3>
     <div class="container table-container">
-    <table class="table table-sm table-hover " id="OrdersTable">
-        <thead class="thead-light table-ts">
-        <tr>
-            <th scope="col"># Заказа</th>
-            <th scope="col">Дата создания</th>
-            <th scope="col">Покупатель</th>
-            <th scope="col">Место</th>
-            <th scope="col">Цена</th>
-            <th scope="col">Кол-во</th>
-            <th scope="col">Статус</th>
-            <th scope="col">Комментарий к заказу</th>
-            <th scope="col">Примечание</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for o in orders %}
-        <tr>
-            <td scope="row">Заказ #<a href="{% url 'main:order_details' pk=o.id %}">{{ o.id }}</a></td>
-            <td>{{ o.created_date }}</td>
-            <td>{{ o.created_by.username }}</td>
-            <td>{{ o.place }}</td>
-            <td>{{ o.price }}</td>
-            <td>{{ o.quantity }}</td>
-            <td>{{ o.status_to_string }}</td>
-            <td>{{ o.order_comment }}</td>
-            <td>{{ o.customer_comment }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+        <table class="table table-sm table-hover " id="OrdersTable">
+            <thead class="thead-light table-ts">
+            <tr>
+                <th scope="col"># Заказа</th>
+                <th scope="col">Дата создания</th>
+                <th scope="col">Покупатель</th>
+                <th scope="col">Цена</th>
+                <th scope="col">Статус</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for o in orders %}
+                <tr>
+                    <td scope="row">Заказ #<a href="{% url 'main:order_details' pk=o.id %}">{{ o.id }}</a></td>
+                    <td>{{ o.created_date }}</td>
+                    <td>{{ o.created_by.username }}</td>
+                    <td>{{ o.price }}</td>
+                    <td>{{ o.status_to_string }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 <!--<script>-->
 <!--    $('#OrdersTable').on('click', 'tbody > tr > td', function ()-->

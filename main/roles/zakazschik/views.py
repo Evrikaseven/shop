@@ -7,13 +7,13 @@ from .fetchers import ZakazschikFetcher
 class ZakazschikMainView(LoginRolesRequiredMixin, TemplateView):
     template_name = 'main/zakazschik.html'
     url_name = 'zakazschik'
-    required_roles = (Roles.ZAKAZSCHIK,)
+    allowed_roles = (Roles.ZAKAZSCHIK,)
 
 
 class ZakazschikOrdersByIdView(LoginRolesRequiredMixin, TemplateView):
     template_name = 'main/order_details.html'
     url_name = 'order_details'
-    required_roles = (Roles.ZAKAZSCHIK,)
+    allowed_roles = (Roles.ZAKAZSCHIK,)
 
     def __init__(self):
         self.place = None

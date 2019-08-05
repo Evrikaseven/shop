@@ -12,12 +12,12 @@ class LoginRolesRequiredMixin(AccessMixin):
         ZAKAZSCHIK, ZAKUPSCHIK, ADMINISTRATOR
     """
 
-    required_roles = ()
+    allowed_roles = ()
 
     def dispatch(self, request, *args, **kwargs):
         user = request.user
         if not user.is_authenticated:
             return self.handle_no_permission()
-        if user.role not in self.required_roles and user.role != Roles.ADMINISTRATOR:
+        if user.role not in self.allowed_roles and user.role != Roles.ADMINISTRATOR:
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
