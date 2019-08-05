@@ -5,26 +5,31 @@ from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import pre_delete
 from django.conf import settings
 from main.core.models import ModelWithTimestamp, ModelWithUser
-from main.core.constants import OrderStatuses, Roles
+from main.core.constants import (
+    OrderStatuses,
+    Roles,
+    OrderItemStatuses,
+    ShoppingTypes
+)
 
 
-MEDIA_DIR_PREFFIX = 'order_'
+MEDIA_PROD_IMAGE_DIR_PREFFIX = 'product_images'
 
 
 # Create your models here.
 class Provider(models.Model):
-    name = models.CharField(max_length=256, null=True, blank=True)
-    vk_link = models.CharField(max_length=256, null=True, blank=True)
-    place = models.CharField(max_length=150, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
-    picture = models.CharField(max_length=256, null=True, blank=True)
-    product_type = models.CharField(max_length=256, null=True, blank=True)
+    name = models.CharField(max_length=256)
+    vk_link = models.CharField(max_length=256)
+    place = models.CharField(max_length=150)
+    description = models.TextField(blank=True, default='')
+    picture = models.CharField(max_length=256)
+    product_type = models.CharField(max_length=256, blank=True, default='')
 
 
 class User(AbstractUser):
-    phone = models.CharField('Телефон', max_length=20, blank=True, null=True, )
-    location = models.CharField('Адрес', max_length=255, blank=True, null=True)
-    birth_date = models.DateField('Дата рождения', blank=True, null=True)
+    phone = models.CharField('Телефон', max_length=20)
+    location = models.CharField('Адрес', max_length=255)
+    birth_date = models.DateField('Дата рождения', blank=True, default='')
 
     ROLES = (
         (Roles.UNREGISTERED, Roles.UNREGISTERED_STR),
@@ -40,10 +45,6 @@ class User(AbstractUser):
         return roles[self.role]
 
 
-def get_path_to_order_images(instance, name):
-    return '{}{}/{}'.format(MEDIA_DIR_PREFFIX, instance.order.pk, name)
-
-
 class OrderManager(models.Manager):
 
     def get_list(self, **kwargs):
@@ -52,14 +53,14 @@ class OrderManager(models.Manager):
 
 class Order(ModelWithTimestamp, ModelWithUser):
     objects = OrderManager()
-    place = models.CharField(max_length=150, blank=True, null=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.PositiveIntegerField(default=1)
-    order_comment = models.TextField(max_length=255, null=True, blank=True)
-    customer_comment = models.TextField(max_length=255, null=True, blank=True)
+
+    # price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    # order_comment = models.TextField(max_length=255, null=True, blank=True)
+    # customer_comment = models.TextField(max_length=255, null=True, blank=True)
 
     ORDER_STATUSES = (
         (OrderStatuses.CREATED, OrderStatuses.CREATED_STR),
+        (OrderStatuses.PAYING_TO_BE_CONFIRMED, OrderStatuses.PAYING_TO_BE_CONFIRMED_STR),
         (OrderStatuses.PAID, OrderStatuses.PAID_STR),
         (OrderStatuses.IN_PROGRESS, OrderStatuses.IN_PROGRESS_STR),
         (OrderStatuses.READY_TO_ISSUE, OrderStatuses.READY_TO_ISSUE_STR),
@@ -68,11 +69,12 @@ class Order(ModelWithTimestamp, ModelWithUser):
     status = models.PositiveIntegerField(default=OrderStatuses.CREATED, choices=ORDER_STATUSES)
     active = models.BooleanField(default=True)
 
+    @property
+    def price(self):
+        return sum(oi.price * oi.quantity for oi in OrderItem.objects.get_list(order=self))
+
     class Meta:
         ordering = ('created_date', )
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
 
     @property
     def status_to_string(self):
@@ -80,17 +82,79 @@ class Order(ModelWithTimestamp, ModelWithUser):
         return statuses[self.status]
 
 
-def remove_order_images_from_disc(sender, **kwargs):
+class OrderItemManager(models.Manager):
+
+    def get_list(self, **kwargs):
+        return OrderItem.objects.filter(active=True, **kwargs)
+
+
+class OrderItem(ModelWithTimestamp, ModelWithUser):
+    objects = OrderItemManager()
+
+    product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, blank=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    place = models.CharField(max_length=150)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    quantity = models.PositiveIntegerField(default=1)
+    order_comment = models.TextField(max_length=255, blank=True, default='')
+    customer_comment = models.TextField(max_length=255, blank=True, default='')
+    ORDER_ITEM_STATUSES = (
+        (OrderItemStatuses.CREATED, OrderItemStatuses.CREATED_STR),
+        (OrderItemStatuses.BAUGHT_OUT, OrderItemStatuses.BAUGHT_OUT_STR),
+        (OrderItemStatuses.NOT_BAUGHT_OUT, OrderItemStatuses.NOT_BAUGHT_OUT_STR),
+    )
+    status = models.PositiveIntegerField(default=OrderItemStatuses.CREATED, choices=ORDER_ITEM_STATUSES)
+    active = models.BooleanField(default=True)
+
+    @property
+    def status_to_string(self):
+        statuses = dict(self.ORDER_ITEM_STATUSES)
+        return statuses[self.status]
+
+
+def get_path_to_product_image(instance, name):
+    return '{}/{}'.format(MEDIA_PROD_IMAGE_DIR_PREFFIX, name)
+
+
+class ProductManager(models.Manager):
+
+    def get_list(self, **kwargs):
+        return Product.objects.filter(active=True, **kwargs)
+
+
+class Product(ModelWithTimestamp, ModelWithUser):
+    objects = ProductManager()
+
+    image = models.ImageField(upload_to=get_path_to_product_image)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    comment = models.CharField(max_length=255, default='')
+    active = models.BooleanField(default=True)
+    SHOPPING_TYPES = (
+        (ShoppingTypes.INDIVIDUAL, ShoppingTypes.INDIVIDUAL_STR),
+        (ShoppingTypes.JOINT, ShoppingTypes.JOINT_STR),
+    )
+    shopping_type = models.PositiveIntegerField(default=ShoppingTypes.INDIVIDUAL, choices=SHOPPING_TYPES)
+
+    @property
+    def shopping_type_to_string(self):
+        types = dict(self.SHOPPING_TYPES)
+        return types[self.shopping_type]
+
+
+def remove_product_image_from_disc(sender, **kwargs):
     instance = kwargs['instance']
-    directory_to_be_removed = os.path.join(settings.MEDIA_ROOT, "{}{}".format(MEDIA_DIR_PREFFIX, instance.id))
-    shutil.rmtree(directory_to_be_removed, ignore_errors=True)
+    instance.image.delete()
+    # directory_to_be_removed = os.path.join(settings.MEDIA_ROOT, "{}{}".format(MEDIA_PROD_IMAGE_DIR_PREFFIX, instance.id))
+    # shutil.rmtree(directory_to_be_removed, ignore_errors=True)
 
 
-class OrderImage(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)
-    image = models.ImageField(upload_to=get_path_to_order_images)
-    comment = models.CharField(max_length=255, null=True, blank=True)
-    selected = models.BooleanField(default=True)
+def remove_order_item(sender, **kwargs):
+    instance = kwargs['instance']
+    if instance.product.shopping_type == ShoppingTypes.INDIVIDUAL:
+        instance.product.delete()
 
 
-pre_delete.connect(remove_order_images_from_disc, sender=Order)
+pre_delete.connect(remove_product_image_from_disc, sender=Product)
+pre_delete.connect(remove_order_item, sender=OrderItem)
+
+

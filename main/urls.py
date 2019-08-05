@@ -31,6 +31,14 @@ urlpatterns = [
     path('orders/', main_views.OrdersListView.as_view(), name='orders'),
     path('orders/<int:pk>/', main_views.OrderDetailsView.as_view(),
          name=main_views.OrderDetailsView.url_name),
+    path('orders/<int:pk>/paying/', main_views.OrderPayingView.as_view(),
+         name=main_views.OrderPayingView.url_name),
+    path('orders/<int:pk>/new_item/', main_views.NewOrderItemView.as_view(),
+         name=main_views.NewOrderItemView.url_name),
+    path('order_item/<int:pk>', main_views.OrderItemView.as_view(),
+         name=main_views.OrderItemView.url_name),
+    path('order_item/<int:pk>/delete', main_views.DeleteOrderItemView.as_view(),
+         name=main_views.DeleteOrderItemView.url_name),
     path('order_created/<int:pk>', main_views.OrderCreatedView.as_view(), name='order_created'),
 
     # Django REST framework related

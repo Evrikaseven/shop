@@ -1,18 +1,19 @@
 
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, FormView, DeleteView
 from django.urls import reverse_lazy
-
+from django.conf import settings
 from main.core.mixins import LoginRolesRequiredMixin
+from main.core.utils import send_new_order_created_email
 from . import models as _models
-from .core.constants import Roles
+from .core.constants import Roles, OrderStatuses
 from . import serializers as _serializers
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from main.roles.zakazschik.views import ZakazschikMainView
 from main.roles.zakupschik.views import ZakupschikMainView
 from main.roles.administrator.views import AdministratorMainView
-from .forms import OrderForm, UserForm
+from .forms import NewOrderForm, OrderForm, UserForm, OrderItemForm
 
 
 class IndexView(TemplateView):
@@ -64,7 +65,7 @@ class UserDetailsView(LoginRolesRequiredMixin, UpdateView):
     template_name = 'main/user_details.html'
     url_name = 'user_details'
     form_class = UserForm
-    required_roles = (Roles.UNREGISTERED, Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+    allowed_roles = (Roles.UNREGISTERED, Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
     model = _models.User
 
     def get_success_url(self):
@@ -73,15 +74,14 @@ class UserDetailsView(LoginRolesRequiredMixin, UpdateView):
 
 class NewOrderView(LoginRolesRequiredMixin, CreateView):
     template_name = 'main/new_order.html'
-    form_class = OrderForm
-    success_url = reverse_lazy('main:order_created')
-    required_roles = (Roles.ZAKAZSCHIK,)
+    form_class = NewOrderForm
+    allowed_roles = (Roles.ZAKAZSCHIK,)
 
     def __init__(self):
         self.user = None
 
     def get_success_url(self):
-        return reverse_lazy('main:order_created', kwargs={'pk': self.object.pk})
+        return reverse_lazy('main:order_details', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -100,7 +100,7 @@ class NewOrderView(LoginRolesRequiredMixin, CreateView):
 
 class OrderCreatedView(LoginRolesRequiredMixin, TemplateView):
     template_name = 'main/order_created.html'
-    required_roles = (Roles.ZAKAZSCHIK,)
+    allowed_roles = (Roles.ZAKAZSCHIK,)
 
     def __init__(self):
         self.order_id = None
@@ -117,7 +117,7 @@ class OrderCreatedView(LoginRolesRequiredMixin, TemplateView):
 
 class OrdersListView(LoginRolesRequiredMixin, TemplateView):
     template_name = 'main/orders.html'
-    required_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+    allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
 
     def __init__(self):
         self.user = None
@@ -136,15 +136,15 @@ class OrdersListView(LoginRolesRequiredMixin, TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class OrderDetailsView(LoginRolesRequiredMixin, UpdateView):
+class OrderDetailsView(LoginRolesRequiredMixin, FormView):
     template_name = 'main/order_details.html'
     url_name = 'order_details'
     form_class = OrderForm
-    required_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
-    model = _models.Order
+    allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
 
     def __init__(self):
         self.user = None
+        self.order_id = None
 
     def get_success_url(self):
         return reverse_lazy('main:order_details', kwargs={'pk': self.kwargs['pk']})
@@ -156,14 +156,121 @@ class OrderDetailsView(LoginRolesRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['roles'] = Roles
         context['user_role'] = self.user.role
-
+        context['roles'] = Roles
+        context['order_statuses'] = OrderStatuses
+        context['order'] = _models.Order.objects.get(id=self.order_id)
+        context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
     def dispatch(self, request, *args, **kwargs):
         self.user = request.user
+        self.order_id = kwargs['pk']
         return super().dispatch(request, *args, **kwargs)
+
+
+class OrderPayingView(LoginRolesRequiredMixin, TemplateView):
+    template_name = 'main/order_paying.html'
+    allowed_roles = (Roles.ZAKAZSCHIK,)
+    url_name = 'order_paying'
+
+    def __init__(self):
+        self.user = None
+        self.order_id = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order = _models.Order.objects.get(id=self.order_id)
+        order.status = OrderStatuses.PAYING_TO_BE_CONFIRMED
+        order.save()
+        context['order'] = order
+        # send_new_order_created_email(self.user, order)
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.order_id = kwargs['pk']
+        self.user = request.user
+        return super().dispatch(request, *args, **kwargs)
+
+
+class NewOrderItemView(LoginRolesRequiredMixin, CreateView):
+    template_name = 'main/new_order_item.html'
+    url_name = 'new_order_item'
+    form_class = OrderItemForm
+    allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+
+    def __init__(self):
+        self.user = None
+        self.order_id = None
+
+    def get_success_url(self):
+        return reverse_lazy('main:order_details', kwargs={'pk': self.kwargs['pk']})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['order_id'] = self.order_id
+        kwargs['user'] = self.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # context['order'] = _models.Order.objects.get(id=self.order_id)
+        # context['MEDIA_URL'] = settings.MEDIA_URL
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user = request.user
+        self.order_id = kwargs['pk']
+        return super().dispatch(request, *args, **kwargs)
+
+
+class OrderItemView(LoginRolesRequiredMixin, UpdateView):
+    template_name = 'main/order_item_details.html'
+    url_name = 'order_item_details'
+    form_class = OrderItemForm
+    allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+    model = _models.OrderItem
+
+    def __init__(self):
+        self.user = None
+        self.order_item_id = None
+
+    def get_success_url(self):
+        return reverse_lazy('main:order_details', kwargs={'pk': self.object.order.id})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['order_id'] = self.object.order.id
+        kwargs['user'] = self.user
+        kwargs['is_image_update_forbidden'] = True
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product_image'] = self.object.product.image
+        context['MEDIA_URL'] = settings.MEDIA_URL
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user = request.user
+        self.order_item_id = kwargs['pk']
+        return super().dispatch(request, *args, **kwargs)
+
+
+class DeleteOrderItemView(LoginRolesRequiredMixin, DeleteView):
+    template_name = "main/delete_order_item.html"
+    url_name = "delete_order_item"
+    allowed_roles = (Roles.ZAKAZSCHIK,)
+    model = _models.OrderItem
+
+    def get_success_url(self):
+        return reverse_lazy('main:order_details', kwargs={'pk': self.object.order.id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['MEDIA_URL'] = settings.MEDIA_URL
+        context['order_item'] = self.object
+        return context
 
 
 class BuyoutsListView(LoginRolesRequiredMixin, TemplateView):

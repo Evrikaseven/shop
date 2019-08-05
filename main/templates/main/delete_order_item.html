@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Удаление товара{% endblock title %}
+
+{% block content %}
+
+<div>
+    <h2>Вы точно хотите удалить?</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div>
+            <img src="{{ MEDIA_URL }}{{ order_item.product.image }}">
+        </div>
+        <button type="submit">Удалить</button>
+    </form>
+</div>
+
+{% endblock content %}
