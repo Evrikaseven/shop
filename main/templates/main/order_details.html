@@ -24,6 +24,7 @@
                         <th scope="col">Место</th>
                         <th scope="col">Количество</th>
                         <th scope="col">Цена</th>
+                        <th scope="col">Статус товара</th>
                         <th scope="col">Коментарий к заказу</th>
                         <th scope="col">Коментарий для себя</th>
                     </tr>
@@ -45,6 +46,7 @@
                             <td>{{ order_item.place }}</td>
                             <td>{{ order_item.quantity }}</td>
                             <td>{{ order_item.price }}</td>
+                            <td>{{ order_item.status_to_string }}</td>
                             <td>{{ order_item.order_comment }}</td>
                             <td>{{ order_item.customer_comment }}</td>
                             {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}

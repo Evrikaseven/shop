@@ -25,7 +25,7 @@ class ZakupschikIndividualOrdersView(LoginRolesRequiredMixin, TemplateView):
 
 
 class ZakupschikOrdersByPlacesView(LoginRolesRequiredMixin, TemplateView):
-    template_name = 'main/zakupschik_order_details_by_place.html'
+    template_name = 'main/zakupschik_order_items_by_place.html'
     url_name = 'zakupschik_order_details_by_place'
     allowed_roles = (Roles.ZAKUPSCHIK,)
 
@@ -35,8 +35,9 @@ class ZakupschikOrdersByPlacesView(LoginRolesRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         fetcher = ZakupschikFetcher()
-        context['orders'] = fetcher.orders_by_place(self.place)
+        context['order_items'] = fetcher.order_items_by_place(self.place)
         context['MEDIA_URL'] = settings.MEDIA_URL
+        context['place'] = self.place
         return context
 
     def dispatch(self, request, *args, **kwargs):
