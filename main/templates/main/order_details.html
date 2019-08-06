@@ -51,7 +51,7 @@
                 {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
                     <div class="mb-4 text-center">
                         <a href="{% url 'main:order_paying' pk=order.pk %}">
-                            <button class="btn btn-outline-dark btn-sm" type="submit">Оплатить заказ</button>
+                            <button class="btn btn-dark btn-sm" type="submit">Оплатить заказ</button>
                         </a>
                     </div>
                 {% endif %}
@@ -111,21 +111,27 @@
                 </div>
                 <hr class="mb-4">
 
-                {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
-                    <div class="text-center">
-                        <span>
-                            <a href="{% url 'main:new_order_item' pk=order.id %}">
-                                <button class="btn btn-outline-dark" type="submit">Добавить товар</button>
-                            </a>
-                        </span>
-                        <span>
-                            <a href="{% url 'main:new_joint_order_item' pk=order.id %}">
-                                <button class="btn btn-outline-dark"
-                                        type="submit">Добавить товар из совместной закупки</button>
-                            </a>
-                        </span>
-                    </div>
-                {% endif %}
+            {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
+            <div class="text-center">
+                <a href="{% url 'main:new_order_item' pk=order.id %}">
+                    <button class="btn btn-dark btn-sm" type="submit">Добавить товар</button>
+                </a>
+                <a href="{% url 'main:new_joint_order_item' pk=order.id %}">
+                    <button class="btn btn-dark btn-sm" type="submit">Добавить товар из совместной закупки</button>
+                </a>
+            </div>
+            {% endif %}
+
+{#{% if user_role == roles.ADMINISTRATOR %}#}
+{#<div class="form-group row">#}
+{#                 <label for="example-text-input" class="col-2 col-form-label">Статус</label>#}
+{#                  <div class="col-10 col-form-label" id="">0</div>#}
+{#            </div>#}
+{##}
+{##}
+{#{% else %}#}
+
+{#{% endif %}#}
 
             </div>
         </div>

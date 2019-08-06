@@ -1,18 +1,75 @@
+
 {% extends 'base.html' %}
 
-{% block title %}Новый товар{% endblock title %}
+{% block title %}Заказы{% endblock title %}
 
 {% block content %}
+<div>
+    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Заказ  #{{ order.id }}</h3>
+    <div class="container">
+        <form class="needs-validation" name="form" action="" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group row">
+                      <label for="photo-input" class="col-2 col-form-label">Фото товара</label>
+                      <div class="col-10 custom-file">
+                          <input class="custom-file-input" type="file" name="{{ form.images.name }}" multiple="" id="photo-input">
+                          <label class="custom-file-label text-truncate">выберите файл</label>
+                      </div>
+            </div>
 
-<div class="container table-container">
-    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
-        Новый товар
-    </h3>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Сохранить</button>
-    </form>
+            <div class="form-group row">
+                 <label for="place-input" class="col-2 col-form-label">Место</label>
+                  <div class="col-10">
+                        <input class="form-control" id="place-input" type="text" name="{{ order.place.name }}" value="{{ order.place }}" placeholder="укажите место" required="" >
+                  </div>
+            </div>
+
+            <div class="form-group row">
+                 <label for="price-input" class="col-2 col-form-label">Цена</label>
+                  <div class="col-10">
+                        <input class="form-control" id="price-input" type="number" name="{{ order.price.name }}" value="{{ order.price }}" placeholder="укажите цену" required="" >
+                  </div>
+            </div>
+
+            <div class="form-group row">
+                 <label for="count-input" class="col-2 col-form-label">Количество</label>
+                  <div class="col-10">
+                        <input class="form-control" id="count-input" type="number" name="{{ order.quantity.name }}" value="{{ order.quantity }}" required="">
+                  </div>
+            </div>
+
+            <div class="form-group row">
+                 <label for="example-text-input" class="col-2 col-form-label">Сумма заказа</label>
+                  <div class="col-10 col-form-label" id="check_sum">0</div>
+            </div>
+
+            <hr class="mb-4">
+              <div class="form-group">
+                <label for="comment_order">Коментарий к заказу</label>
+                <textarea class="form-control" id="comment_order" name="{{ order.order_comment.name }}" placeholder="цвет, размер и пр." rows="3">{{ order.order_comment }}</textarea>
+              </div>
+              <div class="form-group">
+                <label for="comment_customer">Коментарий для себя</label>
+                <textarea class="form-control" id="comment_customer" name="{{ order.customer_comment.name }}" placeholder="заметка по товару и пр." rows="3">{{ order.customer_comment }}</textarea>
+              </div>
+            <div class="mb-4 text-center">
+                <button class="btn btn-outline-dark" type="submit">Заказать</button>
+                <button class="btn btn-outline-dark" type="">Отмена</button>
+            </div>
+        </form>
+    </div>
 </div>
+<script>
+    $('.custom-file-input').on('change', function() {
+       let fileName = $(this).val().split('\\').pop();
+       $(this).next('.custom-file-label').addClass("selected").html(fileName);
+    });
+    $(function() {
+      $('#order').change(function(){
+        let sum =  parseInt($("#price-input").val(), 10) * parseInt($("#count-input").val(), 10);
+        $('#check_sum').html( sum + sum / 10);
+      });
+    });
+</script>
 
 {% endblock content %}
