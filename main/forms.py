@@ -9,7 +9,7 @@ from .models import (
     User
 )
 from main.core import widgets as custom_widgets, form_fields as custom_form_fields
-from main.core.constants import Roles
+from main.core.constants import Roles, OrderStatuses
 
 
 class ProviderForm(forms.ModelForm):
@@ -86,6 +86,12 @@ class OrderForm(forms.ModelForm):
         if getattr(self.user, 'role', Roles.UNREGISTERED) not in (Roles.ZAKUPSCHIK, Roles.ADMINISTRATOR):
             self.fields.pop('status')
 
+    def save(self, commit=True):
+        if self.instance.pk:
+            if 'status' in self.changed_data and int(self.cleaned_data.get('status', OrderStatuses.CREATED)) == OrderStatuses.PAID:
+                self.instance.paid_price = self.instance.price
+        return super().save(commit=commit)
+
 
 class OrderItemForm(forms.ModelForm):
     product_image = forms.ImageField(label='Изображение товара', required=False)
@@ -116,8 +122,8 @@ class OrderItemForm(forms.ModelForm):
 
     def clean_price(self):
         price = self.cleaned_data['price']
-        if not price:
-            raise ValidationError('Цена не может быть нулевой')
+        if not price or price < 0:
+            raise ValidationError('Цена не может быть нулевой или меньше 0')
         return price
 
     @transaction.atomic
@@ -127,6 +133,47 @@ class OrderItemForm(forms.ModelForm):
             product = Product(image=self.cleaned_data['product_image'], created_by=self.user, updated_by=self.user)
             product.save()
             self.instance.product = product
+        return super().save(commit=commit)
+
+
+class JointOrderItemForm(forms.ModelForm):
+    product = forms.ChoiceField(label='Совместный товар', )
+
+    def __init__(self, **kwargs):
+        self.order_id = kwargs.pop('order_id', None)
+        self.user = kwargs.pop('user', None)
+        self.is_image_update_forbidden = kwargs.pop('is_image_update_forbidden', None)
+        super().__init__(**kwargs)
+
+    class Meta:
+        model = OrderItem
+        fields = ('product', 'place', 'price', 'quantity', 'status', 'order_comment', 'customer_comment')
+
+    def clean_product_image(self):
+        image = self.cleaned_data['product_image']
+        if not image and not self.instance.pk:
+            raise ValidationError('Добавьте фотографию товара')
+        return image
+
+    def clean_place(self):
+        value = self.cleaned_data['place'].strip().replace(' ', '')
+        if not value:
+            raise ValidationError('Укажите, пожалуйста, номер места')
+        return value
+
+    def clean_price(self):
+        price = self.cleaned_data['price']
+        if not price or price < 0:
+            raise ValidationError('Цена не может быть нулевой или меньше 0')
+        return price
+
+    @transaction.atomic
+    def save(self, commit=True):
+        if not self.instance.pk:
+            self.instance.order = Order.objects.get(pk=self.order_id)
+            # product = Product(image=self.cleaned_data['product_image'], created_by=self.user, updated_by=self.user)
+            # product.save()
+            # self.instance.product = product
         return super().save(commit=commit)
 
 

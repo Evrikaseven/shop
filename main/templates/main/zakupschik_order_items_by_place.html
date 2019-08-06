@@ -20,12 +20,12 @@
             </div>
 
             <div id="hide-me{{ forloop.counter }}" class="collapse in container border-right border-left">
-                <h5>Заказчик:</h5> {{ order_item.created_by.username }}
+                <h5>Заказчик: {{ order_item.order.created_by.username }} ({{ order_item.order.created_by.first_name }} {{ order_item.order.created_by.last_name }}) </h5>
 
                 <div class="mb-1">Цена: {{ order_item.price }}</div>
                 <div>Количество: {{ order_item.quantity }}</div>
                 <div>Комментарий к заказу: {{ order_item.order_comment }}</div>
-                <div>Комментарий аказчика: {{ order_item.customer_comment }}</div>
+                <div>Комментарий заказчика: {{ order_item.customer_comment }}</div>
                 <hr class="mb-3">
             </div>
         {% endfor %}

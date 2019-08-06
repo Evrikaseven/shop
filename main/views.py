@@ -13,7 +13,13 @@ from rest_framework.permissions import IsAuthenticated
 from main.roles.zakazschik.views import ZakazschikMainView
 from main.roles.zakupschik.views import ZakupschikMainView
 from main.roles.administrator.views import AdministratorMainView
-from .forms import NewOrderForm, OrderForm, UserForm, OrderItemForm
+from .forms import (
+    NewOrderForm,
+    OrderForm,
+    UserForm,
+    OrderItemForm,
+    JointOrderItemForm,
+)
 
 
 class IndexView(TemplateView):
@@ -136,11 +142,12 @@ class OrdersListView(LoginRolesRequiredMixin, TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class OrderDetailsView(LoginRolesRequiredMixin, FormView):
+class OrderDetailsView(LoginRolesRequiredMixin, UpdateView):
     template_name = 'main/order_details.html'
     url_name = 'order_details'
     form_class = OrderForm
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+    model = _models.Order
 
     def __init__(self):
         self.user = None
@@ -159,6 +166,7 @@ class OrderDetailsView(LoginRolesRequiredMixin, FormView):
         context['user_role'] = self.user.role
         context['roles'] = Roles
         context['order_statuses'] = OrderStatuses
+        context['order_statuses_list'] = list(OrderStatuses)
         context['order'] = _models.Order.objects.get(id=self.order_id)
         context['MEDIA_URL'] = settings.MEDIA_URL
         return context
@@ -197,6 +205,37 @@ class NewOrderItemView(LoginRolesRequiredMixin, CreateView):
     template_name = 'main/new_order_item.html'
     url_name = 'new_order_item'
     form_class = OrderItemForm
+    allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+
+    def __init__(self):
+        self.user = None
+        self.order_id = None
+
+    def get_success_url(self):
+        return reverse_lazy('main:order_details', kwargs={'pk': self.kwargs['pk']})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['order_id'] = self.order_id
+        kwargs['user'] = self.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # context['order'] = _models.Order.objects.get(id=self.order_id)
+        # context['MEDIA_URL'] = settings.MEDIA_URL
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user = request.user
+        self.order_id = kwargs['pk']
+        return super().dispatch(request, *args, **kwargs)
+
+
+class NewJointOrderItemView(LoginRolesRequiredMixin, CreateView):
+    template_name = 'main/new_joint_order_item.html'
+    url_name = 'new_joint_order_item'
+    form_class = JointOrderItemForm
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
 
     def __init__(self):

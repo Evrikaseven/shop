@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}Индивидуальные заказы{% endblock title %}
+{% block title %}Заказы{% endblock title %}
 
 
 {% block content %}
+    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Список мест с новыми заказами</h3>
     <div class="container">
         {% for place in places %}
             <div><a href="{% url 'main:zakupschik_order_details_by_place' place=place %}">{{ place }}</a></div>
