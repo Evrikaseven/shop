@@ -35,6 +35,8 @@ urlpatterns = [
          name=main_views.OrderPayingView.url_name),
     path('orders/<int:pk>/new_item/', main_views.NewOrderItemView.as_view(),
          name=main_views.NewOrderItemView.url_name),
+    path('orders/<int:pk>/new_joint_item/', main_views.NewJointOrderItemView.as_view(),
+         name=main_views.NewJointOrderItemView.url_name),
     path('order_item/<int:pk>', main_views.OrderItemView.as_view(),
          name=main_views.OrderItemView.url_name),
     path('order_item/<int:pk>/delete', main_views.DeleteOrderItemView.as_view(),

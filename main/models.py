@@ -68,6 +68,7 @@ class Order(ModelWithTimestamp, ModelWithUser):
     )
     status = models.PositiveIntegerField(default=OrderStatuses.CREATED, choices=ORDER_STATUSES)
     active = models.BooleanField(default=True)
+    paid_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     @property
     def price(self):

@@ -12,9 +12,9 @@ class ZakupschikMainView(LoginRolesRequiredMixin, TemplateView):
     allowed_roles = (Roles.ZAKUPSCHIK,)
 
 
-class ZakupschikIndividualOrdersView(LoginRolesRequiredMixin, TemplateView):
-    template_name = 'main/zakupschik_individual_orders.html'
-    url_name = 'zakupschik_individual_orders'
+class ZakupschikOrdersPlacesView(LoginRolesRequiredMixin, TemplateView):
+    template_name = 'main/zakupschik_orders.html'
+    url_name = 'zakupschik_orders_places'
     allowed_roles = (Roles.ZAKUPSCHIK,)
 
     def get_context_data(self, **kwargs):
@@ -44,10 +44,5 @@ class ZakupschikOrdersByPlacesView(LoginRolesRequiredMixin, TemplateView):
         self.place = kwargs.pop('place', None)
         return super().dispatch(request, *args, **kwargs)
 
-
-class ZakupschikJointOrdersView(LoginRolesRequiredMixin, TemplateView):
-    template_name = 'main/zakupschik_joint_orders.html'
-    url_name = 'zakupschik_joint_orders'
-    allowed_roles = (Roles.ZAKUPSCHIK,)
 
 
