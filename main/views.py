@@ -20,7 +20,7 @@ from .forms import (
     OrderItemForm,
     JointOrderItemForm,
 )
-
+from django.shortcuts import render
 
 class IndexView(TemplateView):
     template_name = 'main/index.html'
@@ -222,7 +222,7 @@ class NewOrderItemView(LoginRolesRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # context['order'] = _models.Order.objects.get(id=self.order_id)
+        context['order'] = _models.Order.objects.get(id=self.order_id)
         # context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
@@ -230,6 +230,19 @@ class NewOrderItemView(LoginRolesRequiredMixin, CreateView):
         self.user = request.user
         self.order_id = kwargs['pk']
         return super().dispatch(request, *args, **kwargs)
+
+    def form_invalid(self, **kwargs):
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def post(self, request, *args, **kwargs):
+        print("!!!! DEBUG !!!!", request.POST)
+        # form = self.form_class(request.POST)
+        # print("!!!! DEBUG !!!!", form)
+        # if form.is_valid():
+        #     # <process form cleaned data>
+        #     form.save()
+        #
+        # return render(request, 'main/order_paying.html', {'form': form})
 
 
 class NewJointOrderItemView(LoginRolesRequiredMixin, CreateView):
@@ -286,6 +299,7 @@ class OrderItemView(LoginRolesRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['order_item'] = _models.OrderItem.objects.get(id=self.order_item_id)
         context['product_image'] = self.object.product.image
         context['MEDIA_URL'] = settings.MEDIA_URL
         return context
