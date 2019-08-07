@@ -4,34 +4,39 @@
 
 {% block content %}
 
-<div class="container table-container">
-    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
-        Список товаров
-    </h3>
-    {% comment %}
-    <table border="1px" class="table">
-        <thead class="thead-dark">
-        <tr>
-            <th scope="col">Место</th>
-            <th scope="col">Фото</th>
-            <th scope="col">Имя</th>
-            <th scope="col">Описание</th>
-            <th scope="col">Чем торгует</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for p in providers %}
-        <tr>
-            <td>{{ p.space }}</td>
-            <td><img src="{{ p.picture }}" alt="ВК картинка"></td>
-            <td><a href="{{p.vk_link}}">{{ p.name }}</a></td>
-            <td>{{ p.description }}</td>
-            <td>{{ p.product_type }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% endcomment %}
-</div>
+    <div class="container table-container">
+        <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
+            Список товаров для совместных закупок
+        </h3>
+        <table border="1px" class="table">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">Фото</th>
+                <th scope="col">Место</th>
+                <th scope="col">Цена</th>
+                <th scope="col">Количество</th>
+                <th scope="col">Комментарий</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for p in products %}
+                <tr>
+                    <td>
+                        <a href="{% url 'main:update_joint_product' pk=p.id %}">
+                            <img src="{{ MEDIA_URL }}{{ p.image }}" height="150" width="150">
+                        </a>
+                    </td>
+                    <td>{{ p.place }}</td>
+                    <td>{{ p.price }}</td>
+                    <td>{{ p.quantity }}</td>
+                    <td>{{ p.comment }}</td>
+                </tr>
+            {% endfor %}
+            <a href="{% url 'main:new_joint_product' %}">
+                <button class="btn btn-outline-dark" type="submit">Добавить товар</button>
+            </a>
+            </tbody>
+        </table>
+    </div>
 
 {% endblock content %}

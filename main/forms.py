@@ -9,7 +9,7 @@ from .models import (
     User
 )
 from main.core import widgets as custom_widgets, form_fields as custom_form_fields
-from main.core.constants import Roles, OrderStatuses
+from main.core.constants import Roles, OrderStatuses, ShoppingTypes
 
 
 class ProviderForm(forms.ModelForm):
@@ -95,12 +95,14 @@ class OrderForm(forms.ModelForm):
 
 class OrderItemForm(forms.ModelForm):
     product_image = forms.ImageField(label='Изображение товара', required=False)
+    place = forms.CharField(label='Место')
 
     def __init__(self, **kwargs):
         self.order_id = kwargs.pop('order_id', None)
         self.user = kwargs.pop('user', None)
         self.is_image_update_forbidden = kwargs.pop('is_image_update_forbidden', None)
         super().__init__(**kwargs)
+        self.fields['place'].initial = self.instance.place
         if self.is_image_update_forbidden:
             self.fields.pop('product_image')
 
@@ -130,24 +132,33 @@ class OrderItemForm(forms.ModelForm):
     def save(self, commit=True):
         if not self.instance.pk:
             self.instance.order = Order.objects.get(pk=self.order_id)
-            product = Product(image=self.cleaned_data['product_image'], created_by=self.user, updated_by=self.user)
+            product = Product(image=self.cleaned_data['product_image'],
+                              created_by=self.user,
+                              updated_by=self.user,
+                              place=self.cleaned_data.get('place', ''))
             product.save()
             self.instance.product = product
+        else:
+            place = self.cleaned_data.get('place')
+            if place:
+                self.instance.place = place
         return super().save(commit=commit)
 
 
 class JointOrderItemForm(forms.ModelForm):
-    product = forms.ChoiceField(label='Совместный товар', )
+    product = forms.ModelChoiceField(queryset=Product.objects.get_joint_products(), label='Совместный товар', widget=forms.widgets.Select())
 
     def __init__(self, **kwargs):
         self.order_id = kwargs.pop('order_id', None)
         self.user = kwargs.pop('user', None)
         self.is_image_update_forbidden = kwargs.pop('is_image_update_forbidden', None)
         super().__init__(**kwargs)
+        # self.fields['product'].choices = Product.objects.all()
+        # self.fields['product'].queryset = Product.objects.all()
 
     class Meta:
         model = OrderItem
-        fields = ('product', 'place', 'price', 'quantity', 'status', 'order_comment', 'customer_comment')
+        fields = ('product', 'price', 'quantity', 'status', 'order_comment', 'customer_comment')
 
     def clean_product_image(self):
         image = self.cleaned_data['product_image']
@@ -175,6 +186,33 @@ class JointOrderItemForm(forms.ModelForm):
             # product.save()
             # self.instance.product = product
         return super().save(commit=commit)
+
+
+class ProductForm(forms.ModelForm):
+
+    comment = forms.CharField(label='Комментарий к товару', required=False, widget=forms.widgets.Textarea)
+
+    class Meta:
+        model = Product
+        fields = ('image', 'place', 'price', 'quantity', 'comment', 'shopping_type')
+
+    def __init__(self, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(**kwargs)
+        #TODO: remove if another shopping_type is necessary
+        self.fields.pop('shopping_type')
+
+    def clean_place(self):
+        value = self.cleaned_data['place'].strip().replace(' ', '')
+        if not value:
+            raise ValidationError('Укажите, пожалуйста, номер места')
+        return value
+
+    def save(self, commit=True):
+        # TODO: remove if another shopping_type is necessary
+        if not self.instance.pk:
+            self.instance.shopping_type = ShoppingTypes.JOINT
+        return super().save(commit=True)
 
 
 class UserForm(forms.ModelForm):

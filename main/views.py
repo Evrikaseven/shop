@@ -19,6 +19,7 @@ from .forms import (
     UserForm,
     OrderItemForm,
     JointOrderItemForm,
+    ProductForm,
 )
 
 
@@ -322,10 +323,76 @@ class BuyoutsListView(LoginRolesRequiredMixin, TemplateView):
 
 class ProductsListView(LoginRolesRequiredMixin, TemplateView):
     template_name = 'main/products_list.html'
+    url_name = 'products'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['products'] = _models.Product.objects.get_joint_products()
+        context['MEDIA_URL'] = settings.MEDIA_URL
         return context
+
+
+class NewJointProductView(LoginRolesRequiredMixin, CreateView):
+    template_name = 'main/new_joint_product.html'
+    url_name = 'new_joint_product'
+    form_class = ProductForm
+    # allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+
+    def __init__(self):
+        self.user = None
+        self.order_id = None
+
+    def get_success_url(self):
+        return reverse_lazy('main:products')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # kwargs['order_id'] = self.order_id
+        kwargs['user'] = self.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # context['order'] = _models.Order.objects.get(id=self.order_id)
+        # context['MEDIA_URL'] = settings.MEDIA_URL
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user = request.user
+        # self.order_id = kwargs['pk']
+        return super().dispatch(request, *args, **kwargs)
+
+
+class UpdateJointProductView(LoginRolesRequiredMixin, UpdateView):
+    template_name = 'main/new_joint_product.html'
+    url_name = 'update_joint_product'
+    form_class = ProductForm
+    model = _models.Product
+    # allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+
+    def __init__(self):
+        self.user = None
+        self.order_id = None
+
+    def get_success_url(self):
+        return reverse_lazy('main:products')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # kwargs['order_id'] = self.order_id
+        kwargs['user'] = self.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # context['order'] = _models.Order.objects.get(id=self.order_id)
+        # context['MEDIA_URL'] = settings.MEDIA_URL
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user = request.user
+        # self.order_id = kwargs['pk']
+        return super().dispatch(request, *args, **kwargs)
 
 
 class HelpView(TemplateView):
