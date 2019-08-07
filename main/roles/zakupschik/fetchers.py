@@ -9,7 +9,7 @@ class ZakupschikFetcher(object):
                                                                        OrderStatuses.PAID,
                                                                        OrderStatuses.IN_PROGRESS,
                                                                        OrderStatuses.READY_TO_ISSUE),
-                                                    place=place)
+                                                    product__place=place)
         return order_items_qs
 
     def places_to_dict(self):
@@ -18,5 +18,5 @@ class ZakupschikFetcher(object):
                                                         OrderStatuses.PAID,
                                                         OrderStatuses.IN_PROGRESS,
                                                         OrderStatuses.READY_TO_ISSUE
-                                                    )).values_list('place', flat=True)
+                                                    )).values_list('product__place', flat=True)
         return set(places)

@@ -74,6 +74,10 @@ class Order(ModelWithTimestamp, ModelWithUser):
     def price(self):
         return sum(oi.price * oi.quantity for oi in OrderItem.objects.get_list(order=self))
 
+    @property
+    def balance(self):
+        return self.price - self.paid_price
+
     class Meta:
         ordering = ('created_date', )
 
@@ -94,7 +98,6 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
 
     product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, blank=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    place = models.CharField(max_length=150)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     quantity = models.PositiveIntegerField(default=1)
     order_comment = models.TextField(max_length=255, blank=True, default='')
@@ -112,6 +115,15 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
         statuses = dict(self.ORDER_ITEM_STATUSES)
         return statuses[self.status]
 
+    @property
+    def place(self):
+        return self.product.place if self.product else None
+
+    @place.setter
+    def place(self, value):
+        self.product.place = value
+        self.product.save()
+
 
 def get_path_to_product_image(instance, name):
     return '{}/{}'.format(MEDIA_PROD_IMAGE_DIR_PREFFIX, name)
@@ -122,19 +134,24 @@ class ProductManager(models.Manager):
     def get_list(self, **kwargs):
         return Product.objects.filter(active=True, **kwargs)
 
+    def get_joint_products(self, **kwargs):
+        return Product.objects.filter(active=True, shopping_type=ShoppingTypes.JOINT, **kwargs)
+
 
 class Product(ModelWithTimestamp, ModelWithUser):
     objects = ProductManager()
 
-    image = models.ImageField(upload_to=get_path_to_product_image)
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    comment = models.CharField(max_length=255, default='')
+    image = models.ImageField(verbose_name='Фото товара', upload_to=get_path_to_product_image)
+    place = models.CharField(verbose_name='Место', max_length=150, default='')
+    price = models.DecimalField(verbose_name='Цена', max_digits=10, decimal_places=2, default=0)
+    comment = models.CharField(verbose_name='Комментарий к товару', max_length=255, default='')
+    quantity = models.PositiveIntegerField(verbose_name='Количество', default=0)
     active = models.BooleanField(default=True)
     SHOPPING_TYPES = (
         (ShoppingTypes.INDIVIDUAL, ShoppingTypes.INDIVIDUAL_STR),
         (ShoppingTypes.JOINT, ShoppingTypes.JOINT_STR),
     )
-    shopping_type = models.PositiveIntegerField(default=ShoppingTypes.INDIVIDUAL, choices=SHOPPING_TYPES)
+    shopping_type = models.PositiveIntegerField(verbose_name='Вид закупки', default=ShoppingTypes.INDIVIDUAL, choices=SHOPPING_TYPES)
 
     @property
     def shopping_type_to_string(self):

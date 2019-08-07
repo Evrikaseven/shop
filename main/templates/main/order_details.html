@@ -22,10 +22,22 @@
                 <ul class="list-group mb-3">
                     <li class="list-group-item d-flex justify-content-between lh-condensed">
                         <div>
-                            <h6 class="my-0">Полная цена: </h6>
+                            <h6 class="my-0">Текущая цена: </h6>
                             <small class="text-muted">С учетом наценки</small>
                         </div>
                         <span class="text-muted">{{ order.price }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Оплачено: </h6>
+                        </div>
+                        <span class="text-muted">{{ order.paid_price }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Баланс: </h6>
+                        </div>
+                        <span class="text-muted">{{ order.balance }}</span>
                     </li>
 
                     {% if user_role == roles.ADMINISTRATOR %}
@@ -71,6 +83,7 @@
                             <th scope="col">Количество</th>
                             <th scope="col">Цена</th>
                             <th scope="col">Статус товара</th>
+                            <th scope="col">Вид закупки</th>
                             <th scope="col">Коментарий к заказу</th>
                             <th scope="col">Коментарий для себя</th>
                             <th scope="col"></th>
@@ -94,6 +107,7 @@
                                 <td class="text-center">{{ order_item.quantity }}</td>
                                 <td class="text-center">{{ order_item.price }}</td>
                                 <td class="text-center">{{ order_item.status_to_string }}</td>
+                                <td class="text-center">{{ order_item.product.shopping_type_to_string }}</td>
                                 <td>{{ order_item.order_comment }}</td>
                                 <td>{{ order_item.customer_comment }}</td>
                                 {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
