@@ -12,6 +12,7 @@
             <thead class="thead-dark">
             <tr>
                 <th scope="col">Фото</th>
+                <th scope="col">Название товара</th>
                 <th scope="col">Место</th>
                 <th scope="col">Цена</th>
                 <th scope="col">Количество</th>
@@ -26,6 +27,7 @@
                             <img src="{{ MEDIA_URL }}{{ p.image }}" height="150" width="150">
                         </a>
                     </td>
+                    <td>{{ p.name }}</td>
                     <td>{{ p.place }}</td>
                     <td>{{ p.price }}</td>
                     <td>{{ p.quantity }}</td>

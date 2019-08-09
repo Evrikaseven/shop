@@ -287,6 +287,8 @@ class OrderItemView(LoginRolesRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['order_item'] = self.object
+        context['child_order_item'] = getattr(self.object, 'orderitem', None)
         context['product_image'] = self.object.product.image
         context['MEDIA_URL'] = settings.MEDIA_URL
         return context
@@ -294,6 +296,40 @@ class OrderItemView(LoginRolesRequiredMixin, UpdateView):
     def dispatch(self, request, *args, **kwargs):
         self.user = request.user
         self.order_item_id = kwargs['pk']
+        return super().dispatch(request, *args, **kwargs)
+
+
+class ReplacementOrderItemView(LoginRolesRequiredMixin, CreateView):
+    template_name = 'main/new_order_item.html'
+    url_name = 'replacement_order_item'
+    form_class = OrderItemForm
+    allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+
+    def __init__(self):
+        self.user = None
+        self.order_item = None
+
+    def get_success_url(self):
+        return reverse_lazy('main:order_details', kwargs={'pk': self.order_item.order.id})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['order_id'] = self.order_item.order.id
+        kwargs['user'] = self.user
+        # kwargs['is_image_update_forbidden'] = True
+        kwargs['parent_item'] = self.order_item
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product_image'] = self.order_item.product.image
+        context['MEDIA_URL'] = settings.MEDIA_URL
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user = request.user
+        order_item_pk = kwargs['pk']
+        self.order_item = _models.OrderItem.objects.get(pk=order_item_pk)
         return super().dispatch(request, *args, **kwargs)
 
 

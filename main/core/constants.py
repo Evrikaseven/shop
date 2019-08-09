@@ -23,6 +23,12 @@ class OrderItemStatuses(metaclass=EnumMetaWithStrings):
     NOT_BAUGHT_OUT = 2, 'Не выкуплен'
 
 
+class OrderItemStates(metaclass=EnumMetaWithStrings):
+    NOT_ACTIVE = 0, 'Не активный'
+    ACTIVE = 1, 'Активный'
+    USED = 2, 'Используется'
+
+
 class ShoppingTypes(metaclass=EnumMetaWithStrings):
     INDIVIDUAL = 0, 'Индивидуальная покупка'
     JOINT = 1, ' Совместная покупка'
