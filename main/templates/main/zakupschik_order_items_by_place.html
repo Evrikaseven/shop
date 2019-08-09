@@ -9,11 +9,9 @@
     <div class="container px-0">
         {% for order_item in order_items %}
             <div class="d-flex font-weight-normal px-4 my-1 card-header">
-                <h5 class="my-1 mr-md-auto">
                     <a href="{% url 'main:order_item_details' pk=order_item.id %}">
                         <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="100" width="200">
                     </a>
-                </h5>
                 <div class="my-1 mr-md-3">Статус: {{ order_item.status_to_string }}</div>
                 <a class="btn btn-sm btn-outline-primary" data-toggle="collapse"
                    data-target="#hide-me{{ forloop.counter }}" aria-expanded="true" href="#">Детальная информация</a>

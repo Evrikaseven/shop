@@ -313,6 +313,30 @@ class DeleteOrderItemView(LoginRolesRequiredMixin, DeleteView):
         return context
 
 
+class CatalogOrderItems(LoginRolesRequiredMixin, CreateView):
+    template_name = 'main/catalog_items.html'
+    url_name = 'catalog'
+    form_class = ProductForm
+    model = _models.Product
+    allowed_roles = (Roles.ZAKAZSCHIK,)
+
+    def __init__(self):
+        self.order_id = None
+
+    def get_success_url(self):
+        return reverse_lazy('main:main_views.ProductsDetailsView.url_name', kwargs={'pk': self.kwargs['pk']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['products'] = _models.Product.objects.get_joint_products()
+        context['MEDIA_URL'] = settings.MEDIA_URL
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.order_id = kwargs.pop('pk', None)
+        return super().dispatch(request, *args, **kwargs)
+
+
 class BuyoutsListView(LoginRolesRequiredMixin, TemplateView):
     template_name = 'main/buyouts_list.html'
 
@@ -330,6 +354,27 @@ class ProductsListView(LoginRolesRequiredMixin, TemplateView):
         context['products'] = _models.Product.objects.get_joint_products()
         context['MEDIA_URL'] = settings.MEDIA_URL
         return context
+
+
+class ProductsAddToOrderView(LoginRolesRequiredMixin, FormView):
+    template_name = 'main/products_add.html'
+    url_name = 'details'
+    allowed_roles = (Roles.ZAKAZSCHIK,)
+    model = _models.Product
+    form_class = ProductForm
+
+    def __init__(self):
+        self.product_id = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product'] = _models.Product.objects.get(id=self.product_id)
+        context['MEDIA_URL'] = settings.MEDIA_URL
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.product_id = kwargs['pk']
+        return super().dispatch(request, *args, **kwargs)
 
 
 class NewJointProductView(LoginRolesRequiredMixin, CreateView):

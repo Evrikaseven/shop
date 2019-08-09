@@ -23,6 +23,7 @@ urlpatterns = [
     path('users/', main_views.UsersListView.as_view(), name='users'),
     path('users/<int:pk>/', main_views.UserDetailsView.as_view(), name=main_views.UserDetailsView.url_name),
     path('products/', main_views.ProductsListView.as_view(), name=main_views.ProductsListView.url_name),
+    path('products/<int:pk>/add_to_order/', main_views.ProductsAddToOrderView.as_view(), name=main_views.ProductsAddToOrderView.url_name),
     path('products/new_joint_product/', main_views.NewJointProductView.as_view(), name=main_views.NewJointProductView.url_name),
     path('products/<int:pk>', main_views.UpdateJointProductView.as_view(), name=main_views.UpdateJointProductView.url_name),
     path('buyouts/', main_views.BuyoutsListView.as_view(), name='buyouts'),
@@ -38,6 +39,9 @@ urlpatterns = [
     path('order_item/<int:pk>', main_views.OrderItemView.as_view(), name=main_views.OrderItemView.url_name),
     path('order_item/<int:pk>/delete', main_views.DeleteOrderItemView.as_view(), name=main_views.DeleteOrderItemView.url_name),
     path('order_created/<int:pk>', main_views.OrderCreatedView.as_view(), name='order_created'),
+
+     #Catalog items
+    path('catalog/', main_views.CatalogOrderItems.as_view(), name='catalog'),
 
     # Django REST framework related
     path('api/', include(router.urls))

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Товары{% endblock title %}
+
+{% block content %}
+    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom">
+        Информация по товару #{{ product.id }}
+    </h3>
+    <div class="container">
+        <div class="card mb-3">
+          <div class="row no-gutters">
+            <div class="col-md-4">
+              <img src="{{ MEDIA_URL }}{{ product.image }}" class="card-img" alt="...">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title">Card title</h5>
+                <p class="card-text">{{ product.place }}</p>
+                <p class="card-text">{{ product.quantity }}</p>
+                <p class="card-text">{{ product.comment }}</p>
+                <p class="card-text"><small class="text-muted">Цена за 1 шт: {{ product.place }} ₽</small></p>
+              </div>
+            </div>
+          </div>
+            <div class="card-footer text-right">
+                <a class="btn btn-sm btn-outline-dark" href="#">Добавить в заказ</a>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
