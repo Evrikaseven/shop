@@ -14,11 +14,11 @@
             </div>
             <div class="col-md-8">
               <div class="card-body">
-                <h5 class="card-title">Card title</h5>
+                <h5 class="card-title">{% if product.name %} {{ product.name }} {% else %} Без названия {% endif %}</h5>
                 <p class="card-text">{{ product.place }}</p>
                 <p class="card-text">{{ product.quantity }}</p>
                 <p class="card-text">{{ product.comment }}</p>
-                <p class="card-text"><small class="text-muted">Цена за 1 шт: {{ product.place }} ₽</small></p>
+                <p class="card-text"><small class="text-muted">Цена за 1 шт: {{ product.price }} ₽</small></p>
               </div>
             </div>
           </div>

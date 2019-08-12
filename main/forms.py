@@ -9,7 +9,7 @@ from .models import (
     User
 )
 from main.core import widgets as custom_widgets, form_fields as custom_form_fields
-from main.core.constants import Roles, OrderStatuses, ShoppingTypes
+from main.core.constants import Roles, OrderStatuses, ShoppingTypes, OrderItemStates, OrderItemStatuses
 
 
 class ProviderForm(forms.ModelForm):
@@ -28,7 +28,7 @@ class ProviderForm(forms.ModelForm):
 class NewOrderForm(forms.ModelForm):
     images = custom_form_fields.MultipleFilesField(label='Изображение товара',
                                                    widget=custom_widgets.ClearableMultiFileInput())
-    status = forms.ChoiceField(required=False, choices=Order.ORDER_STATUSES)
+    status = forms.ChoiceField(required=False, choices=tuple(OrderStatuses))
 
     class Meta:
         model = Order
@@ -40,12 +40,6 @@ class NewOrderForm(forms.ModelForm):
 
         if getattr(self.user, 'role', Roles.UNREGISTERED) not in (Roles.ZAKUPSCHIK, Roles.ADMINISTRATOR):
             self.fields.pop('status')
-
-        # if self.instance.pk:
-        #     order = Order.objects.get(pk=self.instance.pk)
-        #     self.fields['images'].initial = OrderImage.objects.filter(order=order)
-        #     self.fields['images'].choices = OrderImage.objects.filter(order=order)
-        #     self.fields['images'].queryset = OrderImage.objects.filter(order=order)
 
     def clean_images(self):
         images = self.cleaned_data['images']
@@ -62,22 +56,27 @@ class NewOrderForm(forms.ModelForm):
         self.instance.updated_by = self.user
         self.instance.save()
 
+        order_items = []
         for image in self.cleaned_data['images']:
             product = Product(image=image, created_by=self.user, updated_by=self.user)
             product.save()
-            order_item = OrderItem(order=self.instance, product=product, created_by=self.user, updated_by=self.user)
-            order_item.save()
+            # order_item = OrderItem(order=self.instance, product=product, created_by=self.user, updated_by=self.user)
+            # order_item.save()
+            # to optimize with bulk create
+            order_items.append(OrderItem(order=self.instance, product=product, created_by=self.user, updated_by=self.user))
+        if order_items:
+            OrderItem.objects.bulk_create(order_items)
         return self.instance
 
 
 class OrderForm(forms.ModelForm):
     images = custom_form_fields.MultipleFilesField(label='Изображение товара',
                                                    widget=custom_widgets.ClearableMultiFileInput())
-    status = forms.ChoiceField(required=False, choices=Order.ORDER_STATUSES)
+    status = forms.ChoiceField(required=False, choices=tuple(OrderStatuses))
 
     class Meta:
         model = Order
-        fields = ('images', 'status')
+        fields = ('images', 'status', 'paid_price')
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -86,29 +85,56 @@ class OrderForm(forms.ModelForm):
         if getattr(self.user, 'role', Roles.UNREGISTERED) not in (Roles.ZAKUPSCHIK, Roles.ADMINISTRATOR):
             self.fields.pop('status')
 
+    def clean_paid_price(self):
+        price = self.cleaned_data['paid_price']
+        if self.instance.pk:
+            if price is None:
+                price = self.instance.paid_price
+        else:
+            price = 0
+        return price
+
     def save(self, commit=True):
         if self.instance.pk:
+            paid_price = self.cleaned_data.get('paid_price')
             if 'status' in self.changed_data and int(self.cleaned_data.get('status', OrderStatuses.CREATED)) == OrderStatuses.PAID:
-                self.instance.paid_price = self.instance.price
+                if paid_price is None:
+                    self.instance.paid_price = self.instance.price
+                else:
+                    self.instance.paid_price = paid_price
+
         return super().save(commit=commit)
 
 
 class OrderItemForm(forms.ModelForm):
     product_image = forms.ImageField(label='Изображение товара', required=False)
-    place = forms.CharField(label='Место')
+    product_place = forms.CharField(label='Место')
+    product_name = forms.CharField(label='Название товара', required=False)
 
     def __init__(self, **kwargs):
         self.order_id = kwargs.pop('order_id', None)
         self.user = kwargs.pop('user', None)
         self.is_image_update_forbidden = kwargs.pop('is_image_update_forbidden', None)
+        self.parent_item = kwargs.pop('parent_item', None)
         super().__init__(**kwargs)
-        self.fields['place'].initial = self.instance.place
+
+        self.fields['product_name'].initial = self.instance.product_name
+        self.fields['product_place'].initial = self.instance.product_place
         if self.is_image_update_forbidden:
             self.fields.pop('product_image')
+        if self.user and self.user.role == Roles.ZAKAZSCHIK:
+            self.fields.pop('status')
 
     class Meta:
         model = OrderItem
-        fields = ('product_image', 'place', 'price', 'quantity', 'status', 'order_comment', 'customer_comment')
+        fields = ('product_image',
+                  'product_name',
+                  'product_place',
+                  'price',
+                  'quantity',
+                  'status',
+                  'order_comment',
+                  'customer_comment')
 
     def clean_product_image(self):
         image = self.cleaned_data['product_image']
@@ -116,8 +142,8 @@ class OrderItemForm(forms.ModelForm):
             raise ValidationError('Добавьте фотографию товара')
         return image
 
-    def clean_place(self):
-        value = self.cleaned_data['place'].strip().replace(' ', '')
+    def clean_product_place(self):
+        value = self.cleaned_data['product_place'].strip().replace(' ', '')
         if not value:
             raise ValidationError('Укажите, пожалуйста, номер места')
         return value
@@ -135,13 +161,35 @@ class OrderItemForm(forms.ModelForm):
             product = Product(image=self.cleaned_data['product_image'],
                               created_by=self.user,
                               updated_by=self.user,
-                              place=self.cleaned_data.get('place', ''))
+                              place=self.cleaned_data.get('product_place', ''),
+                              name=self.cleaned_data.get('product_name', ''))
             product.save()
             self.instance.product = product
         else:
-            place = self.cleaned_data.get('place')
-            if place:
-                self.instance.place = place
+            place = self.cleaned_data.get('product_place')
+            product = self.instance.product
+            if product:
+                if place:
+                    product.place = place
+                name = self.cleaned_data.get('product_name', '')
+                if name:
+                    product.name = name
+                product.save(update_fields=('place', 'name'))
+
+        if self.parent_item:
+            self.instance.parent = self.parent_item
+
+        if (self.parent_item and self.parent_item.status != OrderItemStatuses.NOT_BAUGHT_OUT and
+                self.instance.status != OrderItemStatuses.BAUGHT_OUT):
+            self.instance.state = OrderItemStates.NOT_ACTIVE
+
+        if self.instance.status == OrderItemStatuses.NOT_BAUGHT_OUT:
+            self.instance.state = OrderItemStates.ACTIVE
+            replacement_item = self.instance.replacement
+            if replacement_item:
+                replacement_item.state = OrderItemStates.USED
+                replacement_item.save()
+
         return super().save(commit=commit)
 
 
@@ -160,23 +208,16 @@ class JointOrderItemForm(forms.ModelForm):
         model = OrderItem
         fields = ('product', 'price', 'quantity', 'status', 'order_comment', 'customer_comment')
 
-    def clean_product_image(self):
-        image = self.cleaned_data['product_image']
-        if not image and not self.instance.pk:
-            raise ValidationError('Добавьте фотографию товара')
-        return image
-
-    def clean_place(self):
-        value = self.cleaned_data['place'].strip().replace(' ', '')
+    def clean_product_place(self):
+        value = self.cleaned_data['product_place'].strip().replace(' ', '')
         if not value:
             raise ValidationError('Укажите, пожалуйста, номер места')
         return value
 
-    def clean_price(self):
-        price = self.cleaned_data['price']
-        if not price or price < 0:
-            raise ValidationError('Цена не может быть нулевой или меньше 0')
-        return price
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        cleaned_data['price'] = cleaned_data['product'].price
+        return cleaned_data
 
     @transaction.atomic
     def save(self, commit=True):
@@ -194,7 +235,7 @@ class ProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        fields = ('image', 'place', 'price', 'quantity', 'comment', 'shopping_type')
+        fields = ('image', 'name', 'place', 'price', 'quantity', 'comment', 'shopping_type')
 
     def __init__(self, **kwargs):
         self.user = kwargs.pop('user', None)

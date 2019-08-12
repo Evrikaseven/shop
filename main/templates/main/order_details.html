@@ -43,7 +43,7 @@
                     {% if user_role == roles.ADMINISTRATOR %}
                         <div class="form-group row">
                             <label for="id_status" class="col-2 col-form-label">Статус заказа:</label>
-                            <select name="status" id="id_status">
+                            <select class="form-control" name="status" id="id_status">
                                 {% for status, status_str in order_statuses_list %}
                                     {% if status == order.status %}
                                         <option value="{{ status }}" selected>{{ status_str }}</option>
@@ -52,6 +52,10 @@
                                     {% endif %}
                                 {% endfor %}
                             </select>
+                        </div>
+                        <div>
+                        <label for="id_paid_price" class="col-2 col-form-label">Оплачено:</label>
+                        <input class="form-control" id="id_paid_price" name="paid_price" type="number" step="0.01" >
                         </div>
                     {% else %}
                         <li class="list-group-item d-flex justify-content-between">
@@ -79,6 +83,7 @@
                         <thead class="thead-light table-ts">
                         <tr>
                             <th scope="col">Изображение товара</th>
+                            <th scope="col">Название товара</th>
                             <th scope="col">Место</th>
                             <th scope="col">Количество</th>
                             <th scope="col">Цена</th>
@@ -91,7 +96,11 @@
                         </thead>
                         <tbody>
                         {% for order_item in order.orderitem_set.all %}
+                            {% if order_item.is_replacement %}
+                            <tr style="background-color: #5b80b2" >
+                            {% else %}
                             <tr>
+                            {% endif %}
                                 <td>
                                     {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
                                         <a href="{% url 'main:order_item_details' pk=order_item.id %}">
@@ -103,14 +112,15 @@
                                              width="150">
                                     {% endif %}
                                 </td>
-                                <td>{{ order_item.place }}</td>
+                                <td>{{ order_item.product_name }}</td>
+                                <td>{{ order_item.product_place }}</td>
                                 <td class="text-center">{{ order_item.quantity }}</td>
                                 <td class="text-center">{{ order_item.price }}</td>
                                 <td class="text-center">{{ order_item.status_to_string }}</td>
                                 <td class="text-center">{{ order_item.product.shopping_type_to_string }}</td>
                                 <td>{{ order_item.order_comment }}</td>
                                 <td>{{ order_item.customer_comment }}</td>
-                                {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
+                                {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR%}
                                     <td>
                                         <a href="{% url 'main:delete_order_item' pk=order_item.id %}">
                                             <button class="btn btn-outline-dark btn-sm mt-3" type="submit">Удалить
