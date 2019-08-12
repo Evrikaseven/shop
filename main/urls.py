@@ -32,10 +32,14 @@ urlpatterns = [
     # Order related
     path('new_order/', main_views.NewOrderView.as_view(), name='new_order'),
     path('orders/', main_views.OrdersListView.as_view(), name='orders'),
+    path('orders/<int:product_id>', main_views.OrdersListView.as_view(), name='product_to_orders'),
     path('orders/<int:pk>/', main_views.OrderDetailsView.as_view(), name=main_views.OrderDetailsView.url_name),
     path('orders/<int:pk>/paying/', main_views.OrderPayingView.as_view(), name=main_views.OrderPayingView.url_name),
     path('orders/<int:pk>/new_item/', main_views.NewOrderItemView.as_view(), name=main_views.NewOrderItemView.url_name),
-    path('orders/<int:pk>/new_joint_item/', main_views.NewJointOrderItemView.as_view(), name=main_views.NewJointOrderItemView.url_name),
+    path('orders/<int:pk>/new_joint_item/', main_views.NewJointOrderItemView.as_view(), name='new_joint_order_item'),
+
+    path('orders/<int:pk>/joint_item_to_product/<int:product_pk>', main_views.NewJointOrderItemView.as_view(), name='joint_item_to_product'),
+
     path('order_item/<int:pk>', main_views.OrderItemView.as_view(), name=main_views.OrderItemView.url_name),
     path('order_item/<int:pk>/new_replacement/', main_views.ReplacementOrderItemView.as_view(), name=main_views.ReplacementOrderItemView.url_name),
     path('order_item/<int:pk>/delete', main_views.DeleteOrderItemView.as_view(), name=main_views.DeleteOrderItemView.url_name),

@@ -4,8 +4,17 @@
 
 {% block content %}
 
-    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Список заказов за 30 дней</h3>
+    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
+    {% if product_id %}
+        Укажите заказ куда добавить товар
+    {% else %}
+        Список ваших заказов
+    {% endif %}
+    </h3>
     <div class="container table-container">
+    {% if product_id %}
+        <a class="btn btn-sm btn-outline-dark my-3" href="#">Создать новый заказ</a>
+    {% endif %}
         <table class="table table-sm table-hover " id="OrdersTable">
             <thead class="thead-light table-ts">
             <tr>
@@ -19,7 +28,12 @@
             <tbody>
             {% for o in orders %}
                 <tr>
-                    <td scope="row">Заказ #<a href="{% url 'main:order_details' pk=o.id %}">{{ o.id }}</a></td>
+                    {% if product_id %}
+                         <td scope="row">Заказ #<a href="{% url 'main:joint_item_to_product' pk=o.id product_pk=product_id %}">{{ o.id }}</a></td>
+                    {% else %}
+                         <td scope="row">Заказ #<a href="{% url 'main:order_details' pk=o.id %}">{{ o.id }}</a></td>
+                    {% endif %}
+
                     <td>{{ o.created_date }}</td>
                     <td>{{ o.created_by.username }}</td>
                     <td>{{ o.price }}</td>

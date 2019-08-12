@@ -128,18 +128,28 @@ class OrdersListView(LoginRolesRequiredMixin, TemplateView):
 
     def __init__(self):
         self.user = None
+        self.product_id = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        if self.product_id:
+            context['product_id'] = self.product_id
+
         if self.user.role in (Roles.ZAKUPSCHIK, Roles.ADMINISTRATOR):
             order_qs = _models.Order.objects.get_list()
         else:
             order_qs = _models.Order.objects.get_list(created_by=self.user)
         context['orders'] = order_qs
+        print(context)
         return context
 
     def dispatch(self, request, *args, **kwargs):
         self.user = request.user
+
+        if 'product_id' in kwargs:
+            self.product_id = kwargs['product_id']
+
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -175,6 +185,7 @@ class OrderDetailsView(LoginRolesRequiredMixin, UpdateView):
     def dispatch(self, request, *args, **kwargs):
         self.user = request.user
         self.order_id = kwargs['pk']
+        # print("########## DEBUG: ", kwargs)
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -235,7 +246,7 @@ class NewOrderItemView(LoginRolesRequiredMixin, CreateView):
 
 class NewJointOrderItemView(LoginRolesRequiredMixin, CreateView):
     template_name = 'main/new_joint_order_item.html'
-    url_name = 'new_joint_order_item'
+    #url_name = 'new_joint_order_item'
     form_class = JointOrderItemForm
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
 

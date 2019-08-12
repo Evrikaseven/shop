@@ -137,17 +137,8 @@
 
                 {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
                     <div class="text-center">
-                        <span>
-                            <a href="{% url 'main:new_order_item' pk=order.id %}">
-                                <button class="btn btn-outline-dark" type="submit">Добавить товар</button>
-                            </a>
-                        </span>
-                        <span>
-                            <a href="{% url 'main:new_joint_order_item' pk=order.id %}">
-                                <button class="btn btn-outline-dark"
-                                        type="submit">Добавить товар из совместной закупки</button>
-                            </a>
-                        </span>
+                            <a class="btn btn-outline-dark" href="{% url 'main:new_order_item' pk=order.id %}">Добавить товар</a>
+                            <a class="btn btn-outline-dark" href="{% url 'main:catalog' %}">Добавить товар из совместной закупки</a>
                     </div>
                 {% endif %}
 
