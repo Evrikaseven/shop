@@ -229,6 +229,45 @@ class JointOrderItemForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
+class JointItemToOrderForm(forms.ModelForm):
+
+
+    def __init__(self, **kwargs):
+        self.order_id = kwargs.pop('order_id', None)
+        self.product_id = kwargs.pop('product_id', None)
+        self.user = kwargs.pop('user', None)
+        self.is_image_update_forbidden = kwargs.pop('is_image_update_forbidden', None)
+        super().__init__(**kwargs)
+        # self.fields['product'].choices = Product.objects.all()
+        # self.fields['product'].queryset = Product.objects.all()
+        print(self.product_id)
+
+    class Meta:
+        model = OrderItem
+        fields = ('product', 'price', 'quantity', 'status', 'order_comment', 'customer_comment')
+
+    def clean_product_place(self):
+        value = self.cleaned_data['product_place'].strip().replace(' ', '')
+        if not value:
+            raise ValidationError('Укажите, пожалуйста, номер места')
+        return value
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        cleaned_data['price'] = cleaned_data['product'].price
+        print(cleaned_data)
+        return cleaned_data
+
+    @transaction.atomic
+    def save(self, commit=True):
+        if not self.instance.pk:
+            self.instance.order = Order.objects.get(pk=self.order_id)
+            # product = Product(image=self.cleaned_data['product_image'], created_by=self.user, updated_by=self.user)
+            # product.save()
+            self.instance.product = Product.objects.get(pk=self.product_id)
+        return super().save(commit=commit)
+
+
 class ProductForm(forms.ModelForm):
 
     comment = forms.CharField(label='Комментарий к товару', required=False, widget=forms.widgets.Textarea)

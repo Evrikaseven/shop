@@ -5,14 +5,18 @@
 {% block content %}
 
 <div>
-    <h2>Вы точно хотите удалить?</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div>
-            <img src="{{ MEDIA_URL }}{{ order_item.product.image }}">
-        </div>
-        <button type="submit">Удалить</button>
-    </form>
+    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom">
+        Вы точно хотите удалить?
+    </h3>
+    <div class="container">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div>
+                <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="150" width="150">
+            </div>
+            <button type="submit">Удалить</button>
+        </form>
+    </div>
 </div>
 
 {% endblock content %}

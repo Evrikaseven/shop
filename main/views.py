@@ -19,6 +19,7 @@ from .forms import (
     UserForm,
     OrderItemForm,
     JointOrderItemForm,
+    JointItemToOrderForm,
     ProductForm,
 )
 
@@ -247,12 +248,13 @@ class NewOrderItemView(LoginRolesRequiredMixin, CreateView):
 class NewJointOrderItemView(LoginRolesRequiredMixin, CreateView):
     template_name = 'main/new_joint_order_item.html'
     #url_name = 'new_joint_order_item'
-    form_class = JointOrderItemForm
+    form_class = JointItemToOrderForm
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
 
     def __init__(self):
         self.user = None
         self.order_id = None
+        self.product_id = None
 
     def get_success_url(self):
         return reverse_lazy('main:order_details', kwargs={'pk': self.kwargs['pk']})
@@ -260,6 +262,7 @@ class NewJointOrderItemView(LoginRolesRequiredMixin, CreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['order_id'] = self.order_id
+        kwargs['product_id'] = self.product_id
         kwargs['user'] = self.user
         return kwargs
 
@@ -272,6 +275,7 @@ class NewJointOrderItemView(LoginRolesRequiredMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.user = request.user
         self.order_id = kwargs['pk']
+        self.product_id = kwargs['product_pk']
         return super().dispatch(request, *args, **kwargs)
 
 

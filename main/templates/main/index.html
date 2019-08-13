@@ -5,43 +5,6 @@
 
 {% block content %}
 
-    <div class="mb-3 border-bottom box-shadow">
-        <div class="container">
-        <div class="row justify-content-between">
-            <div class="col-6">
-                <h2 class="d-flex justify-content-between align-items-center py-2">
-                    <span class="text-muted">ОП*ТЫ</span>
-                </h2>
-            </div>
-                {% if user.is_authenticated %}
-                    <div class="col-6">
-                        <div class="py-2 text-right">
-                            {% if user.first_name and user.last_name %}
-                                <span> Привет, {{ user.first_name }}!</span>
-                            {% else %}
-                                <span> Логин: {{ user.username }} </span>
-                            {% endif %}
-                            <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:logout' %}">Выход</a>
-                            {% if pers_area_url == 'administrator' %}
-                                <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:administrator' %}">Личный кабинет</a>
-                            {% elif pers_area_url == 'zakupschik' %}
-                                <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:zakupschik' %}">Личный кабинет</a>
-                            {% else %} {# 'zakazschik' #}
-                                <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:zakazschik' %}">Личный кабинет</a>
-                            {% endif %}
-                        </div>
-                {% else %}
-                    <div class="col-3 text-right">
-                        <div class="py-3 btn-group">
-                            <a class="btn btn-sm btn-outline-secondary " href="{% url 'main:signup' %}">Регистрация</a>
-                            <a class="btn btn-sm btn-outline-secondary" href="{% url 'main:login' %}">Войти</a>
-                        </div>
-                {% endif %}
-                    </div>
-                    </div>
-            </div>
-        </div>
-    </div>
     <div class="container">
         <nav class="site-header sticky-top py-2">
           <div class="container d-flex flex-column flex-md-row justify-content-between">
