@@ -80,30 +80,38 @@ class OrderForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
+        self.user_balance_delta = 0
         super().__init__(*args, **kwargs)
 
         if getattr(self.user, 'role', Roles.UNREGISTERED) not in (Roles.ZAKUPSCHIK, Roles.ADMINISTRATOR):
             self.fields.pop('status')
 
+    @transaction.atomic
+    def pay_order(self):
+        self.instance.status = OrderStatuses.PAYING_TO_BE_CONFIRMED
+        user = self.instance.created_by
+        user.balance -= self.instance.price
+        user.save()
+        self.instance.save()
+
     def clean_paid_price(self):
-        price = self.cleaned_data['paid_price']
-        if self.instance.pk:
-            if price is None:
-                price = self.instance.paid_price
-        else:
-            price = 0
-        return price
+        paid_price = self.cleaned_data['paid_price']
+        return paid_price if paid_price else 0
 
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        if self.instance.pk:
+            paid_price = cleaned_data['paid_price']
+            cleaned_data['paid_price'] = self.instance.paid_price + paid_price
+            self.user_balance_delta = paid_price
+        return cleaned_data
+
+    @transaction.atomic
     def save(self, commit=True):
-        if self.instance.pk:
-            paid_price = self.cleaned_data.get('paid_price')
-            if 'status' in self.changed_data and int(self.cleaned_data.get('status', OrderStatuses.CREATED)) == OrderStatuses.PAID:
-                if paid_price is None:
-                    self.instance.paid_price = self.instance.price
-                else:
-                    self.instance.paid_price = paid_price
-
-        return super().save(commit=commit)
+        user = self.instance.created_by
+        user.balance += self.user_balance_delta
+        user.save()
+        return super().save(commit=True)
 
 
 class OrderItemForm(forms.ModelForm):
