@@ -1,10 +1,11 @@
 
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, FormView, DeleteView
+from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.conf import settings
 from main.core.mixins import LoginRolesRequiredMixin
-from main.core.utils import send_new_order_created_email
+from main.core.utils import shop_send_email
 from . import models as _models
 from .core.constants import Roles, OrderStatuses
 from . import serializers as _serializers
@@ -163,7 +164,6 @@ class OrderDetailsView(LoginRolesRequiredMixin, UpdateView):
 
     def __init__(self):
         self.user = None
-        self.order_id = None
 
     def get_success_url(self):
         return reverse_lazy('main:order_details', kwargs={'pk': self.kwargs['pk']})
@@ -176,40 +176,52 @@ class OrderDetailsView(LoginRolesRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['user_role'] = self.user.role
+        context['user_balance'] = self.object.created_by.balance
         context['roles'] = Roles
         context['order_statuses'] = OrderStatuses
         context['order_statuses_list'] = list(OrderStatuses)
-        context['order'] = _models.Order.objects.get(id=self.order_id)
+        context['order'] = self.object
         context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
     def dispatch(self, request, *args, **kwargs):
         self.user = request.user
-        self.order_id = kwargs['pk']
-        # print("########## DEBUG: ", kwargs)
         return super().dispatch(request, *args, **kwargs)
 
 
-class OrderPayingView(LoginRolesRequiredMixin, TemplateView):
+class OrderPayingView(LoginRolesRequiredMixin, UpdateView):
     template_name = 'main/order_paying.html'
+    form_class = OrderForm
     allowed_roles = (Roles.ZAKAZSCHIK,)
     url_name = 'order_paying'
+    model = _models.Order
 
     def __init__(self):
         self.user = None
-        self.order_id = None
+
+    def _send_order_is_paid_email(self):
+        email_template = 'main/email_order_paying.html'
+        email_context = {
+            'user': self.user,
+            'order': self.object,
+        }
+        email_subject = 'Новый заказ оплачен'
+        email_to = [self.user.email]
+        shop_send_email(email_template, email_context, email_subject, email_to)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.user
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        order = _models.Order.objects.get(id=self.order_id)
-        order.status = OrderStatuses.PAYING_TO_BE_CONFIRMED
-        order.save()
-        context['order'] = order
-        # send_new_order_created_email(self.user, order)
+        self._send_order_is_paid_email()
+        form = self.get_form()
+        form.pay_order()
         return context
 
     def dispatch(self, request, *args, **kwargs):
-        self.order_id = kwargs['pk']
         self.user = request.user
         return super().dispatch(request, *args, **kwargs)
 

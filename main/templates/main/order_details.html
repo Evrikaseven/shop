@@ -35,9 +35,9 @@
                     </li>
                     <li class="list-group-item d-flex justify-content-between lh-condensed">
                         <div>
-                            <h6 class="my-0">Баланс: </h6>
+                            <h6 class="my-0">Баланс пользователя:</h6>
                         </div>
-                        <span class="text-muted">{{ order.balance }}</span>
+                        <span class="text-muted">{{ user_balance }}</span>
                     </li>
 
                     {% if user_role == roles.ADMINISTRATOR %}
@@ -54,8 +54,8 @@
                             </select>
                         </div>
                         <div>
-                        <label for="id_paid_price" class="col-2 col-form-label">Оплачено:</label>
-                        <input class="form-control" id="id_paid_price" name="paid_price" type="number" step="0.01" >
+                            <label for="id_paid_price" class="col-2 col-form-label">Оплачено:</label>
+                            <input class="form-control" id="id_paid_price" name="paid_price" type="number" step="0.01">
                         </div>
                     {% else %}
                         <li class="list-group-item d-flex justify-content-between">
@@ -97,38 +97,39 @@
                         <tbody>
                         {% for order_item in order.orderitem_set.all %}
                             {% if order_item.is_replacement %}
-                            <tr style="background-color: #5b80b2" >
-                            {% else %}
-                            <tr>
-                            {% endif %}
-                                <td>
-                                    {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
-                                        <a href="{% url 'main:order_item_details' pk=order_item.id %}">
-                                            <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="150"
-                                                 width="150">
-                                        </a>
+                                <tr style="background-color: #5b80b2">
                                     {% else %}
-                                        <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="150"
-                                             width="150">
-                                    {% endif %}
-                                </td>
-                                <td>{{ order_item.product_name }}</td>
-                                <td>{{ order_item.product_place }}</td>
-                                <td class="text-center">{{ order_item.quantity }}</td>
-                                <td class="text-center">{{ order_item.price }}</td>
-                                <td class="text-center">{{ order_item.status_to_string }}</td>
-                                <td class="text-center">{{ order_item.product.shopping_type_to_string }}</td>
-                                <td>{{ order_item.order_comment }}</td>
-                                <td>{{ order_item.customer_comment }}</td>
-                                {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR%}
-                                    <td>
-                                        <a href="{% url 'main:delete_order_item' pk=order_item.id %}">
-                                            <button class="btn btn-outline-dark btn-sm mt-3" type="submit">Удалить
-                                            </button>
-                                        </a>
-                                    </td>
+                                <tr>
+                            {% endif %}
+                        <td>
+                            <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="150" width="150">
+                        </td>
+                        <td>{{ order_item.product_name }}</td>
+                        <td>{{ order_item.product_place }}</td>
+                        <td class="text-center">{{ order_item.quantity }}</td>
+                        <td class="text-center">{{ order_item.price }}</td>
+                        <td class="text-center">{{ order_item.status_to_string }}</td>
+                        <td class="text-center">{{ order_item.product.shopping_type_to_string }}</td>
+                        <td>{{ order_item.order_comment }}</td>
+                        <td>{{ order_item.customer_comment }}</td>
+                        {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
+                            <td>
+                                <a href="{% url 'main:order_item_details' pk=order_item.id %}">
+                                    <button class="btn btn-outline-dark btn-sm mt-3" type="submit">Изменить
+                                    </button>
+                                </a>
+
+                                {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
+
+                                    <a href="{% url 'main:delete_order_item' pk=order_item.id %}">
+                                        <button class="btn btn-outline-dark btn-sm mt-3" type="submit">Удалить
+                                        </button>
+                                    </a>
                                 {% endif %}
-                            </tr>
+                            </td>
+
+                        {% endif %}
+                        </tr>
                         {% endfor %}
                         </tbody>
                     </table>
@@ -137,8 +138,10 @@
 
                 {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
                     <div class="text-center">
-                            <a class="btn btn-outline-dark" href="{% url 'main:new_order_item' pk=order.id %}">Добавить товар</a>
-                            <a class="btn btn-outline-dark" href="{% url 'main:catalog' %}">Добавить товар из совместной закупки</a>
+                        <a class="btn btn-outline-dark" href="{% url 'main:new_order_item' pk=order.id %}">Добавить
+                            товар</a>
+                        <a class="btn btn-outline-dark" href="{% url 'main:catalog' %}">Добавить товар из совместной
+                            закупки</a>
                     </div>
                 {% endif %}
 
