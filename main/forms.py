@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from main.core.utils import shop_send_email
 from django.db import transaction
 from .models import (
     Provider,
@@ -10,6 +11,7 @@ from .models import (
 )
 from main.core import widgets as custom_widgets, form_fields as custom_form_fields
 from main.core.constants import Roles, OrderStatuses, ShoppingTypes, OrderItemStates, OrderItemStatuses
+from main.core.form_mixins import WithUserDataUpdateFormMixin
 
 
 class ProviderForm(forms.ModelForm):
@@ -25,7 +27,7 @@ class ProviderForm(forms.ModelForm):
         exclude = []
 
 
-class NewOrderForm(forms.ModelForm):
+class NewOrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
     images = custom_form_fields.MultipleFilesField(label='Изображение товара',
                                                    widget=custom_widgets.ClearableMultiFileInput())
     status = forms.ChoiceField(required=False, choices=tuple(OrderStatuses))
@@ -51,11 +53,6 @@ class NewOrderForm(forms.ModelForm):
     def save(self, commit=True):
         super().save(commit=commit)
 
-        if not self.instance.created_by:
-            self.instance.created_by = self.user
-        self.instance.updated_by = self.user
-        self.instance.save()
-
         order_items = []
         for image in self.cleaned_data['images']:
             product = Product(image=image, created_by=self.user, updated_by=self.user)
@@ -69,7 +66,7 @@ class NewOrderForm(forms.ModelForm):
         return self.instance
 
 
-class OrderForm(forms.ModelForm):
+class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
     images = custom_form_fields.MultipleFilesField(label='Изображение товара',
                                                    widget=custom_widgets.ClearableMultiFileInput())
     status = forms.ChoiceField(required=False, choices=tuple(OrderStatuses))
@@ -90,9 +87,28 @@ class OrderForm(forms.ModelForm):
     def pay_order(self):
         self.instance.status = OrderStatuses.PAYING_TO_BE_CONFIRMED
         user = self.instance.created_by
+        old_user_balance = user.balance
         user.balance -= self.instance.price
         user.save()
         self.instance.save()
+
+        email_data = {
+            'order_pk': self.instance.pk,
+            'order_price': self.instance.price,
+            'username': user.username,
+            'status': OrderStatuses.PAYING_TO_BE_CONFIRMED_STR,
+            'paid_price': self.instance.paid_price,
+            'user_balance': user.balance,
+            'status_changed': True,
+            'paid_price_changed': False,
+            'user_balance_changed': False,
+        }
+        if old_user_balance != user.balance:
+            email_data['user_balance_changed'] = True
+        shop_send_email(template='main/email_order_template.html',
+                        context=email_data,
+                        subject='Новый заказ №{}'.format(self.instance.pk),
+                        to=[user.email])
 
     def clean_paid_price(self):
         paid_price = self.cleaned_data['paid_price']
@@ -108,13 +124,15 @@ class OrderForm(forms.ModelForm):
 
     @transaction.atomic
     def save(self, commit=True):
-        user = self.instance.created_by
-        user.balance += self.user_balance_delta
-        user.save()
+        if self.user_balance_delta:
+            user = self.instance.created_by
+            user.balance += self.user_balance_delta
+            user.save()
+
         return super().save(commit=True)
 
 
-class OrderItemForm(forms.ModelForm):
+class OrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
     product_image = forms.ImageField(label='Изображение товара', required=False)
     product_place = forms.CharField(label='Место')
     product_name = forms.CharField(label='Название товара', required=False)
@@ -164,16 +182,7 @@ class OrderItemForm(forms.ModelForm):
 
     @transaction.atomic
     def save(self, commit=True):
-        if not self.instance.pk:
-            self.instance.order = Order.objects.get(pk=self.order_id)
-            product = Product(image=self.cleaned_data['product_image'],
-                              created_by=self.user,
-                              updated_by=self.user,
-                              place=self.cleaned_data.get('product_place', ''),
-                              name=self.cleaned_data.get('product_name', ''))
-            product.save()
-            self.instance.product = product
-        else:
+        if self.instance.pk:
             place = self.cleaned_data.get('product_place')
             product = self.instance.product
             if product:
@@ -183,6 +192,16 @@ class OrderItemForm(forms.ModelForm):
                 if name:
                     product.name = name
                 product.save(update_fields=('place', 'name'))
+        else:
+            # in case when new order item is created
+            self.instance.order = Order.objects.get(pk=self.order_id)
+            product = Product(image=self.cleaned_data['product_image'],
+                              created_by=self.user,
+                              updated_by=self.user,
+                              place=self.cleaned_data.get('product_place', ''),
+                              name=self.cleaned_data.get('product_name', ''))
+            product.save()
+            self.instance.product = product
 
         if self.parent_item:
             self.instance.parent = self.parent_item
@@ -201,7 +220,7 @@ class OrderItemForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
-class JointOrderItemForm(forms.ModelForm):
+class JointOrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
     product = forms.ModelChoiceField(queryset=Product.objects.get_joint_products(), label='Совместный товар', widget=forms.widgets.Select())
 
     def __init__(self, **kwargs):
@@ -235,7 +254,7 @@ class JointOrderItemForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
-class JointItemToOrderForm(forms.ModelForm):
+class JointItemToOrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
 
 
     def __init__(self, **kwargs):
@@ -274,7 +293,7 @@ class JointItemToOrderForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
-class ProductForm(forms.ModelForm):
+class ProductForm(WithUserDataUpdateFormMixin, forms.ModelForm):
 
     comment = forms.CharField(label='Комментарий к товару', required=False, widget=forms.widgets.Textarea)
 

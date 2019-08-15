@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Заказ №{{ order_pk }}</title>
+</head>
+<body>
+<div>
+   Пользователь: <em>{{ username }}</em>
+</div>
+<div>
+   Номер заказа: <em>{{ order_pk }}</em>
+</div>
+<div>
+    Заказ на сумму: <em>{{ order_price }}</em>
+</div>
+<div>
+    {% if status_changed %}
+        Новый статус заказа: <em>{{ status }}</em>
+    {% endif %}
+</div>
+<div>
+    {% if paid_price_changed %}
+        Оплаченная сумма заказа <em>{{ paid_price }}</em>
+    {% endif %}
+</div>
+<div>
+    {% if user_balance_changed %}
+        Новый баланс пользователя: <em>{{ user_balance }}</em>
+    {% endif %}
+</div>
+
+</body>
+</html>

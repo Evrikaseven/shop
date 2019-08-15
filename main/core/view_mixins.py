@@ -3,7 +3,7 @@ from main.models import Roles
 from main.models import User
 
 
-class LoginRolesRequiredMixin(AccessMixin):
+class LoginRolesRequiredViewMixin(AccessMixin):
     """
     Verify that the current user is authenticated and has allowed role
     required_roles class attribute should be provided to add roles
@@ -28,7 +28,7 @@ class LoginRolesRequiredMixin(AccessMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
-class LoginRolesOwnerRequiredUpdateViewMixin(LoginRolesRequiredMixin):
+class LoginRolesOwnerRequiredUpdateViewMixin(LoginRolesRequiredViewMixin):
     """
         Verify that the current user is authenticated and has allowed role
         required_roles class attribute should be provided to add roles
@@ -67,7 +67,7 @@ class LoginRolesOwnerRequiredUpdateViewMixin(LoginRolesRequiredMixin):
         return super().post(*args, **kwargs)
 
 
-class WithRolesInContextMixin:
+class WithRolesInContextViewMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if hasattr(self.user, 'role'):
