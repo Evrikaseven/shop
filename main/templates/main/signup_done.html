@@ -1,8 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Регистрация прошла успешно</h2>
+    <div class="container table-container">
+    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
+    Регистрация прошла успешно
+    </h3>
     <p>
         <a href="{% url 'main:index' %}">Вернуться на главную страницу</a>
     </p>
+    </div>
 {% endblock %}
