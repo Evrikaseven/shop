@@ -209,8 +209,6 @@ class JointOrderItemForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         self.is_image_update_forbidden = kwargs.pop('is_image_update_forbidden', None)
         super().__init__(**kwargs)
-        # self.fields['product'].choices = Product.objects.all()
-        # self.fields['product'].queryset = Product.objects.all()
 
     class Meta:
         model = OrderItem
@@ -304,6 +302,13 @@ class ProductForm(forms.ModelForm):
 
 
 class UserForm(forms.ModelForm):
+
+    def __init__(self, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(**kwargs)
+        if self.user.role != Roles.ADMINISTRATOR:
+            self.fields.pop('role')
+
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'birth_date', 'phone', 'location', 'role')

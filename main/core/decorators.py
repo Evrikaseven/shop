@@ -1,13 +1,11 @@
 import functools
+from django.http import HttpResponseForbidden
+from main.core.constants import Roles
 
 
-def roles_allowed(roles=None):
-    if not roles:
-        roles = []
-    def decor(func):
-        functools.wraps(func)
-        def wrapped(*args, **kwargs):
-            pass
-        return wrapped
-    return decor
-
+# def disable_for_other_users(func):
+#     @functools.wraps(func)
+#     def wrapped(*args, **kwargs):
+#         return HttpResponseForbidden('12313')
+#         # return func(*args, **kwargs)
+#     return wrapped

@@ -29,16 +29,16 @@
                     <div class="col-6">
                         <div class="py-2 text-right">
                             {% if user.first_name and user.last_name %}
-                                <span> Привет, {{ user.first_name }}!</span>
+                                <span> Привет, <a href="{% url 'main:user_details' pk=user.pk %}" title="Детальная информация о пользователе">{{ user.first_name }}</a>!</span>
                             {% else %}
                                 <span> Логин: {{ user.username }} </span>
                             {% endif %}
                             <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:logout' %}">Выход</a>
-                            {% if pers_area_url == 'administrator' %}
+                            {% if user_role == roles.ADMINISTRATOR %}
                                 <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:administrator' %}">Личный кабинет</a>
-                            {% elif pers_area_url == 'zakupschik' %}
+                            {% elif user_role == roles.ZAKUPSCHIK %}
                                 <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:zakupschik' %}">Личный кабинет</a>
-                            {% else %} {# 'zakazschik' #}
+                            {% else %} {# 'ZAKAZSCHIK' #}
                                 <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:zakazschik' %}">Личный кабинет</a>
                             {% endif %}
                         </div>
