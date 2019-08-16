@@ -32,7 +32,7 @@ urlpatterns = [
     # Order related
     path('new_order/', main_views.NewOrderView.as_view(), name='new_order'),
     path('orders/', main_views.OrdersListView.as_view(), name='orders'),
-    path('orders/<int:product_id>', main_views.OrdersListView.as_view(), name='product_to_orders'),
+    path('orders/product_to_order/<int:product_id>', main_views.OrdersListView.as_view(), name='product_to_orders'),
     path('orders/<int:pk>/', main_views.OrderDetailsView.as_view(), name=main_views.OrderDetailsView.url_name),
     path('orders/<int:pk>/paying/', main_views.OrderPayingView.as_view(), name=main_views.OrderPayingView.url_name),
     path('orders/<int:pk>/new_item/', main_views.NewOrderItemView.as_view(), name=main_views.NewOrderItemView.url_name),

@@ -67,10 +67,19 @@ class LoginRolesOwnerRequiredUpdateViewMixin(LoginRolesRequiredViewMixin):
         return super().post(*args, **kwargs)
 
 
-class WithRolesInContextViewMixin:
+class WithLogedUserInContextViewMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if hasattr(self.user, 'role'):
+        if self.user.is_authenticated:
+            context['user_pk'] = self.user.pk
+            context['username'] = self.user.username
             context['user_role'] = self.user.role
             context['roles'] = Roles
+            context['user_is_authenticated'] = True
+            context['user_first_name'] = self.user.first_name
+            context['user_last_name'] = self.user.last_name
         return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user = request.user
+        return super().dispatch(request, *args, **kwargs)

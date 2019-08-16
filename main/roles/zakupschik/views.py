@@ -1,18 +1,18 @@
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from main.core.view_mixins import LoginRolesRequiredViewMixin, WithRolesInContextViewMixin
+from main.core.view_mixins import LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin
 from django.conf import settings
 from .fetchers import ZakupschikFetcher
 from main.core.constants import Roles
 
 
-class ZakupschikMainView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, TemplateView):
+class ZakupschikMainView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, TemplateView):
     template_name = 'main/zakupschik.html'
     url_name = 'zakupschik'
     allowed_roles = (Roles.ZAKUPSCHIK,)
 
 
-class ZakupschikOrdersPlacesView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, TemplateView):
+class ZakupschikOrdersPlacesView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, TemplateView):
     template_name = 'main/zakupschik_orders.html'
     url_name = 'zakupschik_orders_places'
     allowed_roles = (Roles.ZAKUPSCHIK,)
@@ -24,7 +24,7 @@ class ZakupschikOrdersPlacesView(LoginRolesRequiredViewMixin, WithRolesInContext
         return context
 
 
-class ZakupschikOrdersByPlacesView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, TemplateView):
+class ZakupschikOrdersByPlacesView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, TemplateView):
     template_name = 'main/zakupschik_order_items_by_place.html'
     url_name = 'zakupschik_order_details_by_place'
     allowed_roles = (Roles.ZAKUPSCHIK,)
