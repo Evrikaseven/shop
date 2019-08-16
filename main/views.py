@@ -3,7 +3,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, FormView, DeleteView
 from django.urls import reverse_lazy
 from django.conf import settings
-from main.core.view_mixins import LoginRolesRequiredViewMixin, LoginRolesOwnerRequiredUpdateViewMixin, WithRolesInContextViewMixin
+from main.core.view_mixins import LoginRolesRequiredViewMixin, LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInContextViewMixin
 from . import models as _models
 from .core.constants import Roles, OrderStatuses
 from . import serializers as _serializers
@@ -19,7 +19,7 @@ from .forms import (
 )
 
 
-class IndexView(WithRolesInContextViewMixin, TemplateView):
+class IndexView(WithLogedUserInContextViewMixin, TemplateView):
     template_name = 'main/index.html'
 
     def __init__(self, *args, **kwargs):
@@ -31,7 +31,7 @@ class IndexView(WithRolesInContextViewMixin, TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class ProvidersListView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, TemplateView):
+class ProvidersListView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, TemplateView):
     template_name = 'main/providers_list.html'
 
     def get_context_data(self, **kwargs):
@@ -40,7 +40,7 @@ class ProvidersListView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin
         return context
 
 
-class UsersListView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, TemplateView):
+class UsersListView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, TemplateView):
     template_name = 'main/users_list.html'
 
     def get_context_data(self, **kwargs):
@@ -50,7 +50,7 @@ class UsersListView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, Te
         return context
 
 
-class UserDetailsView(LoginRolesOwnerRequiredUpdateViewMixin, WithRolesInContextViewMixin, UpdateView):
+class UserDetailsView(LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInContextViewMixin, UpdateView):
     template_name = 'main/user_details.html'
     url_name = 'user_details'
     form_class = UserForm
@@ -65,8 +65,11 @@ class UserDetailsView(LoginRolesOwnerRequiredUpdateViewMixin, WithRolesInContext
     def get_success_url(self):
         return reverse_lazy('main:user_details', kwargs={'pk': self.kwargs['pk']})
 
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
-class NewOrderView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, CreateView):
+
+class NewOrderView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, CreateView):
     template_name = 'main/new_order.html'
     form_class = NewOrderForm
     allowed_roles = (Roles.ZAKAZSCHIK,)
@@ -103,7 +106,7 @@ class NewOrderView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, Cre
 #         return super().dispatch(request, *args, **kwargs)
 
 
-class OrdersListView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, TemplateView):
+class OrdersListView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, TemplateView):
     template_name = 'main/orders.html'
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
 
@@ -119,6 +122,8 @@ class OrdersListView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, T
 
         if self.user.role in (Roles.ZAKUPSCHIK, Roles.ADMINISTRATOR):
             order_qs = _models.Order.objects.get_list()
+        elif self.product_id:
+            order_qs = _models.Order.objects.get_list(created_by=self.user, status=OrderStatuses.CREATED)
         else:
             order_qs = _models.Order.objects.get_list(created_by=self.user)
         context['orders'] = order_qs
@@ -130,7 +135,7 @@ class OrdersListView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, T
         return super().dispatch(request, *args, **kwargs)
 
 
-class OrderDetailsView(LoginRolesOwnerRequiredUpdateViewMixin, WithRolesInContextViewMixin, UpdateView):
+class OrderDetailsView(LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInContextViewMixin, UpdateView):
     template_name = 'main/order_details.html'
     url_name = 'order_details'
     form_class = OrderForm
@@ -158,7 +163,7 @@ class OrderDetailsView(LoginRolesOwnerRequiredUpdateViewMixin, WithRolesInContex
         return context
 
 
-class OrderPayingView(LoginRolesOwnerRequiredUpdateViewMixin, WithRolesInContextViewMixin, UpdateView):
+class OrderPayingView(LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInContextViewMixin, UpdateView):
     template_name = 'main/order_paying.html'
     form_class = OrderForm
     allowed_roles = (Roles.ZAKAZSCHIK,)
@@ -178,7 +183,7 @@ class OrderPayingView(LoginRolesOwnerRequiredUpdateViewMixin, WithRolesInContext
         return context
 
 
-class NewOrderItemView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, CreateView):
+class NewOrderItemView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, CreateView):
     template_name = 'main/new_order_item.html'
     url_name = 'new_order_item'
     form_class = OrderItemForm
@@ -208,7 +213,7 @@ class NewOrderItemView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin,
         return super().dispatch(request, *args, **kwargs)
 
 
-class NewJointOrderItemView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, CreateView):
+class NewJointOrderItemView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, CreateView):
     template_name = 'main/new_joint_order_item.html'
     #url_name = 'new_joint_order_item'
     form_class = JointItemToOrderForm
@@ -241,7 +246,7 @@ class NewJointOrderItemView(LoginRolesRequiredViewMixin, WithRolesInContextViewM
         return super().dispatch(request, *args, **kwargs)
 
 
-class OrderItemView(LoginRolesOwnerRequiredUpdateViewMixin, WithRolesInContextViewMixin, UpdateView):
+class OrderItemView(LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInContextViewMixin, UpdateView):
     template_name = 'main/order_item_details.html'
     url_name = 'order_item_details'
     form_class = OrderItemForm
@@ -276,7 +281,7 @@ class OrderItemView(LoginRolesOwnerRequiredUpdateViewMixin, WithRolesInContextVi
         return super().dispatch(request, *args, **kwargs)
 
 
-class ReplacementOrderItemView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, CreateView):
+class ReplacementOrderItemView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, CreateView):
     template_name = 'main/new_order_item.html'
     url_name = 'replacement_order_item'
     form_class = OrderItemForm
@@ -309,7 +314,7 @@ class ReplacementOrderItemView(LoginRolesRequiredViewMixin, WithRolesInContextVi
         return super().dispatch(request, *args, **kwargs)
 
 
-class DeleteOrderItemView(LoginRolesOwnerRequiredUpdateViewMixin, WithRolesInContextViewMixin, DeleteView):
+class DeleteOrderItemView(LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInContextViewMixin, DeleteView):
     template_name = "main/delete_order_item.html"
     url_name = "delete_order_item"
     allowed_roles = (Roles.ZAKAZSCHIK,)
@@ -325,7 +330,7 @@ class DeleteOrderItemView(LoginRolesOwnerRequiredUpdateViewMixin, WithRolesInCon
         return context
 
 
-class CatalogOrderItems(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, CreateView):
+class CatalogOrderItems(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, CreateView):
     template_name = 'main/catalog_items.html'
     url_name = 'catalog'
     form_class = ProductForm
@@ -350,7 +355,7 @@ class CatalogOrderItems(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin
         return super().dispatch(request, *args, **kwargs)
 
 
-class BuyoutsListView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, TemplateView):
+class BuyoutsListView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, TemplateView):
     template_name = 'main/buyouts_list.html'
 
     def get_context_data(self, **kwargs):
@@ -358,7 +363,7 @@ class BuyoutsListView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, 
         return context
 
 
-class ProductsListView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, TemplateView):
+class ProductsListView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, TemplateView):
     template_name = 'main/products_list.html'
     url_name = 'products'
 
@@ -369,7 +374,7 @@ class ProductsListView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin,
         return context
 
 
-class ProductsAddToOrderView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, FormView):
+class ProductsAddToOrderView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, FormView):
     template_name = 'main/products_add.html'
     url_name = 'details'
     allowed_roles = (Roles.ZAKAZSCHIK,)
@@ -391,7 +396,7 @@ class ProductsAddToOrderView(LoginRolesRequiredViewMixin, WithRolesInContextView
         return super().dispatch(request, *args, **kwargs)
 
 
-class NewJointProductView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, CreateView):
+class NewJointProductView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, CreateView):
     template_name = 'main/new_joint_product.html'
     url_name = 'new_joint_product'
     form_class = ProductForm
@@ -410,7 +415,7 @@ class NewJointProductView(LoginRolesRequiredViewMixin, WithRolesInContextViewMix
         return kwargs
 
 
-class UpdateJointProductView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, UpdateView):
+class UpdateJointProductView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, UpdateView):
     template_name = 'main/new_joint_product.html'
     url_name = 'update_joint_product'
     form_class = ProductForm
@@ -430,12 +435,8 @@ class UpdateJointProductView(LoginRolesRequiredViewMixin, WithRolesInContextView
         return kwargs
 
 
-class HelpView(WithRolesInContextViewMixin, TemplateView):
+class HelpView(WithLogedUserInContextViewMixin, TemplateView):
     template_name = 'main/help.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
 
 
 # Resources

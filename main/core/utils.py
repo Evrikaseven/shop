@@ -20,11 +20,3 @@ def shop_send_email(template: str, context: dict, subject: str, to: list):
               connection=None,
               html_message=html_message)
 
-
-def send_user_updates_email(email_context: dict, email_subject: str, email_to: list):
-    email_template = 'main/email_user_changes.html'
-    email_context = {
-        'user': user,
-    }
-    email_to = [user.email]
-    shop_send_email(email_template, email_context, email_subject, email_to)
