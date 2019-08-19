@@ -3,7 +3,7 @@ from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
 from .forms import UserSignUpForm
 from main.models import User
-from main.core.utils import shop_send_email
+from main.core.utils import user_data_email
 from main.core.constants import Roles
 
 
@@ -26,18 +26,5 @@ class SignUpDoneView(TemplateView):
     def dispatch(self, *args, **kwargs):
         user_pk = kwargs['pk']
         user = User.objects.get(pk=user_pk)
-        email_data = {
-            'username': user.username,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'phone': user.phone,
-            'email': user.email,
-            'location': user.location,
-            'birth_date': user.birth_date,
-            'role': Roles[user.role],
-        }
-        shop_send_email(template='main/email_user_template.html',
-                        context=email_data,
-                        subject='Добавлен новый пользователь',
-                        to=[user.email])
+        user_data_email(user=user, subject='Добавлен новый пользователь', extra_params={})
         return super().dispatch(*args, **kwargs)

@@ -23,8 +23,10 @@
             </div>
           </div>
             <div class="card-footer d-flex justify-content-between align-items-center">
-                <div class="card-text">Сумма заказа:</div>
-                <a class="btn btn-sm btn-outline-dark" href="{% url 'main:product_to_orders' product.id %}">Добавить в заказ</a>
+{#                <div class="card-text">Сумма заказа:</div>#}
+                {% if product.quantity > 0 %}
+                    <a class="btn btn-sm btn-outline-dark" href="{% url 'main:product_to_orders' product.id %}">Добавить в заказ</a>
+                {% endif %}
             </div>
         </div>
     </div>

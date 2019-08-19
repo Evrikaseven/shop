@@ -29,5 +29,10 @@
 <div>
    Статус: <em>{{ role }}</em>
 </div>
+{% if balance_changed %}
+<div>
+    Новый баланс: <em>{{ balance }}</em>
+</div>
+{% endif %}
 </body>
 </html>

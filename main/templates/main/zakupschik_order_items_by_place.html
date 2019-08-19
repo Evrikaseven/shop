@@ -7,24 +7,30 @@
     <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Список товаров для
         места {{ place }}</h3>
     <div class="container px-0">
-        {% for order_item in order_items %}
+        {% for product_data in products %}
             <div class="d-flex font-weight-normal px-4 my-1 card-header">
-                    <a href="{% url 'main:order_item_details' pk=order_item.id %}">
-                        <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="100" width="200">
-                    </a>
-                <div class="my-1 mr-md-3">Статус: {{ order_item.status_to_string }}</div>
+                <img src="{{ MEDIA_URL }}{{ product_data.product.image }}" height="100" width="200">
+
+                <div class="my-1 mr-md-3">{{ product_data.product.name }}</div>
+                <div class="my-1 mr-md-3">Цена: {{ product_data.price }}</div>
+                <div class="my-1 mr-md-3">Количество: {{ product_data.total_quantity }}</div>
+                <div class="my-1 mr-md-3">Статус: {{ product_data.item_status_str }}</div>
                 <a class="btn btn-sm btn-outline-primary" data-toggle="collapse"
                    data-target="#hide-me{{ forloop.counter }}" aria-expanded="true" href="#">Детальная информация</a>
             </div>
-
             <div id="hide-me{{ forloop.counter }}" class="collapse in container border-right border-left">
-                <h5>Заказчик: {{ order_item.order.created_by.username }} ({{ order_item.order.created_by.first_name }} {{ order_item.order.created_by.last_name }}) </h5>
-
-                <div class="mb-1">Цена: {{ order_item.price }}</div>
-                <div>Количество: {{ order_item.quantity }}</div>
-                <div>Комментарий к заказу: {{ order_item.order_comment }}</div>
-                <div>Комментарий заказчика: {{ order_item.customer_comment }}</div>
-                <hr class="mb-3">
+                {% for order_item in product_data.items %}
+                    <div class="container table-container">
+                        <a href="{% url 'main:order_item_details' pk=order_item.id %}">
+                            <h5>Заказчик: {{ order_item.order.created_by.username }}
+                                ({{ order_item.order.created_by.first_name }} {{ order_item.order.created_by.last_name }}) </h5>
+                            <div>Количество: {{ order_item.quantity }}</div>
+                            <div>Комментарий к заказу: {{ order_item.order_comment }}</div>
+                            <div>Комментарий заказчика: {{ order_item.customer_comment }}</div>
+                        </a>
+                        <hr class="mb-3">
+                    </div>
+                {% endfor %}
             </div>
         {% endfor %}
     </div>

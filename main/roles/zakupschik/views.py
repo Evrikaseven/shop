@@ -36,7 +36,7 @@ class ZakupschikOrdersByPlacesView(LoginRolesRequiredViewMixin, WithLogedUserInC
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         fetcher = ZakupschikFetcher()
-        context['order_items'] = fetcher.order_items_by_place(self.place)
+        context['products'] = fetcher.products_by_place(self.place)
         context['MEDIA_URL'] = settings.MEDIA_URL
         context['place'] = self.place
         return context

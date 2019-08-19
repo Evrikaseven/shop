@@ -1,4 +1,5 @@
 from .types import EnumMetaWithStrings
+from decimal import Decimal
 
 
 class Roles(metaclass=EnumMetaWithStrings):
@@ -32,4 +33,8 @@ class OrderItemStates(metaclass=EnumMetaWithStrings):
 class ShoppingTypes(metaclass=EnumMetaWithStrings):
     INDIVIDUAL = 0, 'Индивидуальная покупка'
     JOINT = 1, ' Совместная покупка'
+
+
+EXTRA_CHARGE = Decimal('1.1')  # 10%
+
 
