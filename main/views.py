@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.conf import settings
 from main.core.view_mixins import LoginRolesRequiredViewMixin, LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInContextViewMixin
 from . import models as _models
-from .core.constants import Roles, OrderStatuses
+from .core.constants import Roles, OrderStatuses, ShoppingTypes
 from . import serializers as _serializers
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
@@ -159,6 +159,7 @@ class OrderDetailsView(LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInCo
         context['order_statuses'] = OrderStatuses
         context['order_statuses_list'] = list(OrderStatuses)
         context['order'] = self.object
+        context['SHOPPING_TYPES'] = ShoppingTypes
         context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
@@ -259,6 +260,8 @@ class OrderItemView(LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInConte
         super().__init__(*args, **kwargs)
 
     def get_success_url(self):
+        if self.user.role == Roles.ZAKUPSCHIK:
+            return reverse_lazy('main:order_item_details', kwargs={'pk': self.object.id})
         return reverse_lazy('main:order_details', kwargs={'pk': self.object.order.id})
 
     def get_form_kwargs(self):
@@ -271,6 +274,7 @@ class OrderItemView(LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInConte
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['order_item'] = self.object
+        context['SHOPPING_TYPES'] = ShoppingTypes
         context['child_order_item'] = getattr(self.object, 'orderitem', None)
         context['product_image'] = self.object.product.image
         context['MEDIA_URL'] = settings.MEDIA_URL

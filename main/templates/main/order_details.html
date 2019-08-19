@@ -104,13 +104,23 @@
                         <td>
                             <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="150" width="150">
                         </td>
-                        <td>{{ order_item.product_name }}</td>
-                        <td>{{ order_item.product_place }}</td>
+                        <td>{{ order_item.name }}</td>
+                        <td>{{ order_item.place }}</td>
                         <td class="text-center">{{ order_item.quantity }}</td>
                         <td class="text-center">{{ order_item.price }}</td>
                         <td class="text-center">{{ order_item.status_to_string }}</td>
                         <td class="text-center">{{ order_item.product.shopping_type_to_string }}</td>
-                        <td>{{ order_item.order_comment }}</td>
+                        <td>
+                            {% if order_item.product.shopping_type == SHOPPING_TYPES.JOINT %}
+                                {% if order_item.product.quantity == 0 %}
+                                    Выкуп собран
+                                {% else %}
+                                    Выкуп в процессе сборки
+                                {% endif %}
+                                <br>
+                            {% endif %}
+                            {{ order_item.order_comment }}
+                        </td>
                         <td>{{ order_item.customer_comment }}</td>
                         {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
                             <td>

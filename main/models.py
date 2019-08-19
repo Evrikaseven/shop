@@ -2,7 +2,7 @@ import os.path
 import shutil
 from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, post_save, post_delete
 from django.conf import settings
 from main.core.models import ModelWithTimestamp, ModelWithUser
 from main.core.constants import (
@@ -11,6 +11,7 @@ from main.core.constants import (
     OrderItemStatuses,
     OrderItemStates,
     ShoppingTypes,
+    EXTRA_CHARGE,
 )
 
 
@@ -53,21 +54,42 @@ class Order(ModelWithTimestamp, ModelWithUser):
     # customer_comment = models.TextField(max_length=255, null=True, blank=True)
     status = models.PositiveSmallIntegerField(default=OrderStatuses.CREATED, choices=tuple(OrderStatuses))
     paid_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True)
-
-    @property
-    def price(self):
-        return sum(oi.price * oi.quantity for oi in OrderItem.objects.get_used(order=self))
-
-    @property
-    def balance(self):
-        return self.price - self.paid_price
+    actual_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True)
 
     class Meta:
         ordering = ('created_date', )
 
     @property
+    def price(self):
+        return sum(oi.price * oi.quantity for oi in OrderItem.objects.get_used(order=self)) * EXTRA_CHARGE
+
+    @property
+    def actual_price_diff(self):
+        return self.actual_price - self.price
+
+    @transaction.atomic
+    def update_actual_price_with_user_balance(self):
+        if self.actual_price_diff:
+            # Update user balance first
+            user = self.created_by
+            user.balance += self.actual_price_diff
+            user.save()
+            self.actual_price = self.price
+            super().save(update_fields=['actual_price'])
+
+    @property
     def status_to_string(self):
         return OrderStatuses[self.status]
+
+    @transaction.atomic
+    def save(self, **kwargs):
+        if self.actual_price_diff:
+            # Update user balance first
+            user = self.created_by
+            user.balance += self.actual_price_diff
+            user.save()
+            self.actual_price = self.price
+        super().save(**kwargs)
 
 
 class OrderItemManager(models.Manager):
@@ -84,7 +106,6 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
 
     product = models.ForeignKey('Product', verbose_name='Продукт', on_delete=models.SET_NULL, null=True, blank=True)
     order = models.ForeignKey(Order, verbose_name='Заказ', on_delete=models.CASCADE)
-    price = models.DecimalField(verbose_name='Цена', max_digits=10, decimal_places=2, default=0)
     quantity = models.PositiveIntegerField(verbose_name='Количество', default=1)
     order_comment = models.TextField(verbose_name='Комментарий к заказу', max_length=255, blank=True, default='')
     customer_comment = models.TextField(verbose_name='Комментарий заказчика', max_length=255, blank=True, default='')
@@ -101,22 +122,16 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
         return OrderItemStatuses[self.status]
 
     @property
-    def product_place(self):
+    def place(self):
         return self.product.place if self.product else ''
 
-    @product_place.setter
-    def product_place(self, value):
-        self.product.place = value
-        self.product.save()
-
     @property
-    def product_name(self):
+    def name(self):
         return self.product.name if self.product else ''
 
-    @product_name.setter
-    def product_name(self, value):
-        self.product.name = value
-        self.product.save()
+    @property
+    def price(self):
+        return self.product.price if self.product else 0
 
     @property
     def is_replacement(self):
@@ -162,14 +177,31 @@ def remove_product_image_from_disc(sender, **kwargs):
 
 
 @transaction.atomic
-def remove_order_item(sender, **kwargs):
+def pre_remove_order_item(sender, **kwargs):
     instance = kwargs['instance']
     # TODO: add items handling if CASCADE deleting is not necessary
     if instance.product.shopping_type == ShoppingTypes.INDIVIDUAL:
         instance.product.delete()
 
+    if instance.product.shopping_type == ShoppingTypes.JOINT:
+        product = instance.product
+        # Update other order items statuses to ACTIVE first
+        for oi in product.orderitem_set.all():
+            if oi.pk != instance.pk:
+                oi.state = OrderItemStates.ACTIVE
+                oi.save()
+        # Return quantity back to product
+        product.quantity += instance.quantity
+        product.save()
+
+
+def post_remove_order_item(sender, **kwargs):
+    instance = kwargs['instance']
+    order = instance.order
+    order.update_actual_price_with_user_balance()
+
 
 pre_delete.connect(remove_product_image_from_disc, sender=Product)
-pre_delete.connect(remove_order_item, sender=OrderItem)
-
+pre_delete.connect(pre_remove_order_item, sender=OrderItem)
+post_delete.connect(post_remove_order_item, sender=OrderItem)
 
