@@ -45,7 +45,7 @@ class UsersListView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['users'] = _models.User.objects.all()
+        context['users'] = _models.User.objects.all() if self.user.is_superuser else _models.User.objects.get_list()
         context['roles'] = Roles
         return context
 
@@ -85,6 +85,7 @@ class NewOrderView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin,
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = self.form_class
+        context['STATUS_CREATED_STR'] = OrderStatuses.CREATED_STR
         return context
 
 
@@ -451,7 +452,7 @@ class ProvidersResourceView(LoginRolesRequiredViewMixin, ModelViewSet):
 
 
 class UsersResourceView(LoginRolesRequiredViewMixin, ModelViewSet):
-    queryset = _models.User.objects.all()
+    queryset = _models.User.objects.get_list()
     serializer_class = _serializers.UserSerializer
     permission_classes = (IsAuthenticated,)
 

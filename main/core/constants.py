@@ -35,6 +35,10 @@ class ShoppingTypes(metaclass=EnumMetaWithStrings):
     JOINT = 1, ' Совместная покупка'
 
 
-EXTRA_CHARGE = Decimal('1.1')  # 10%
+class DeliveryTypes(metaclass=EnumMetaWithStrings):
+    PURCHASE_AND_DELIVERY = 0, 'Закупка вместе с доставкой'
+    DELIVERY_ONLY = 1, 'Только доставка'
+
+EXTRA_CHARGE = Decimal('0.10')  # 10%
 
 

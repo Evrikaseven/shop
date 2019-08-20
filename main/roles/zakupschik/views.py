@@ -46,4 +46,15 @@ class ZakupschikOrdersByPlacesView(LoginRolesRequiredViewMixin, WithLogedUserInC
         return super().dispatch(request, *args, **kwargs)
 
 
+class ZakupschikUsersWithProductsToDeliverView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, TemplateView):
+    template_name = 'main/zakupschik_products_ready_to_delivery.html'
+    url_name = 'zakupschik_products_ready_to_delivery'
+    allowed_roles = (Roles.ZAKUPSCHIK,)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        fetcher = ZakupschikFetcher()
+        context['data'] = fetcher.users_with_ready_to_deliver_products()
+        context['MEDIA_URL'] = settings.MEDIA_URL
+        return context
 
