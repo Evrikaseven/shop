@@ -164,11 +164,12 @@ class OrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         if self.user:
             if self.user.role == Roles.ZAKAZSCHIK:
                 self.fields['status'].disabled = True
-            if (self.user.role in (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK) and  self.instance.pk and
-                    self.instance.product.shopping_type == ShoppingTypes.JOINT):
-                self.fields['place'].disabled = True
-                self.fields['name'].disabled = True
-                self.fields['price'].disabled = True
+            if self.user.role in (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK) and self.instance.pk:
+                self.fields['delivery'].disabled = True
+                if self.instance.product.shopping_type == ShoppingTypes.JOINT:
+                    self.fields['place'].disabled = True
+                    self.fields['name'].disabled = True
+                    self.fields['price'].disabled = True
 
     class Meta:
         model = OrderItem
@@ -178,6 +179,7 @@ class OrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
                   'price',
                   'quantity',
                   'status',
+                  'delivery',
                   'order_comment',
                   'customer_comment')
 

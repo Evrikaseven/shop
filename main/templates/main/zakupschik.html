@@ -5,8 +5,11 @@
 
 {% block content %}
     <div class="container">
-        <h1 class="h3 mb-3 font-weight-normal">
+        <div class="h3 mb-3 font-weight-normal">
             <a href="{% url 'main:zakupschik_orders_places' %}">Места с новыми заказами</a>
-        </h1>
+        </div>
+        <div class="h3 mb-3 font-weight-normal">
+            <a href="{% url 'main:zakupschik_products_ready_to_delivery' %}">Товары, готовые к выдаче</a>
+        </div>
     </div>
 {% endblock content %}

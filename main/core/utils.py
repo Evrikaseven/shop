@@ -9,7 +9,7 @@ from main.core.constants import Roles, OrderStatuses
 def shop_send_email(template: str, context: dict, subject: str, to: list):
     html_message = render_to_string(template, context)
     plain_message = strip_tags(html_message)
-    admins = [admin.email for admin in User.objects.filter(role=Roles.ADMINISTRATOR)]
+    admins = [admin.email for admin in User.objects.get_list(role=Roles.ADMINISTRATOR)]
     recipient_list = to + admins
     send_mail(subject, plain_message,
               settings.EMAIL_HOST_USER,

@@ -1,7 +1,7 @@
 import os.path
 import shutil
 from django.db import models, transaction
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager as ParentUserManager
 from django.db.models.signals import pre_delete, post_save, post_delete
 from django.conf import settings
 from main.core.models import ModelWithTimestamp, ModelWithUser
@@ -11,6 +11,7 @@ from main.core.constants import (
     OrderItemStatuses,
     OrderItemStates,
     ShoppingTypes,
+    DeliveryTypes,
     EXTRA_CHARGE,
 )
 
@@ -28,7 +29,15 @@ class Provider(models.Model):
     product_type = models.CharField(max_length=256, blank=True, default='')
 
 
+class UserManager(ParentUserManager):
+
+    def get_list(self, **kwargs):
+        return User.objects.filter(is_staff=False, is_superuser=False, **kwargs)
+
+
 class User(AbstractUser):
+    objects = UserManager()
+
     phone = models.CharField('Телефон', max_length=20)
     location = models.CharField('Адрес', max_length=255)
     birth_date = models.DateField('Дата рождения', blank=True, default='')
@@ -57,11 +66,19 @@ class Order(ModelWithTimestamp, ModelWithUser):
     actual_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True)
 
     class Meta:
-        ordering = ('created_date', )
+        ordering = ('created_date',)
 
     @property
     def price(self):
-        return sum(oi.price * oi.quantity for oi in OrderItem.objects.get_used(order=self)) * EXTRA_CHARGE
+        order_items_qs = OrderItem.objects.get_used(order=self)
+        return (
+                sum(oi.price * oi.quantity for oi in order_items_qs.filter(
+                    delivery=DeliveryTypes.PURCHASE_AND_DELIVERY
+                )) * (1 + EXTRA_CHARGE) +
+                sum(oi.price * oi.quantity for oi in order_items_qs.filter(
+                    delivery=DeliveryTypes.DELIVERY_ONLY
+                )) * EXTRA_CHARGE
+        )
 
     @property
     def actual_price_diff(self):
@@ -115,11 +132,19 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
     state = models.PositiveSmallIntegerField(verbose_name='Состояние',
                                              default=OrderItemStates.USED,
                                              choices=tuple(OrderItemStates))
-    parent = models.OneToOneField('self', verbose_name='Заменяемый товар', on_delete=models.CASCADE, null=True, blank=True)
+    parent = models.OneToOneField('self', verbose_name='Заменяемый товар',
+                                  on_delete=models.CASCADE, null=True, blank=True)
+    delivery = models.PositiveSmallIntegerField(verbose_name='Тип доставки',
+                                                default=DeliveryTypes.PURCHASE_AND_DELIVERY,
+                                                choices=tuple(DeliveryTypes))
 
     @property
     def status_to_string(self):
         return OrderItemStatuses[self.status]
+
+    @property
+    def delivery_to_string(self):
+        return DeliveryTypes[self.delivery]
 
     @property
     def place(self):
