@@ -3,7 +3,12 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, FormView, DeleteView
 from django.urls import reverse_lazy
 from django.conf import settings
-from main.core.view_mixins import LoginRolesRequiredViewMixin, LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInContextViewMixin
+from main.core.view_mixins import (
+    LoginRolesRequiredViewMixin,
+    LoginRolesOwnerRequiredUpdateViewMixin,
+    WithLogedUserInContextViewMixin,
+    OrderCreateStatusOnlyAllowUpdateViewMixin,
+)
 from . import models as _models
 from .core.constants import Roles, OrderStatuses, ShoppingTypes
 from . import serializers as _serializers
@@ -89,24 +94,6 @@ class NewOrderView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin,
         return context
 
 
-# class OrderCreatedView(LoginRolesRequiredViewMixin, WithRolesInContextViewMixin, TemplateView):
-#     template_name = 'main/to_be_removed__order_created.html'
-#     allowed_roles = (Roles.ZAKAZSCHIK,)
-#
-#     def __init__(self, *args, **kwargs):
-#         self.order_id = None
-#         super().__init__(*args, **kwargs)
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['order_id'] = self.order_id
-#         return context
-#
-#     def dispatch(self, request, *args, **kwargs):
-#         self.order_id = kwargs.pop('pk', None)
-#         return super().dispatch(request, *args, **kwargs)
-
-
 class OrdersListView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, TemplateView):
     template_name = 'main/orders.html'
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
@@ -136,7 +123,7 @@ class OrdersListView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixi
         return super().dispatch(request, *args, **kwargs)
 
 
-class OrderDetailsView(LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInContextViewMixin, UpdateView):
+class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, WithLogedUserInContextViewMixin, UpdateView):
     template_name = 'main/order_details.html'
     url_name = 'order_details'
     form_class = OrderForm
@@ -185,7 +172,7 @@ class OrderPayingView(LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInCon
         return context
 
 
-class NewOrderItemView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, CreateView):
+class NewOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, WithLogedUserInContextViewMixin, CreateView):
     template_name = 'main/new_order_item.html'
     url_name = 'new_order_item'
     form_class = OrderItemForm
@@ -215,7 +202,7 @@ class NewOrderItemView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMi
         return super().dispatch(request, *args, **kwargs)
 
 
-class NewJointOrderItemView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, CreateView):
+class NewJointOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, WithLogedUserInContextViewMixin, CreateView):
     template_name = 'main/new_joint_order_item.html'
     #url_name = 'new_joint_order_item'
     form_class = JointItemToOrderForm
@@ -248,7 +235,7 @@ class NewJointOrderItemView(LoginRolesRequiredViewMixin, WithLogedUserInContextV
         return super().dispatch(request, *args, **kwargs)
 
 
-class OrderItemView(LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInContextViewMixin, UpdateView):
+class OrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, WithLogedUserInContextViewMixin, UpdateView):
     template_name = 'main/order_item_details.html'
     url_name = 'order_item_details'
     form_class = OrderItemForm
@@ -286,7 +273,7 @@ class OrderItemView(LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInConte
         return super().dispatch(request, *args, **kwargs)
 
 
-class ReplacementOrderItemView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, CreateView):
+class ReplacementOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, WithLogedUserInContextViewMixin, CreateView):
     template_name = 'main/new_order_item.html'
     url_name = 'replacement_order_item'
     form_class = OrderItemForm
@@ -319,7 +306,7 @@ class ReplacementOrderItemView(LoginRolesRequiredViewMixin, WithLogedUserInConte
         return super().dispatch(request, *args, **kwargs)
 
 
-class DeleteOrderItemView(LoginRolesOwnerRequiredUpdateViewMixin, WithLogedUserInContextViewMixin, DeleteView):
+class DeleteOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, WithLogedUserInContextViewMixin, DeleteView):
     template_name = "main/delete_order_item.html"
     url_name = "delete_order_item"
     allowed_roles = (Roles.ZAKAZSCHIK,)
@@ -426,10 +413,6 @@ class UpdateJointProductView(LoginRolesRequiredViewMixin, WithLogedUserInContext
     form_class = ProductForm
     model = _models.Product
     # allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
-
-    def __init__(self, *args, **kwargs):
-        self.order_id = None
-        super().__init__(*args, **kwargs)
 
     def get_success_url(self):
         return reverse_lazy('main:products')
