@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import AccessMixin
-from main.models import Roles
-from main.models import User
+from main.core.constants import Roles, OrderStatuses
+from main.models import User, Order, OrderItem
 
 
 class LoginRolesRequiredViewMixin(AccessMixin):
@@ -13,7 +13,7 @@ class LoginRolesRequiredViewMixin(AccessMixin):
         ZAKAZSCHIK, ZAKUPSCHIK, ADMINISTRATOR
     """
 
-    allowed_roles = set()
+    allowed_roles = ()
 
     def __init__(self, *args, **kwargs):
         self.user = None
@@ -41,7 +41,7 @@ class LoginRolesOwnerRequiredUpdateViewMixin(LoginRolesRequiredViewMixin):
             ZAKUPSCHIK and ADMINISTRATOR. For ZAKAZSCHIK other instances updating will be forbidden,
             only its own possible to change
     """
-    allowed_non_owner_roles = set()
+    allowed_non_owner_roles = ()
 
     def _is_it_allowed(self, **kwargs) -> bool:
         pk = kwargs.get('pk') or kwargs.get('id')
@@ -63,6 +63,32 @@ class LoginRolesOwnerRequiredUpdateViewMixin(LoginRolesRequiredViewMixin):
 
     def post(self, *args, **kwargs):
         if not self._is_it_allowed(**kwargs):
+            return self.handle_no_permission()
+        return super().post(*args, **kwargs)
+
+
+class OrderCreateStatusOnlyAllowUpdateViewMixin(LoginRolesOwnerRequiredUpdateViewMixin):
+    roles_allowed_to_update_order_in_create_status_only = (Roles.ZAKAZSCHIK, )
+
+    def _is_it_allowed_to_update_order(self, **kwargs):
+        pk = kwargs.get('pk') or kwargs.get('id')
+        if self.model is Order:
+            order = self.model.objects.get(pk=pk)
+            if (order.status != OrderStatuses.CREATED and
+                    self.user.role in self.roles_allowed_to_update_order_in_create_status_only):
+                return False
+        elif self.model is OrderItem:
+            if hasattr(self, 'order_id') and self.order_id:
+                order = Order.objects.get(pk=self.order_id)
+            else:
+                order = self.model.objects.get(pk=pk).order
+            if (order.status != OrderStatuses.CREATED and
+                    self.user.role in self.roles_allowed_to_update_order_in_create_status_only):
+                return False
+        return super()._is_it_allowed(**kwargs)
+
+    def post(self, *args, **kwargs):
+        if not self._is_it_allowed_to_update_order(**kwargs):
             return self.handle_no_permission()
         return super().post(*args, **kwargs)
 

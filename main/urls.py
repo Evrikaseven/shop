@@ -43,7 +43,6 @@ urlpatterns = [
     path('order_item/<int:pk>', main_views.OrderItemView.as_view(), name=main_views.OrderItemView.url_name),
     path('order_item/<int:pk>/new_replacement/', main_views.ReplacementOrderItemView.as_view(), name=main_views.ReplacementOrderItemView.url_name),
     path('order_item/<int:pk>/delete', main_views.DeleteOrderItemView.as_view(), name=main_views.DeleteOrderItemView.url_name),
-    # path('order_created/<int:pk>', main_views.OrderCreatedView.as_view(), name='order_created'),
 
      #Catalog items
     path('catalog/', main_views.CatalogOrderItems.as_view(), name='catalog'),
