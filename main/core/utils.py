@@ -23,7 +23,6 @@ def shop_send_email(template: str, context: dict, subject: str, to: list):
 
 def user_data_email(user: User, subject: str, extra_params: dict):
     email_data = {
-        'username': user.username,
         'first_name': user.first_name,
         'last_name': user.last_name,
         'phone': user.phone,
@@ -46,7 +45,7 @@ def order_data_email(order: Order, subject: str, extra_params: dict):
     email_data = {
         'order_pk': order.pk,
         'order_price': order.price,
-        'username': user.username,
+        'email': user.email,
         'status': OrderStatuses[order.status],
         'paid_price': order.paid_price,
         'status_changed': False,

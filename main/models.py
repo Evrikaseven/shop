@@ -1,7 +1,9 @@
 import os.path
 import shutil
+from datetime import timedelta
+from django.utils import timezone
 from django.db import models, transaction
-from django.contrib.auth.models import AbstractUser, UserManager as ParentUserManager
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db.models.signals import pre_delete, post_save, post_delete
 from django.conf import settings
 from main.core.models import ModelWithTimestamp, ModelWithUser
@@ -29,20 +31,57 @@ class Provider(models.Model):
     product_type = models.CharField(max_length=256, blank=True, default='')
 
 
-class UserManager(ParentUserManager):
+class CustomUserManager(BaseUserManager):
+    """
+    Custom user model manager where email is the unique identifiers
+    for authentication instead of usernames.
+    """
+    def create_user(self, email, password, **extra_fields):
+        """
+        Create and save a User with the given email and password.
+        """
+        if not email:
+            raise ValueError(_('The Email must be set'))
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, email, password, **extra_fields):
+        """
+        Create and save a SuperUser with the given email and password.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(_('Superuser must have is_staff=True.'))
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(_('Superuser must have is_superuser=True.'))
+        return self.create_user(email, password, **extra_fields)
 
     def get_list(self, **kwargs):
         return User.objects.filter(is_staff=False, is_superuser=False, **kwargs)
 
 
 class User(AbstractUser):
-    objects = UserManager()
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    username = None
+    email = models.EmailField('Email адрес', unique=True)
     phone = models.CharField('Телефон', max_length=20)
     location = models.CharField('Адрес', max_length=255)
     birth_date = models.DateField('Дата рождения', blank=True, default='')
     role = models.PositiveSmallIntegerField('Роль', choices=tuple(Roles), default=Roles.UNREGISTERED)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return self.email
 
     @property
     def role_to_string(self):
@@ -161,6 +200,102 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
     @property
     def is_replacement(self):
         return bool(self.parent)
+
+
+# class SettingOption(models.Model):
+#     """
+#         Модель настроек с интерфейсом атрибутов
+#
+#         >>> settings.hello = 'world'
+#         Сохранит модель с key='hello' и value='world'. Если модель с таким ключом до этого
+#         существовала (т.е. в данный момент мы меняем значение), запись в БД поменяется и кэш
+#         инвалидируется.
+#
+#         >>> settings.hello
+#         'world'
+#         Получение ключа. Сначала ищет в кэше. Если находит - возвращает, если нет,
+#         ищет в БД запись с таким ключом (hello). Если находит - кладёт в кэш и возвращает.
+#
+#         >>> del settings.hello
+#         Удаляет запись с ключом hello из БД и кэша.
+#
+#         Также, ключ и значение можно редактировать из админки (кэш в этом случает также
+#         инвалидируется)
+#
+#         Пример куска вьюхи, которая может редактировать настройки сайта:
+#         if form.is_valid():
+#             settings.phone = form.cleaned_data['phone']
+#             settings.address = form.cleaned_data['address']
+#         """
+#
+#     s_name = models.CharField(max_length=100, primary_key=True)
+#     s_value = models.TextField()
+#
+#     __cache_ttl = 60 * 60
+#     __cache = {}
+#     __cache_max_size = 300
+#
+#     def save(self, *args, **kwargs):
+#         super(SettingOption, self).save(*args, **kwargs)
+#         # self._cache_invalidate(self.s_name)
+#
+#     def __getattr__(self, name):
+#         value = self._cache_get(name)
+#         if value is None:
+#             cls = type(self)
+#             try:
+#                 value = cls.objects.get(pk=name).s_value
+#                 self._cache_set(name, value)
+#             except cls.DoesNotExist:
+#                 value = None
+#         return value
+#
+#     def __setattr__(self, name, value):
+#         cls = type(self)
+#         try:
+#             instance = cls.objects.get(pk=name)
+#             instance.__dict__['s_value'] = value
+#             instance.save()
+#         except cls.DoesNotExist:
+#             self.__dict__[name] = value
+#             # self.save()
+#         # self._cache_set(name, value)
+#
+#     def __delattr__(self, name):
+#         type(self).objects.filter(key=name).delete()
+#         self._cache_invalidate(name)
+#
+#     def _cache_set(self, name, value):
+#         if len(self.__cache) < self.__cache_max_size:
+#             self._cache_force_set(name, value)
+#         else:
+#             self._cache_remove_old()
+#             if len(self.__cache) < self.__cache_max_size:
+#                 self._cache_force_set(name, value)
+#
+#     def _cache_force_set(self, name, value):
+#         self.__cache[name] = (
+#             value,
+#             timezone.now() + timedelta(seconds=self.__cache_ttl)
+#         )
+#
+#     def _cache_get(self, name):
+#         result = self.__cache.get(name)
+#         if not result:
+#             return None
+#         if result[1] > timezone.now():
+#             self._cache_invalidate(name)
+#             return None
+#         return result[0]
+#
+#     def _cache_invalidate(self, name):
+#         del self.__cache[name]
+#
+#     def _cache_remove_old(self):
+#         now = timezone.now()
+#         for k, v in self.__cache.items():
+#             if v[1] < now:
+#                 self._cache_invalidate(k)
 
 
 def get_path_to_product_image(instance, name):

@@ -22,8 +22,7 @@
                 {% for order_item in product_data.items %}
                     <div class="container table-container">
                         <a href="{% url 'main:order_item_details' pk=order_item.id %}">
-                            <h5>Заказчик: {{ order_item.order.created_by.username }}
-                                ({{ order_item.order.created_by.first_name }} {{ order_item.order.created_by.last_name }}) </h5>
+                            <h5>Заказчик: {{order_item.order.created_by.email}} ({{ order_item.order.created_by.first_name }} {{ order_item.order.created_by.last_name }}) </h5>
                             <div>Количество: {{ order_item.quantity }}</div>
                             <div>Комментарий к заказу: {{ order_item.order_comment }}</div>
                             <div>Комментарий заказчика: {{ order_item.customer_comment }}</div>

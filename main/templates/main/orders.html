@@ -35,7 +35,7 @@
                     {% endif %}
 
                     <td>{{ o.created_date }}</td>
-                    <td>{{ o.created_by.username }}</td>
+                    <td>{{ o.created_by.email }} ({{ o.created_by.first_name }})</td>
                     <td>{{ o.price }}</td>
                     <td>{{ o.status_to_string }}</td>
                 </tr>
