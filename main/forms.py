@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 from main.core.utils import user_data_email, order_data_email
 from django.db import transaction
@@ -94,7 +95,7 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         email_data = {
             'order_pk': self.instance.pk,
             'order_price': self.instance.price,
-            'username': user.username,
+            'email': user.email,
             'status': OrderStatuses.PAYING_TO_BE_CONFIRMED_STR,
             'paid_price': self.instance.paid_price,
             'user_balance': user.balance,
@@ -422,10 +423,25 @@ class UserForm(forms.ModelForm):
     def __init__(self, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(**kwargs)
+        self.fields['email'].disabled = True
         if self.user.role != Roles.ADMINISTRATOR:
             self.fields['role'].disabled = True
             self.fields['balance'].disabled = True
 
     class Meta:
         model = User
-        fields = ('username', 'role', 'balance', 'first_name', 'last_name', 'email', 'birth_date', 'phone', 'location')
+        fields = ('email', 'first_name', 'last_name', 'role', 'balance', 'birth_date', 'phone', 'location')
+
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm):
+        model = User
+        fields = ('email',)
+
+
+class CustomUserChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ('email',)
+
+

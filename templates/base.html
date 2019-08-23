@@ -28,11 +28,7 @@
                 {% if user_is_authenticated %}
                     <div class="col-6">
                         <div class="py-2 text-right">
-                            {% if user_first_name and user_last_name %}
-                                <span> Привет, <a href="{% url 'main:user_details' pk=user_pk %}" title="Детальная информация о пользователе">{{ user_first_name }}</a>!</span>
-                            {% else %}
-                                <span> Логин: {{ username }} </span>
-                            {% endif %}
+                            <span> Привет, <a href="{% url 'main:user_details' pk=user_pk %}" title="Детальная информация о пользователе">{{ user_first_name }} ({{ email }})</a>!</span>
                             <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:logout' %}">Выход</a>
                             {% if user_role == roles.ADMINISTRATOR %}
                                 <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:administrator' %}">Личный кабинет</a>

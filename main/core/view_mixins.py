@@ -98,7 +98,7 @@ class WithLogedUserInContextViewMixin:
         context = super().get_context_data(**kwargs)
         if self.user.is_authenticated:
             context['user_pk'] = self.user.pk
-            context['username'] = self.user.username
+            context['email'] = self.user.email
             context['user_role'] = self.user.role
             context['roles'] = Roles
             context['user_is_authenticated'] = True
