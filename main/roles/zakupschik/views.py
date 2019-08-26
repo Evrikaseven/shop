@@ -1,18 +1,18 @@
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from main.core.view_mixins import LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin
+from main.core.view_mixins import LoginRolesRequiredViewMixin, CommonContextViewMixin
 from django.conf import settings
 from .fetchers import ZakupschikFetcher
 from main.core.constants import Roles
 
 
-class ZakupschikMainView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, TemplateView):
+class ZakupschikMainView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/zakupschik.html'
     url_name = 'zakupschik'
     allowed_roles = (Roles.ZAKUPSCHIK,)
 
 
-class ZakupschikOrdersPlacesView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, TemplateView):
+class ZakupschikOrdersPlacesView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/zakupschik_orders.html'
     url_name = 'zakupschik_orders_places'
     allowed_roles = (Roles.ZAKUPSCHIK,)
@@ -24,7 +24,7 @@ class ZakupschikOrdersPlacesView(LoginRolesRequiredViewMixin, WithLogedUserInCon
         return context
 
 
-class ZakupschikOrdersByPlacesView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, TemplateView):
+class ZakupschikOrdersByPlacesView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/zakupschik_order_items_by_place.html'
     url_name = 'zakupschik_order_details_by_place'
     allowed_roles = (Roles.ZAKUPSCHIK,)
@@ -46,7 +46,7 @@ class ZakupschikOrdersByPlacesView(LoginRolesRequiredViewMixin, WithLogedUserInC
         return super().dispatch(request, *args, **kwargs)
 
 
-class ZakupschikUsersWithProductsToDeliverView(LoginRolesRequiredViewMixin, WithLogedUserInContextViewMixin, TemplateView):
+class ZakupschikUsersWithProductsToDeliverView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/zakupschik_products_ready_to_delivery.html'
     url_name = 'zakupschik_products_ready_to_delivery'
     allowed_roles = (Roles.ZAKUPSCHIK,)

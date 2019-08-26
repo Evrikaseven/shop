@@ -39,6 +39,8 @@ class DeliveryTypes(metaclass=EnumMetaWithStrings):
     PURCHASE_AND_DELIVERY = 0, 'Закупка вместе с доставкой'
     DELIVERY_ONLY = 1, 'Только доставка'
 
+
 EXTRA_CHARGE = Decimal('0.10')  # 10%
+SHOP_TITLE = chr(214) + 'П*ТЫ'
 
 

@@ -4,10 +4,10 @@ from django.urls import reverse_lazy
 from .forms import UserSignUpForm
 from main.models import User
 from main.core.utils import user_data_email
-from main.core.constants import Roles
+from main.core.view_mixins import CommonContextViewMixin
 
 
-class UserSignUpView(CreateView):
+class UserSignUpView(CommonContextViewMixin, CreateView):
     template_name = 'main/signup.html'
     form_class = UserSignUpForm
 
@@ -20,7 +20,7 @@ class UserSignUpView(CreateView):
         return context
 
 
-class SignUpDoneView(TemplateView):
+class SignUpDoneView(CommonContextViewMixin, TemplateView):
     template_name = 'main/signup_done.html'
 
     def dispatch(self, *args, **kwargs):

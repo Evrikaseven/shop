@@ -418,6 +418,10 @@ class ProductForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         return super().save(commit=True)
 
 
+# class SettingsForm(forms.Form):
+
+
+
 class UserForm(forms.ModelForm):
 
     def __init__(self, **kwargs):
