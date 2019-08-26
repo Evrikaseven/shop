@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import AccessMixin
-from main.core.constants import Roles, OrderStatuses
+from main.core.constants import Roles, OrderStatuses, SHOP_TITLE
 from main.models import User, Order, OrderItem
 
 
@@ -50,8 +50,13 @@ class LoginRolesOwnerRequiredUpdateViewMixin(LoginRolesRequiredViewMixin):
         if self.model is User:
             if self.user != self.model.objects.get(pk=pk) and self.user.role not in allowed_non_owner_roles:
                 return False
-        else:
+        elif self.model is not None:
             instance = self.model.objects.get(pk=pk)
+            if getattr(instance, 'created_by', None) != self.user and self.user.role not in allowed_non_owner_roles:
+                return False
+        else:
+            model = self.form_class._meta.model
+            instance = model.objects.get(pk=pk)
             if getattr(instance, 'created_by', None) != self.user and self.user.role not in allowed_non_owner_roles:
                 return False
         return True
@@ -93,9 +98,10 @@ class OrderCreateStatusOnlyAllowUpdateViewMixin(LoginRolesOwnerRequiredUpdateVie
         return super().post(*args, **kwargs)
 
 
-class WithLogedUserInContextViewMixin:
+class CommonContextViewMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['shop_title'] = SHOP_TITLE
         if self.user.is_authenticated:
             context['user_pk'] = self.user.pk
             context['email'] = self.user.email

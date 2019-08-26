@@ -80,6 +80,9 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
 
+    class Meta:
+        ordering = ('role',)
+
     def __str__(self):
         return self.email
 
