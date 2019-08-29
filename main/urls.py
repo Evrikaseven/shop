@@ -47,7 +47,7 @@ urlpatterns = [
      #Catalog items
     path('catalog/', main_views.CatalogOrderItems.as_view(), name='catalog'),
 
-    # path('settings/', main_views.SettingsView.as_view(), name=main_views.SettingsView.url_name),
+    path('settings/', main_views.SettingsView.as_view(), name=main_views.SettingsView.url_name),
 
     # Django REST framework related
     path('api/', include(router.urls))

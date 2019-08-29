@@ -1,7 +1,8 @@
 import os.path
 import shutil
 from datetime import timedelta
-from django.utils import timezone
+from decimal import Decimal
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db.models.signals import pre_delete, post_save, post_delete
@@ -14,7 +15,6 @@ from main.core.constants import (
     OrderItemStates,
     ShoppingTypes,
     DeliveryTypes,
-    EXTRA_CHARGE,
 )
 
 
@@ -100,9 +100,6 @@ class OrderManager(models.Manager):
 class Order(ModelWithTimestamp, ModelWithUser):
     objects = OrderManager()
 
-    # price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    # order_comment = models.TextField(max_length=255, null=True, blank=True)
-    # customer_comment = models.TextField(max_length=255, null=True, blank=True)
     status = models.PositiveSmallIntegerField(default=OrderStatuses.CREATED, choices=tuple(OrderStatuses))
     paid_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True)
     actual_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True)
@@ -113,13 +110,14 @@ class Order(ModelWithTimestamp, ModelWithUser):
     @property
     def price(self):
         order_items_qs = OrderItem.objects.get_used(order=self)
+        extra_charge = SettingOptionHandler('extra_charge').value
         return (
                 sum(oi.price * oi.quantity for oi in order_items_qs.filter(
                     delivery=DeliveryTypes.PURCHASE_AND_DELIVERY
-                )) * (1 + EXTRA_CHARGE) +
+                )) * (1 + extra_charge / 100) +
                 sum(oi.price * oi.quantity for oi in order_items_qs.filter(
                     delivery=DeliveryTypes.DELIVERY_ONLY
-                )) * EXTRA_CHARGE
+                )) * (extra_charge / 100)
         )
 
     @property
@@ -299,6 +297,44 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
 #         for k, v in self.__cache.items():
 #             if v[1] < now:
 #                 self._cache_invalidate(k)
+
+
+class SettingOptionManager(models.Manager):
+
+    def get_by_name(self, name):
+        try:
+            instance = SettingOption.objects.get(s_name=name)
+        except ObjectDoesNotExist:
+            instance = SettingOption(s_name=name, s_value='')
+            instance.save()
+        return instance
+
+
+class SettingOption(models.Model):
+    objects = SettingOptionManager()
+    s_name = models.CharField(max_length=100, primary_key=True)
+    s_value = models.TextField()
+
+
+class SettingOptionHandler(object):
+
+    def __init__(self, name):
+        self.instance = SettingOption.objects.get_by_name(name)
+
+    @property
+    def value(self):
+        val = self.instance.s_value.strip()
+        name = self.instance.s_name
+        if name == 'extra_charge':
+            if val == '':
+                return Decimal(0)
+            return Decimal(val)
+        return val
+
+    @value.setter
+    def value(self, value):
+        self.instance.s_value = value
+        self.instance.save()
 
 
 def get_path_to_product_image(instance, name):

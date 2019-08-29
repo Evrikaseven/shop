@@ -21,7 +21,7 @@ from .forms import (
     OrderItemForm,
     JointItemToOrderForm,
     ProductForm,
-    # SettingsForm,
+    SettingsForm,
 )
 
 
@@ -31,6 +31,11 @@ class IndexView(CommonContextViewMixin, TemplateView):
     def __init__(self, *args, **kwargs):
         self.user = None
         super().__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['announcement'] = _models.SettingOptionHandler('announcement').value
+        return context
 
     def dispatch(self, request, *args, **kwargs):
         self.user = request.user
@@ -428,18 +433,17 @@ class HelpView(CommonContextViewMixin, TemplateView):
     template_name = 'main/help.html'
 
 
-# class SettingsView(LoginRolesRequiredViewMixin, FormView):
-#     template_name = 'main/settings.html'
-#     form_class = SettingsForm
-#     url_name = 'settings'
-#
-#     def get_success_url(self):
-#         return reverse_lazy('main:products')
-#
-#     def get_form_kwargs(self):
-#         kwargs = super().get_form_kwargs()
-#         kwargs['user'] = self.user
-#         return kwargs
+class SettingsView(LoginRolesRequiredViewMixin, CommonContextViewMixin, FormView):
+    template_name = 'main/settings.html'
+    form_class = SettingsForm
+    url_name = 'settings'
+
+    def get_success_url(self):
+        return reverse_lazy('main:administrator')
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
 
 
 # Resources
