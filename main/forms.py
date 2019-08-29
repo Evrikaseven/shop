@@ -8,7 +8,8 @@ from .models import (
     Order,
     OrderItem,
     Product,
-    User
+    User,
+    SettingOptionHandler,
 )
 from main.core import widgets as custom_widgets, form_fields as custom_form_fields
 from main.core.constants import Roles, OrderStatuses, ShoppingTypes, OrderItemStates, OrderItemStatuses
@@ -418,8 +419,25 @@ class ProductForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         return super().save(commit=True)
 
 
-# class SettingsForm(forms.Form):
+class SettingsForm(forms.Form):
+    extra_charge = forms.DecimalField(label='Наценка в %',
+                                      min_value=0.01, max_value=100,
+                                      max_digits=5, decimal_places=2)
+    announcement = forms.CharField(label='Объявление', max_length=300, widget=forms.Textarea)
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        for field in self.fields:
+            self.fields[field].initial = SettingOptionHandler(field).value
+
+    def clean_extra_charge(self):
+        value = self.cleaned_data['extra_charge']
+        return str(value)
+
+    def save(self):
+        for setting in self.cleaned_data:
+            instance = SettingOptionHandler(setting)
+            instance.value = self.cleaned_data[setting]
 
 
 class UserForm(forms.ModelForm):

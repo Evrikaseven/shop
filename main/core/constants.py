@@ -40,7 +40,6 @@ class DeliveryTypes(metaclass=EnumMetaWithStrings):
     DELIVERY_ONLY = 1, 'Только доставка'
 
 
-EXTRA_CHARGE = Decimal('0.10')  # 10%
 SHOP_TITLE = chr(214) + 'П*ТЫ'
 
 
