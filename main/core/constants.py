@@ -35,9 +35,26 @@ class ShoppingTypes(metaclass=EnumMetaWithStrings):
     JOINT = 1, ' Совместная покупка'
 
 
-class DeliveryTypes(metaclass=EnumMetaWithStrings):
+class PurchaseAndDeliveryTypes(metaclass=EnumMetaWithStrings):
     PURCHASE_AND_DELIVERY = 0, 'Закупка вместе с доставкой'
     DELIVERY_ONLY = 1, 'Только доставка'
+
+
+class DeliveryTypes(metaclass=EnumMetaWithStrings):
+    PICKUP = 0, 'Самовывоз'
+    STORAGE = 1, 'Хранение'
+    POST_MAIL = 2, 'Почта'
+    HOME_DELIVEY = 3, 'Доставка на дом'
+    TK = 4, 'Транспортная компания'
+
+
+DELIVERY_PRICES = (
+    (DeliveryTypes.PICKUP, 0),
+    (DeliveryTypes.STORAGE, 0),
+    (DeliveryTypes.POST_MAIL, 100),
+    (DeliveryTypes.HOME_DELIVEY, 150),
+    (DeliveryTypes.TK, 150),
+)
 
 
 SHOP_TITLE = chr(214) + 'П*ТЫ'

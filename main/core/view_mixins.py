@@ -54,11 +54,11 @@ class LoginRolesOwnerRequiredUpdateViewMixin(LoginRolesRequiredViewMixin):
             instance = self.model.objects.get(pk=pk)
             if getattr(instance, 'created_by', None) != self.user and self.user.role not in allowed_non_owner_roles:
                 return False
-        else:
-            model = self.form_class._meta.model
-            instance = model.objects.get(pk=pk)
-            if getattr(instance, 'created_by', None) != self.user and self.user.role not in allowed_non_owner_roles:
-                return False
+        elif hasattr(self, 'order_id') and self.order_id:
+                order = Order.objects.get(pk=self.order_id)
+                user = order.created_by
+                if user != self.user and self.user.role not in allowed_non_owner_roles:
+                    return False
         return True
 
     def get(self, *args, **kwargs):
