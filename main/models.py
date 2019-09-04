@@ -14,7 +14,9 @@ from main.core.constants import (
     OrderItemStatuses,
     OrderItemStates,
     ShoppingTypes,
+    PurchaseAndDeliveryTypes,
     DeliveryTypes,
+    DELIVERY_PRICES,
 )
 
 
@@ -71,9 +73,9 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     username = None
-    email = models.EmailField('Email адрес', unique=True)
+    email = models.EmailField('Email', unique=True)
     phone = models.CharField('Телефон', max_length=20)
-    location = models.CharField('Адрес', max_length=255)
+    location = models.CharField('Адрес доставки', max_length=255)
     birth_date = models.DateField('Дата рождения', blank=True, default='')
     role = models.PositiveSmallIntegerField('Роль', choices=tuple(Roles), default=Roles.UNREGISTERED)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -103,6 +105,7 @@ class Order(ModelWithTimestamp, ModelWithUser):
     status = models.PositiveSmallIntegerField(default=OrderStatuses.CREATED, choices=tuple(OrderStatuses))
     paid_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True)
     actual_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True)
+    delivery = models.PositiveSmallIntegerField(default=DeliveryTypes.PICKUP, choices=tuple(DeliveryTypes))
 
     class Meta:
         ordering = ('created_date',)
@@ -111,14 +114,15 @@ class Order(ModelWithTimestamp, ModelWithUser):
     def price(self):
         order_items_qs = OrderItem.objects.get_used(order=self)
         extra_charge = SettingOptionHandler('extra_charge').value
+        extra_delivery_price = dict(DELIVERY_PRICES)[self.delivery]
         return (
                 sum(oi.price * oi.quantity for oi in order_items_qs.filter(
-                    delivery=DeliveryTypes.PURCHASE_AND_DELIVERY
+                    delivery=PurchaseAndDeliveryTypes.PURCHASE_AND_DELIVERY
                 )) * (1 + extra_charge / 100) +
                 sum(oi.price * oi.quantity for oi in order_items_qs.filter(
-                    delivery=DeliveryTypes.DELIVERY_ONLY
+                    delivery=PurchaseAndDeliveryTypes.DELIVERY_ONLY
                 )) * (extra_charge / 100)
-        )
+        ) + extra_delivery_price
 
     @property
     def actual_price_diff(self):
@@ -137,6 +141,22 @@ class Order(ModelWithTimestamp, ModelWithUser):
     @property
     def status_to_string(self):
         return OrderStatuses[self.status]
+
+    @property
+    def delivery_to_string(self):
+        return DeliveryTypes[self.delivery]
+
+    @property
+    def location(self):
+        if self.created_by:
+            return self.created_by.location
+        return ''
+
+    @location.setter
+    def location(self, value):
+        if self.created_by:
+            self.created_by.location = value
+            self.created_by.save()
 
     @transaction.atomic
     def save(self, **kwargs):
@@ -175,8 +195,8 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
     parent = models.OneToOneField('self', verbose_name='Заменяемый товар',
                                   on_delete=models.CASCADE, null=True, blank=True)
     delivery = models.PositiveSmallIntegerField(verbose_name='Тип доставки',
-                                                default=DeliveryTypes.PURCHASE_AND_DELIVERY,
-                                                choices=tuple(DeliveryTypes))
+                                                default=PurchaseAndDeliveryTypes.PURCHASE_AND_DELIVERY,
+                                                choices=tuple(PurchaseAndDeliveryTypes))
 
     @property
     def status_to_string(self):
@@ -184,7 +204,7 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
 
     @property
     def delivery_to_string(self):
-        return DeliveryTypes[self.delivery]
+        return PurchaseAndDeliveryTypes[self.delivery]
 
     @property
     def place(self):
@@ -201,102 +221,6 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
     @property
     def is_replacement(self):
         return bool(self.parent)
-
-
-# class SettingOption(models.Model):
-#     """
-#         Модель настроек с интерфейсом атрибутов
-#
-#         >>> settings.hello = 'world'
-#         Сохранит модель с key='hello' и value='world'. Если модель с таким ключом до этого
-#         существовала (т.е. в данный момент мы меняем значение), запись в БД поменяется и кэш
-#         инвалидируется.
-#
-#         >>> settings.hello
-#         'world'
-#         Получение ключа. Сначала ищет в кэше. Если находит - возвращает, если нет,
-#         ищет в БД запись с таким ключом (hello). Если находит - кладёт в кэш и возвращает.
-#
-#         >>> del settings.hello
-#         Удаляет запись с ключом hello из БД и кэша.
-#
-#         Также, ключ и значение можно редактировать из админки (кэш в этом случает также
-#         инвалидируется)
-#
-#         Пример куска вьюхи, которая может редактировать настройки сайта:
-#         if form.is_valid():
-#             settings.phone = form.cleaned_data['phone']
-#             settings.address = form.cleaned_data['address']
-#         """
-#
-#     s_name = models.CharField(max_length=100, primary_key=True)
-#     s_value = models.TextField()
-#
-#     __cache_ttl = 60 * 60
-#     __cache = {}
-#     __cache_max_size = 300
-#
-#     def save(self, *args, **kwargs):
-#         super(SettingOption, self).save(*args, **kwargs)
-#         # self._cache_invalidate(self.s_name)
-#
-#     def __getattr__(self, name):
-#         value = self._cache_get(name)
-#         if value is None:
-#             cls = type(self)
-#             try:
-#                 value = cls.objects.get(pk=name).s_value
-#                 self._cache_set(name, value)
-#             except cls.DoesNotExist:
-#                 value = None
-#         return value
-#
-#     def __setattr__(self, name, value):
-#         cls = type(self)
-#         try:
-#             instance = cls.objects.get(pk=name)
-#             instance.__dict__['s_value'] = value
-#             instance.save()
-#         except cls.DoesNotExist:
-#             self.__dict__[name] = value
-#             # self.save()
-#         # self._cache_set(name, value)
-#
-#     def __delattr__(self, name):
-#         type(self).objects.filter(key=name).delete()
-#         self._cache_invalidate(name)
-#
-#     def _cache_set(self, name, value):
-#         if len(self.__cache) < self.__cache_max_size:
-#             self._cache_force_set(name, value)
-#         else:
-#             self._cache_remove_old()
-#             if len(self.__cache) < self.__cache_max_size:
-#                 self._cache_force_set(name, value)
-#
-#     def _cache_force_set(self, name, value):
-#         self.__cache[name] = (
-#             value,
-#             timezone.now() + timedelta(seconds=self.__cache_ttl)
-#         )
-#
-#     def _cache_get(self, name):
-#         result = self.__cache.get(name)
-#         if not result:
-#             return None
-#         if result[1] > timezone.now():
-#             self._cache_invalidate(name)
-#             return None
-#         return result[0]
-#
-#     def _cache_invalidate(self, name):
-#         del self.__cache[name]
-#
-#     def _cache_remove_old(self):
-#         now = timezone.now()
-#         for k, v in self.__cache.items():
-#             if v[1] < now:
-#                 self._cache_invalidate(k)
 
 
 class SettingOptionManager(models.Manager):

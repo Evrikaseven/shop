@@ -12,7 +12,14 @@ from .models import (
     SettingOptionHandler,
 )
 from main.core import widgets as custom_widgets, form_fields as custom_form_fields
-from main.core.constants import Roles, OrderStatuses, ShoppingTypes, OrderItemStates, OrderItemStatuses
+from main.core.constants import (
+    Roles,
+    OrderStatuses,
+    ShoppingTypes,
+    OrderItemStates,
+    OrderItemStatuses,
+    DeliveryTypes,
+)
 from main.core.form_mixins import WithUserDataUpdateFormMixin
 
 
@@ -72,10 +79,11 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
     images = custom_form_fields.MultipleFilesField(label='Изображение товара',
                                                    widget=custom_widgets.ClearableMultiFileInput())
     status = forms.ChoiceField(required=False, choices=tuple(OrderStatuses))
+    delivery = forms.ChoiceField(required=False, choices=tuple(DeliveryTypes))
 
     class Meta:
         model = Order
-        fields = ('images', 'status', 'paid_price')
+        fields = ('images', 'status', 'paid_price', 'delivery')
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -83,8 +91,11 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         self.status_changed = False
         super().__init__(*args, **kwargs)
 
-        if getattr(self.user, 'role', Roles.UNREGISTERED) not in (Roles.ZAKUPSCHIK, Roles.ADMINISTRATOR):
+        role = getattr(self.user, 'role', Roles.UNREGISTERED)
+        if role not in (Roles.ZAKUPSCHIK, Roles.ADMINISTRATOR):
             self.fields.pop('status')
+        if role == Roles.UNREGISTERED:
+            self.fields.pop('delivery')
 
     @transaction.atomic
     def pay_order(self):
@@ -123,7 +134,7 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
             paid_price = cleaned_data['paid_price']
             cleaned_data['paid_price'] = self.instance.paid_price + paid_price
             self.user_balance_delta = paid_price
-            if self.instance.status != cleaned_data['status']:
+            if 'status' in self.cleaned_data and self.instance.status != cleaned_data['status']:
                 self.status_changed = True
         return cleaned_data
 

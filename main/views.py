@@ -10,7 +10,7 @@ from main.core.view_mixins import (
     OrderCreateStatusOnlyAllowUpdateViewMixin,
 )
 from . import models as _models
-from .core.constants import Roles, OrderStatuses, ShoppingTypes
+from .core.constants import Roles, OrderStatuses, ShoppingTypes, DeliveryTypes, DELIVERY_PRICES
 from . import serializers as _serializers
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
@@ -147,11 +147,17 @@ class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['update_is_allowed'] = (self.user.role == Roles.ADMINISTRATOR or
+                                        (self.user.role == Roles.ZAKAZSCHIK and
+                                         self.object.status == OrderStatuses.CREATED))
         context['user_role'] = self.user.role
         context['user_balance'] = self.object.created_by.balance
         context['roles'] = Roles
         context['order_statuses'] = OrderStatuses
         context['order_statuses_list'] = list(OrderStatuses)
+        delivery_prices = dict(DELIVERY_PRICES)
+        context['delivery_types_list'] = [(delivery[0], '{} - {} руб.'.format(delivery[1], delivery_prices[delivery[0]]))
+                                          for delivery in DeliveryTypes]
         context['order'] = self.object
         context['SHOPPING_TYPES'] = ShoppingTypes
         context['MEDIA_URL'] = settings.MEDIA_URL
@@ -320,6 +326,11 @@ class DeleteOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonConte
 
     def get_success_url(self):
         return reverse_lazy('main:order_details', kwargs={'pk': self.object.order.id})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['order_id'] = self.object.order.id
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

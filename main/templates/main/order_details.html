@@ -10,7 +10,7 @@
         <div class="row">
             <div class="col-md-3 order-md-2 mb-4">
 
-                {% if user_role == roles.ADMINISTRATOR %}
+                {% if update_is_allowed %}
                     <form class="needs-validation" id="order" action="" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                 {% endif %}
@@ -19,27 +19,27 @@
                     <span class="text-muted">Заказано товаров</span>
                     <span class="badge badge-secondary badge-pill">3</span>
                 </h4>
-                <ul class="list-group mb-3">
-                    <li class="list-group-item d-flex justify-content-between lh-condensed">
-                        <div>
-                            <h6 class="my-0">Текущая цена: </h6>
-                            <small class="text-muted">С учетом наценки</small>
-                        </div>
-                        <span class="text-muted">{{ order.price }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between lh-condensed">
-                        <div>
-                            <h6 class="my-0">Оплачено: </h6>
-                        </div>
-                        <span class="text-muted">{{ order.paid_price }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between lh-condensed">
-                        <div>
-                            <h6 class="my-0">Баланс пользователя:</h6>
-                        </div>
-                        <span class="text-muted">{{ user_balance }}</span>
-                    </li>
+                <li class="list-group-item d-flex justify-content-between lh-condensed">
+                    <div>
+                        <h6 class="my-0">Текущая цена: </h6>
+                        <small class="text-muted">С учетом наценки</small>
+                    </div>
+                    <span class="text-muted">{{ order.price }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between lh-condensed">
+                    <div>
+                        <h6 class="my-0">Оплачено: </h6>
+                    </div>
+                    <span class="text-muted">{{ order.paid_price }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between lh-condensed">
+                    <div>
+                        <h6 class="my-0">Баланс пользователя:</h6>
+                    </div>
+                    <span class="text-muted">{{ user_balance }}</span>
+                </li>
 
+                {% if update_is_allowed %}
                     {% if user_role == roles.ADMINISTRATOR %}
                         <div class="form-group row">
                             <label for="id_status" class="col-2 col-form-label">Статус заказа:</label>
@@ -57,24 +57,45 @@
                             <label for="id_paid_price" class="col-2 col-form-label">Оплачено:</label>
                             <input class="form-control" id="id_paid_price" name="paid_price" type="number" step="0.01">
                         </div>
-                    {% else %}
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Статус заказа:</span>
-                            <strong>{{ order.status_to_string }}</strong>
-                        </li>
                     {% endif %}
-                </ul>
-                {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED %}
-                    <div class="mb-4 text-center">
-                        <a href="{% url 'main:order_paying' pk=order.pk %}">
-                            <button class="btn btn-outline-dark btn-sm" type="submit">Оплатить заказ</button>
-                        </a>
-                    </div>
-                {% endif %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <div class="form-group row">
+                            <label for="id_delivery" class="col-2 col-form-label">Тип доставки:</label>
+                            <select class="form-control" name="delivery" id="id_delivery">
+                                {% for delivery, delivery_str in delivery_types_list %}
+                                    {% if delivery == order.delivery %}
+                                        <option value="{{ delivery }}" selected>{{ delivery_str }}</option>
+                                    {% else %}
+                                        <option value="{{ delivery }}">{{ delivery_str }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </li>
 
-                {% if user_role == roles.ADMINISTRATOR %}
+                {% else %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Статус заказа:</span>
+                        <strong>{{ order.status_to_string }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Тип доставки:</span>
+                        <strong>{{ order.delivery_to_string }}</strong>
+                    </li>
+                {% endif %}
+                </ul>
+
+                {% if update_is_allowed %}
                     <button class="btn btn-outline-dark btn-sm" type="submit">Сохранить</button>
                     </form>
+
+                    {% if user_role == roles.ZAKAZSCHIK %}
+                        <div class="mb-4 text-center">
+                            <a href="{% url 'main:order_paying' pk=order.pk %}">
+                                <button class="btn btn-outline-dark btn-sm" type="submit">Оплатить заказ</button>
+                            </a>
+                        </div>
+                    {% endif %}
                 {% endif %}
             </div>
             <div class="col-md-9 order-md-1">
@@ -89,7 +110,6 @@
                             <th scope="col">Цена</th>
                             <th scope="col">Статус товара</th>
                             <th scope="col">Вид закупки</th>
-{#                            <th scope="col">Доставка</th>#}
                             <th scope="col">Коментарий к заказу</th>
                             <th scope="col">Коментарий для себя</th>
                             <th scope="col"></th>
@@ -111,17 +131,22 @@
                         <td class="text-left small">{{ order_item.price }}</td>
                         <td class="text-left small">{{ order_item.status_to_string }}</td>
                         <td class="text-left small">{{ order_item.product.shopping_type_to_string }}</td>
-{#                        <td class="text-left small">{{ order_item.delivery_to_string }}</td>#}
                         <td class="text-left small">
-                            {% if order_item.product.shopping_type == SHOPPING_TYPES.JOINT %}
-                                {% if order_item.product.quantity == 0 %}
-                                    Выкуп собран
-                                {% else %}
-                                    Выкуп в процессе сборки
+                            <div>
+                                {% if order_item.product.shopping_type == SHOPPING_TYPES.JOINT %}
+                                    {% if order_item.product.quantity == 0 %}
+                                        Выкуп собран
+                                    {% else %}
+                                        Выкуп в процессе сборки
+                                    {% endif %}
                                 {% endif %}
-                                <br>
-                            {% endif %}
-                            {{ order_item.order_comment }}
+                            </div>
+                            <div>
+                                {{ order_item.delivery_to_string }}
+                            </div>
+                            <div>
+                                {{ order_item.order_comment }}
+                            </div>
                         </td>
                         <td class="text-left small">{{ order_item.customer_comment }}</td>
                         {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
