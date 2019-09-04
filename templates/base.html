@@ -17,39 +17,42 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
 <body>
-    <div class="mb-3 border-bottom box-shadow">
-        <div class="container">
-        <div class="row justify-content-between">
-            <div class="col-6">
-                <h2 class="d-flex justify-content-between align-items-center py-2">
-                     <a class="nav-link active" href="{% url 'main:index' %}" style="color: rgba(0,0,0,.5);">{{ shop_title }}</a>
-                </h2>
-            </div>
-                {% if user_is_authenticated %}
-                    <div class="col-6">
-                        <div class="py-2 text-right">
-                            <span> Привет, <a href="{% url 'main:user_details' pk=user_pk %}" title="Детальная информация о пользователе">{{ user_first_name }} ({{ email }})</a>!</span>
-                            <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:logout' %}">Выход</a>
-                            {% if user_role == roles.ADMINISTRATOR %}
-                                <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:administrator' %}">Личный кабинет</a>
-                            {% elif user_role == roles.ZAKUPSCHIK %}
-                                <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:zakupschik' %}">Личный кабинет</a>
-                            {% else %} {# 'ZAKAZSCHIK' #}
-                                <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:zakazschik' %}">Личный кабинет</a>
-                            {% endif %}
+    <header>
+        <div class="border-bottom">
+            <div class="container">
+            <div class="row justify-content-between">
+                <div class="col-5">
+                    <h2 class="d-flex justify-content-between align-items-center py-2">
+                         <a class="nav-link active" href="{% url 'main:index' %}" style="color: rgba(0,0,0,.5);">{{ shop_title }}</a>
+                    </h2>
+                </div>
+                    {% if user_is_authenticated %}
+                        <div class="col-7">
+                            <div class="py-2 text-right">
+                                <span> Привет, <a href="{% url 'main:user_details' pk=user_pk %}" title="Детальная информация о пользователе">{{ user_first_name }} ({{ email }})</a>!</span>
+                                <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:logout' %}">Выход</a>
+                                {% if user_role == roles.ADMINISTRATOR %}
+                                    <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:administrator' %}">Личный кабинет</a>
+                                {% elif user_role == roles.ZAKUPSCHIK %}
+                                    <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:zakupschik' %}">Личный кабинет</a>
+                                {% else %} {# 'ZAKAZSCHIK' #}
+                                    <a class="py-2 btn btn-sm btn-outline-secondary" href="{% url 'main:zakazschik' %}">Личный кабинет</a>
+                                {% endif %}
+                            </div>
+                    {% else %}
+                        <div class="col-3 text-right">
+                            <div class="py-3 btn-group">
+                                <a class="btn btn-sm btn-outline-secondary " href="{% url 'main:signup' %}">Регистрация</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="{% url 'main:login' %}">Войти</a>
+                            </div>
+                    {% endif %}
                         </div>
-                {% else %}
-                    <div class="col-3 text-right">
-                        <div class="py-3 btn-group">
-                            <a class="btn btn-sm btn-outline-secondary " href="{% url 'main:signup' %}">Регистрация</a>
-                            <a class="btn btn-sm btn-outline-secondary" href="{% url 'main:login' %}">Войти</a>
                         </div>
-                {% endif %}
-                    </div>
-                    </div>
+                </div>
             </div>
         </div>
-    </div>
+        <div class="py-1" style="background-color: #fff"></div>
+    </header>
     {% block content %}
         No content
     {% endblock %}

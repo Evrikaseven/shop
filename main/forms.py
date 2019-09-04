@@ -10,6 +10,7 @@ from .models import (
     Product,
     User,
     SettingOptionHandler,
+    Receipt,
 )
 from main.core import widgets as custom_widgets, form_fields as custom_form_fields
 from main.core.constants import (
@@ -153,6 +154,34 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
                             extra_params={'balance_changed': True})
 
         return super().save(commit=True)
+
+
+class ReceiptForOrderForm(forms.ModelForm):
+
+    def __init__(self, **kwargs):
+        self.order_id = kwargs.pop('order_id', None)
+        self.user = kwargs.pop('user', None)
+        self.is_image_update_forbidden = kwargs.pop('is_image_update_forbidden', None)
+        super().__init__(**kwargs)
+
+        if self.is_image_update_forbidden:
+            self.fields.pop('product_image')
+
+    class Meta:
+        model = Receipt
+        fields = ('image',)
+
+    # def clean_check_image(self):
+    #     image = self.cleaned_data['check_image']
+    #     if not image and not self.instance.pk:
+    #         raise ValidationError('Добавьте фотографию чека')
+    #     return image
+
+    @transaction.atomic
+    def save(self, commit=True):
+        if not self.instance.pk:
+            self.instance.order = Order.objects.get(pk=self.order_id)
+        return super().save(commit=commit)
 
 
 class OrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):

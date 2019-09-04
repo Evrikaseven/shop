@@ -34,7 +34,7 @@ urlpatterns = [
     path('orders/', main_views.OrdersListView.as_view(), name='orders'),
     path('orders/product_to_order/<int:product_id>', main_views.OrdersListView.as_view(), name='product_to_orders'),
     path('orders/<int:pk>/', main_views.OrderDetailsView.as_view(), name=main_views.OrderDetailsView.url_name),
-    path('orders/<int:pk>/paying/', main_views.OrderPayingView.as_view(), name=main_views.OrderPayingView.url_name),
+    path('orders/<int:pk>/pay_done/', main_views.OrderPayingView.as_view(), name=main_views.OrderPayingView.url_name),
     path('orders/<int:pk>/new_item/', main_views.NewOrderItemView.as_view(), name=main_views.NewOrderItemView.url_name),
     path('orders/<int:pk>/new_joint_item/', main_views.NewJointOrderItemView.as_view(), name='new_joint_order_item'),
 
@@ -46,6 +46,8 @@ urlpatterns = [
 
      #Catalog items
     path('catalog/', main_views.CatalogOrderItems.as_view(), name='catalog'),
+    #Check image
+    path('orders/<int:pk>/paying/',  main_views.JointReceiptForOrderView.as_view(), name=main_views.JointReceiptForOrderView.url_name),
 
     path('settings/', main_views.SettingsView.as_view(), name=main_views.SettingsView.url_name),
 

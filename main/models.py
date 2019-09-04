@@ -21,6 +21,7 @@ from main.core.constants import (
 
 
 MEDIA_PROD_IMAGE_DIR_PREFFIX = 'product_images'
+MEDIA_RECEIPT_IMAGE_DIR_PREFFIX = 'receipt_images'
 
 
 # Create your models here.
@@ -265,6 +266,15 @@ def get_path_to_product_image(instance, name):
     return '{}/{}'.format(MEDIA_PROD_IMAGE_DIR_PREFFIX, name)
 
 
+def get_path_to_receipt_image(instance, name):
+    return '{}/{}'.format(MEDIA_RECEIPT_IMAGE_DIR_PREFFIX, name)
+
+
+class Receipt(ModelWithTimestamp, ModelWithUser):
+   order = models.ForeignKey(Order, verbose_name='Заказ', on_delete=models.CASCADE)
+   image = models.ImageField(verbose_name='Фото чека', upload_to=get_path_to_receipt_image)
+
+
 class ProductManager(models.Manager):
 
     def get_list(self, **kwargs):
@@ -292,7 +302,7 @@ class Product(ModelWithTimestamp, ModelWithUser):
         return ShoppingTypes[self.shopping_type]
 
 
-def remove_product_image_from_disc(sender, **kwargs):
+def remove_image_from_disc(sender, **kwargs):
     instance = kwargs['instance']
     instance.image.delete()
     # directory_to_be_removed = os.path.join(settings.MEDIA_ROOT, "{}{}".format(MEDIA_PROD_IMAGE_DIR_PREFFIX, instance.id))
@@ -324,7 +334,7 @@ def post_remove_order_item(sender, **kwargs):
     order.update_actual_price_with_user_balance()
 
 
-pre_delete.connect(remove_product_image_from_disc, sender=Product)
+pre_delete.connect(remove_image_from_disc, sender=Product)
 pre_delete.connect(pre_remove_order_item, sender=OrderItem)
 post_delete.connect(post_remove_order_item, sender=OrderItem)
 

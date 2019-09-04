@@ -3,12 +3,16 @@
 {% block title %}Заказы{% endblock title %}
 
 {% block content %}
-    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
+    <div class="container">
+    <h3 class="font-weight-normal text-center">
         Заказ #{{ order.id }}
     </h3>
-    <div class="container table-container">
+    </div>
+    <div class="py-1 mb-3" style="background-color: #fff"></div>
+
+        <div class="container">
         <div class="row">
-            <div class="col-md-3 order-md-2 mb-4">
+            <div class="col-md-3 order-md-2 mb-4 table-ts">
 
                 {% if update_is_allowed %}
                     <form class="needs-validation" id="order" action="" method="POST" enctype="multipart/form-data">
@@ -21,7 +25,7 @@
                 </h4>
                 <li class="list-group-item d-flex justify-content-between lh-condensed">
                     <div>
-                        <h6 class="my-0">Текущая цена: </h6>
+                        <h6 class="my-0">К оплате: </h6>
                         <small class="text-muted">С учетом наценки</small>
                     </div>
                     <span class="text-muted">{{ order.price }}</span>
@@ -58,9 +62,11 @@
                             <input class="form-control" id="id_paid_price" name="paid_price" type="number" step="0.01">
                         </div>
                     {% endif %}
-                    <li class="list-group-item d-flex justify-content-between">
+                    <li class="list-group-item d-flex justify-content-between h-condensed">
                         <div class="form-group row">
-                            <label for="id_delivery" class="col-2 col-form-label">Тип доставки:</label>
+                            <div>
+                                <h6 for="id_delivery">Тип доставки:</h6>
+                            </div>
                             <select class="form-control" name="delivery" id="id_delivery">
                                 {% for delivery, delivery_str in delivery_types_list %}
                                     {% if delivery == order.delivery %}
@@ -72,34 +78,37 @@
                             </select>
                         </div>
                     </li>
-
                 {% else %}
-                    <li class="list-group-item d-flex justify-content-between">
-                        <span>Статус заказа:</span>
-                        <strong>{{ order.status_to_string }}</strong>
+
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Статус заказа:</h6>
+                        </div>
+                        <span class="text-muted">{{ order.status_to_string }}</span>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <span>Тип доставки:</span>
-                        <strong>{{ order.delivery_to_string }}</strong>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Тип доставки:</h6>
+                        </div>
+                        <span class="text-muted">{{ order.delivery_to_string }}</span>
                     </li>
                 {% endif %}
                 </ul>
+                <div class="btn-group py-3 pl-4">
+                    {% if update_is_allowed %}
+                        <button class="btn btn-outline-dark btn-sm" type="submit">Сохранить</button>
+                        </form>
 
-                {% if update_is_allowed %}
-                    <button class="btn btn-outline-dark btn-sm" type="submit">Сохранить</button>
-                    </form>
+                        {% if user_role == roles.ZAKAZSCHIK %}
+                                <a class="btn btn-outline-dark btn-sm" href="{% url 'main:receipt_for_order' pk=order.pk %}">
+                                    Оплатить заказ</a>
 
-                    {% if user_role == roles.ZAKAZSCHIK %}
-                        <div class="mb-4 text-center">
-                            <a href="{% url 'main:order_paying' pk=order.pk %}">
-                                <button class="btn btn-outline-dark btn-sm" type="submit">Оплатить заказ</button>
-                            </a>
-                        </div>
+                        {% endif %}
                     {% endif %}
-                {% endif %}
+                </div>
             </div>
             <div class="col-md-9 order-md-1">
-                <div class="">
+                    <div class="table-container">
                     <table class="table table-sm table-hover " id="OrderItemsTable">
                         <thead class="thead-light table-ts">
                         <tr>
@@ -123,7 +132,7 @@
                                 <tr>
                             {% endif %}
                         <td>
-                            <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="150" width="150">
+                            <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="100" width="100">
                         </td>
                         <td class="text-left small">{{ order_item.name }}</td>
                         <td class="text-left small">{{ order_item.place }}</td>
@@ -151,18 +160,15 @@
                         <td class="text-left small">{{ order_item.customer_comment }}</td>
                         {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
                             <td>
-                                <a href="{% url 'main:order_item_details' pk=order_item.id %}">
-                                    <button class="btn btn-outline-dark btn-sm mt-3" type="submit">Изменить
-                                    </button>
-                                </a>
+                                <div class="btn-group-vertical py-3">
+                                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:order_item_details' pk=order_item.id %}">
+                                        Изменить</a>
 
-                                {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
-
-                                    <a href="{% url 'main:delete_order_item' pk=order_item.id %}">
-                                        <button class="btn btn-outline-dark btn-sm mt-3" type="submit">Удалить
-                                        </button>
-                                    </a>
-                                {% endif %}
+                                    {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
+                                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:delete_order_item' pk=order_item.id %}">
+                                            Удалить</a>
+                                    {% endif %}
+                                </div>
                             </td>
 
                         {% endif %}
@@ -174,10 +180,10 @@
                 <hr class="mb-4">
 
                 {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
-                    <div class="text-left small">
-                        <a class="btn btn-outline-dark" href="{% url 'main:new_order_item' pk=order.id %}">Добавить
+                    <div class="text-center small">
+                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:new_order_item' pk=order.id %}">Добавить
                             товар</a>
-                        <a class="btn btn-outline-dark" href="{% url 'main:catalog' %}">Добавить товар из совместной
+                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:catalog' %}">Добавить товар из совместной
                             закупки</a>
                     </div>
                 {% endif %}

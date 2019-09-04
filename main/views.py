@@ -22,6 +22,7 @@ from .forms import (
     JointItemToOrderForm,
     ProductForm,
     SettingsForm,
+    ReceiptForOrderForm,
 )
 
 
@@ -182,6 +183,37 @@ class OrderPayingView(LoginRolesOwnerRequiredUpdateViewMixin, CommonContextViewM
         form = self.get_form()
         form.pay_order()
         return context
+
+
+class JointReceiptForOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, CreateView):
+    template_name = 'main/receipt_for_order.html'
+    url_name = 'receipt_for_order'
+    form_class = ReceiptForOrderForm
+    allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+
+    def __init__(self):
+        self.user = None
+        self.order_id = None
+
+    def get_success_url(self):
+        return reverse_lazy('main:order_paying', kwargs={'pk': self.kwargs['pk']})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['order_id'] = self.order_id
+        kwargs['user'] = self.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # context['order'] = _models.Order.objects.get(id=self.order_id)
+        # context['MEDIA_URL'] = settings.MEDIA_URL
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user = request.user
+        self.order_id = kwargs['pk']
+        return super().dispatch(request, *args, **kwargs)
 
 
 class NewOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, CreateView):

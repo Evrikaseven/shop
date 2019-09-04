@@ -20,9 +20,9 @@
             <tr>
                 <th scope="col"># Заказа</th>
                 <th scope="col">Дата создания</th>
-                <th scope="col">Покупатель</th>
                 <th scope="col">Цена</th>
                 <th scope="col">Статус</th>
+                <th scope="col"></th>
             </tr>
             </thead>
             <tbody>
@@ -35,9 +35,9 @@
                     {% endif %}
 
                     <td>{{ o.created_date }}</td>
-                    <td>{{ o.created_by.email }} ({{ o.created_by.first_name }})</td>
                     <td>{{ o.price }}</td>
                     <td>{{ o.status_to_string }}</td>
+                    <td scope="row"><a href="{% url 'main:order_details' pk=o.id %}">подробнее</a></td>
                 </tr>
             {% endfor %}
             </tbody>
