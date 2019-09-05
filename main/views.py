@@ -159,6 +159,9 @@ class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
         delivery_prices = dict(DELIVERY_PRICES)
         context['delivery_types_list'] = [(delivery[0], '{} - {} руб.'.format(delivery[1], delivery_prices[delivery[0]]))
                                           for delivery in DeliveryTypes]
+        context['show_delivery_address'] = self.object.delivery in (DeliveryTypes.TK,
+                                                                    DeliveryTypes.HOME_DELIVERY,
+                                                                    DeliveryTypes.POST_MAIL)
         context['order'] = self.object
         context['SHOPPING_TYPES'] = ShoppingTypes
         context['MEDIA_URL'] = settings.MEDIA_URL

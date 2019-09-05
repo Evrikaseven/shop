@@ -81,10 +81,11 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
                                                    widget=custom_widgets.ClearableMultiFileInput())
     status = forms.ChoiceField(required=False, choices=tuple(OrderStatuses))
     delivery = forms.ChoiceField(required=False, choices=tuple(DeliveryTypes))
+    delivery_address = forms.CharField(required=False)
 
     class Meta:
         model = Order
-        fields = ('images', 'status', 'paid_price', 'delivery')
+        fields = ('images', 'status', 'paid_price', 'delivery', 'delivery_address')
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -97,6 +98,7 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
             self.fields.pop('status')
         if role == Roles.UNREGISTERED:
             self.fields.pop('delivery')
+            self.fields.pop('delivery_address')
 
     @transaction.atomic
     def pay_order(self):
@@ -152,6 +154,9 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
             user_data_email(user=user,
                             subject='Баланс пользователя изменен',
                             extra_params={'balance_changed': True})
+        if ('delivery_address' in self.cleaned_data and self.cleaned_data['delivery_address'] and
+                self.cleaned_data['delivery_address'] != self.instance.delivery_address):
+            self.instance.delivery_address = self.cleaned_data['delivery_address']
 
         return super().save(commit=True)
 
@@ -492,7 +497,7 @@ class UserForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('email', 'first_name', 'last_name', 'role', 'balance', 'birth_date', 'phone', 'location')
+        fields = ('email', 'first_name', 'last_name', 'role', 'balance', 'birth_date', 'phone', 'delivery_address')
 
 
 class CustomUserCreationForm(UserCreationForm):

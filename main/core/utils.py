@@ -27,7 +27,7 @@ def user_data_email(user: User, subject: str, extra_params: dict):
         'last_name': user.last_name,
         'phone': user.phone,
         'email': user.email,
-        'location': user.location,
+        'delivery_address': user.delivery_address,
         'birth_date': user.birth_date,
         'role': Roles[user.role],
         'balance': user.balance,
