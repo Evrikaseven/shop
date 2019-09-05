@@ -44,7 +44,7 @@ class DeliveryTypes(metaclass=EnumMetaWithStrings):
     PICKUP = 0, 'Самовывоз'
     STORAGE = 1, 'Хранение'
     POST_MAIL = 2, 'Почта'
-    HOME_DELIVEY = 3, 'Доставка на дом'
+    HOME_DELIVERY = 3, 'Доставка на дом'
     TK = 4, 'Транспортная компания'
 
 
@@ -52,7 +52,7 @@ DELIVERY_PRICES = (
     (DeliveryTypes.PICKUP, 0),
     (DeliveryTypes.STORAGE, 0),
     (DeliveryTypes.POST_MAIL, 100),
-    (DeliveryTypes.HOME_DELIVEY, 150),
+    (DeliveryTypes.HOME_DELIVERY, 150),
     (DeliveryTypes.TK, 150),
 )
 

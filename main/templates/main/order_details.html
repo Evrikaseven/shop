@@ -4,13 +4,13 @@
 
 {% block content %}
     <div class="container">
-    <h3 class="font-weight-normal text-center">
-        Заказ #{{ order.id }}
-    </h3>
+        <h3 class="font-weight-normal text-center">
+            Заказ #{{ order.id }}
+        </h3>
     </div>
     <div class="py-1 mb-3" style="background-color: #fff"></div>
 
-        <div class="container">
+    <div class="container">
         <div class="row">
             <div class="col-md-3 order-md-2 mb-4 table-ts">
 
@@ -78,6 +78,17 @@
                             </select>
                         </div>
                     </li>
+                    {% if show_delivery_address %}
+                        <li class="list-group-item d-flex justify-content-between h-condensed">
+                            <div>
+                                <div>
+                                    <h6 for="id_delivery">Адрес доставки:</h6>
+                                </div>
+                                <input class="form-control" id="id_delivery_address" name="delivery_address" type="text"
+                                       value="{{ order.delivery_address }}">
+                            </div>
+                        </li>
+                    {% endif %}
                 {% else %}
 
                     <li class="list-group-item d-flex justify-content-between lh-condensed">
@@ -100,96 +111,105 @@
                         </form>
 
                         {% if user_role == roles.ZAKAZSCHIK %}
-                                <a class="btn btn-outline-dark btn-sm" href="{% url 'main:receipt_for_order' pk=order.pk %}">
-                                    Оплатить заказ</a>
+                            <a class="btn btn-outline-dark btn-sm"
+                               href="{% url 'main:receipt_for_order' pk=order.pk %}">
+                                Оплатить заказ</a>
 
                         {% endif %}
                     {% endif %}
-                </div>
-            </div>
-            <div class="col-md-9 order-md-1">
-                    <div class="table-container">
-                    <table class="table table-sm table-hover " id="OrderItemsTable">
-                        <thead class="thead-light table-ts">
-                        <tr>
-                            <th scope="col">Изображение товара</th>
-                            <th scope="col">Название товара</th>
-                            <th scope="col">Место</th>
-                            <th scope="col">Количество</th>
-                            <th scope="col">Цена</th>
-                            <th scope="col">Статус товара</th>
-                            <th scope="col">Вид закупки</th>
-                            <th scope="col">Коментарий к заказу</th>
-                            <th scope="col">Коментарий для себя</th>
-                            <th scope="col"></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for order_item in order.orderitem_set.all %}
-                            {% if order_item.is_replacement %}
-                                <tr style="background-color: #5b80b2">
-                                    {% else %}
-                                <tr>
-                            {% endif %}
-                        <td>
-                            <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="100" width="100">
-                        </td>
-                        <td class="text-left small">{{ order_item.name }}</td>
-                        <td class="text-left small">{{ order_item.place }}</td>
-                        <td class="text-left small">{{ order_item.quantity }}</td>
-                        <td class="text-left small">{{ order_item.price }}</td>
-                        <td class="text-left small">{{ order_item.status_to_string }}</td>
-                        <td class="text-left small">{{ order_item.product.shopping_type_to_string }}</td>
-                        <td class="text-left small">
-                            <div>
-                                {% if order_item.product.shopping_type == SHOPPING_TYPES.JOINT %}
-                                    {% if order_item.product.quantity == 0 %}
-                                        Выкуп собран
-                                    {% else %}
-                                        Выкуп в процессе сборки
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                            <div>
-                                {{ order_item.delivery_to_string }}
-                            </div>
-                            <div>
-                                {{ order_item.order_comment }}
-                            </div>
-                        </td>
-                        <td class="text-left small">{{ order_item.customer_comment }}</td>
-                        {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
-                            <td>
-                                <div class="btn-group-vertical py-3">
-                                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:order_item_details' pk=order_item.id %}">
-                                        Изменить</a>
-
-                                    {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
-                                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:delete_order_item' pk=order_item.id %}">
-                                            Удалить</a>
-                                    {% endif %}
-                                </div>
-                            </td>
-
-                        {% endif %}
-                        </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <hr class="mb-4">
-
-                {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
-                    <div class="text-center small">
-                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:new_order_item' pk=order.id %}">Добавить
-                            товар</a>
-                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:catalog' %}">Добавить товар из совместной
-                            закупки</a>
-                    </div>
-                {% endif %}
-
             </div>
         </div>
+        <div class="col-md-9 order-md-1">
+            <div class="table-container">
+                <table class="table table-sm table-hover " id="OrderItemsTable">
+                    <thead class="thead-light table-ts">
+                    <tr>
+                        <th scope="col">Изображение товара</th>
+                        <th scope="col">Название товара</th>
+                        <th scope="col">Место</th>
+                        <th scope="col">Количество</th>
+                        <th scope="col">Цена</th>
+                        <th scope="col">Статус товара</th>
+                        <th scope="col">Вид закупки</th>
+                        <th scope="col">Коментарий к заказу</th>
+                        <th scope="col">Коментарий для себя</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for order_item in order.orderitem_set.all %}
+                        {% if order_item.is_replacement %}
+                            <tr style="background-color: #BBBBBB">
+                                {% else %}
+                            <tr>
+                        {% endif %}
+                    <td>
+                        <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="100" width="100">
+                    </td>
+                    <td class="text-left small">{{ order_item.name }}</td>
+                    <td class="text-left small">{{ order_item.place }}</td>
+                    <td class="text-left small">{{ order_item.quantity }}</td>
+                    <td class="text-left small">{{ order_item.price }}</td>
+                    <td class="text-left small">{{ order_item.status_to_string }}</td>
+                    <td class="text-left small">{{ order_item.product.shopping_type_to_string }}</td>
+                    <td class="text-left small">
+                        <div>
+                            {% if order_item.product.shopping_type == SHOPPING_TYPES.JOINT %}
+                                {% if order_item.product.quantity == 0 %}
+                                    Выкуп собран
+                                {% else %}
+                                    Выкуп в процессе сборки
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div>
+                            {{ order_item.delivery_to_string }}
+                        </div>
+                        <div>
+                            {{ order_item.order_comment }}
+                        </div>
+                    <div>
+                        {% if order_item.is_replacement %}
+                            Данный товар является заменой
+                        {% endif %}
+                    </div>
+                    </td>
+                    <td class="text-left small">{{ order_item.customer_comment }}</td>
+                    {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
+                        <td>
+                            <div class="btn-group-vertical py-3">
+                                <a class="btn btn-outline-secondary btn-sm"
+                                   href="{% url 'main:order_item_details' pk=order_item.id %}">
+                                    Изменить</a>
+
+                                {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
+                                    <a class="btn btn-outline-secondary btn-sm"
+                                       href="{% url 'main:delete_order_item' pk=order_item.id %}">
+                                        Удалить</a>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                    {% endif %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <hr class="mb-4">
+
+            {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
+                <div class="text-center small">
+                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:new_order_item' pk=order.id %}">Добавить
+                        товар</a>
+                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:catalog' %}">Добавить товар из
+                        совместной
+                        закупки</a>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
     </div>
 
 {% endblock content %}

@@ -21,7 +21,7 @@ from main.core.constants import (
 
 
 MEDIA_PROD_IMAGE_DIR_PREFFIX = 'product_images'
-MEDIA_RECEIPT_IMAGE_DIR_PREFFIX = 'receipt_images'
+MEDIA_ORDER_DIR_PREFFIX = 'order_'
 
 
 # Create your models here.
@@ -76,7 +76,7 @@ class User(AbstractUser):
     username = None
     email = models.EmailField('Email', unique=True)
     phone = models.CharField('Телефон', max_length=20)
-    location = models.CharField('Адрес доставки', max_length=255)
+    delivery_address = models.CharField('Адрес доставки', max_length=255)
     birth_date = models.DateField('Дата рождения', blank=True, default='')
     role = models.PositiveSmallIntegerField('Роль', choices=tuple(Roles), default=Roles.UNREGISTERED)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -148,15 +148,15 @@ class Order(ModelWithTimestamp, ModelWithUser):
         return DeliveryTypes[self.delivery]
 
     @property
-    def location(self):
+    def delivery_address(self):
         if self.created_by:
-            return self.created_by.location
+            return self.created_by.delivery_address
         return ''
 
-    @location.setter
-    def location(self, value):
+    @delivery_address.setter
+    def delivery_address(self, value):
         if self.created_by:
-            self.created_by.location = value
+            self.created_by.delivery_address = value
             self.created_by.save()
 
     @transaction.atomic
@@ -267,7 +267,8 @@ def get_path_to_product_image(instance, name):
 
 
 def get_path_to_receipt_image(instance, name):
-    return '{}/{}'.format(MEDIA_RECEIPT_IMAGE_DIR_PREFFIX, name)
+    order_id = instance.order.id
+    return '{}{}/{}'.format(MEDIA_ORDER_DIR_PREFFIX, order_id, name)
 
 
 class Receipt(ModelWithTimestamp, ModelWithUser):
@@ -302,11 +303,16 @@ class Product(ModelWithTimestamp, ModelWithUser):
         return ShoppingTypes[self.shopping_type]
 
 
-def remove_image_from_disc(sender, **kwargs):
+def remove_product_image_from_disc(sender, **kwargs):
     instance = kwargs['instance']
     instance.image.delete()
-    # directory_to_be_removed = os.path.join(settings.MEDIA_ROOT, "{}{}".format(MEDIA_PROD_IMAGE_DIR_PREFFIX, instance.id))
-    # shutil.rmtree(directory_to_be_removed, ignore_errors=True)
+
+
+def remove_receipts_images_from_disc(sender, **kwargs):
+    instance = kwargs['instance']
+    order_id = instance.id
+    directory_to_be_removed = os.path.join(settings.MEDIA_ROOT, "{}{}".format(MEDIA_ORDER_DIR_PREFFIX, order_id))
+    shutil.rmtree(directory_to_be_removed, ignore_errors=True)
 
 
 @transaction.atomic
@@ -334,7 +340,8 @@ def post_remove_order_item(sender, **kwargs):
     order.update_actual_price_with_user_balance()
 
 
-pre_delete.connect(remove_image_from_disc, sender=Product)
+pre_delete.connect(remove_product_image_from_disc, sender=Product)
+pre_delete.connect(remove_receipts_images_from_disc, sender=Order)
 pre_delete.connect(pre_remove_order_item, sender=OrderItem)
 post_delete.connect(post_remove_order_item, sender=OrderItem)
 
