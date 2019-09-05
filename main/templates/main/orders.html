@@ -3,53 +3,35 @@
 {% block title %}Заказы{% endblock title %}
 
 {% block content %}
-
-    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
-    {% if product_id %}
-        Укажите заказ куда добавить товар
-    {% else %}
-        Список ваших заказов
-    {% endif %}
+    <h3 class="font-weight-normal text-center text-muted" style="color: #6c757d">
+        {% if product_id %}
+            Укажите заказ куда добавить товар
+        {% else %}
+            Список ваших заказов
+        {% endif %}
     </h3>
-    <div class="container table-container">
+    <hr class="mb-4">
+    <div class="container">
     {% if product_id %}
         <a class="btn btn-sm btn-outline-dark my-3" href="#">Создать новый заказ</a>
     {% endif %}
-        <table class="table table-sm table-hover " id="OrdersTable">
-            <thead class="thead-light table-ts">
-            <tr>
-                <th scope="col"># Заказа</th>
-                <th scope="col">Дата создания</th>
-                <th scope="col">Цена</th>
-                <th scope="col">Статус</th>
-                <th scope="col"></th>
-            </tr>
-            </thead>
-            <tbody>
+        <div class="list-group">
             {% for o in orders %}
-                <tr>
-                    {% if product_id %}
-                         <td scope="row">Заказ #<a href="{% url 'main:joint_item_to_product' pk=o.id product_pk=product_id %}">{{ o.id }}</a></td>
-                    {% else %}
-                         <td scope="row">Заказ #<a href="{% url 'main:order_details' pk=o.id %}">{{ o.id }}</a></td>
-                    {% endif %}
+                  <a href="{% url 'main:order_details' pk=o.id %}" class="list-group-item list-group-item-action ">
+                    <div class="d-flex w-100 justify-content-between">
+                      <h5 class="mb-1">Заказ #{{ o.id }}</h5>
+                        <p class="mb-1">{{ o.status_to_string }}</p>
+                        <small>Создан {{ o.created_date }}</small>
+                    </div>
 
-                    <td>{{ o.created_date }}</td>
-                    <td>{{ o.price }}</td>
-                    <td>{{ o.status_to_string }}</td>
-                    <td scope="row"><a href="{% url 'main:order_details' pk=o.id %}">подробнее</a></td>
-                </tr>
+                      <div class="d-flex w-100">
+
+                        <h6 class="mr-2">К оплате:</h6>
+                        <small>{{ o.price }}</small>
+                    </div>
+                  </a>
+{#                  <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>#}
             {% endfor %}
-            </tbody>
-        </table>
+        </div>
     </div>
-
-<!--<script>-->
-<!--    $('#OrdersTable').on('click', 'tbody > tr > td', function ()-->
-<!--    {-->
-<!--        // 'this' refers to the current <td>, if you need information out of it-->
-<!--        window.open('http://example.com');-->
-<!--    });-->
-<!--</script>-->
-
 {% endblock content %}

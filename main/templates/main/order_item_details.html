@@ -4,34 +4,82 @@
 
 {% block content %}
 
-    <div class="container table-container">
-        <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
-            Товар
-        </h3>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <img src="{{ MEDIA_URL }}{{ product_image }}">
-            {{ form.as_p }}
-            <button class="btn btn-outline-dark" type="submit">Сохранить</button>
+    <h3 class="font-weight-normal text-center">
+        Товар #{{ order_item.id }}
+    </h3>
+    <hr class="mb-4">
 
-            {% if order_item.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL%}
-                {% if order_item.parent %}
-                    <a class="btn btn-outline-dark" href="{% url 'main:order_item_details' pk=order_item.parent.pk %}">
+    <div class="container py-3" style="background-color: #fff">
+        <div class="row">
+            <div class="col-3 text-center">
+                <img src="{{ MEDIA_URL }}{{ product_image }}" class="mb-3" height="200" width="200">
+
+                {% if order_item.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL%}{% if order_item.parent %}
+                    <a class="btn btn-outline-dark btn-sm" href="{% url 'main:order_item_details' pk=order_item.parent.pk %}">
                         Заменяемый товар
                     </a>
                 {% endif %}
-
-                {% if child_order_item %}
-                    <a class="btn btn-outline-dark" href="{% url 'main:order_item_details' pk=child_order_item.pk %}">
-                        Замена
-                    </a>
-                {% else %}
-                    <a class="btn btn-outline-dark" href="{% url 'main:replacement_order_item' pk=order_item.pk %}">
-                        Добавить замену
-                    </a>
+                    {% if child_order_item %}
+                        <a class="btn btn-outline-dark btn-sm" href="{% url 'main:order_item_details' pk=child_order_item.pk %}">
+                        Добавить Замена</a>
+                    {% else %}
+                        <a class="btn btn-outline-dark btn-sm" href="{% url 'main:replacement_order_item' pk=order_item.pk %}">
+                        Добавить замену</a>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-        </form>
+            </div>
+            <div class="col">
+                <form class="needs-validation" name="form" action="" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="form-group row">
+                         <label for="id_name" class="col-2 col-form-label">Название товара</label>
+                          <div class="col-10">
+                                <input class="form-control" type="text" id="id_name" name="{{ order_item.name }}" value="{{ order_item.name }}" placeholder="название товара" required="id_name" >
+                          </div>
+                    </div>
+
+                    <div class="form-group row">
+                         <label for="id_place" class="col-2 col-form-label">Место</label>
+                          <div class="col-10">
+                                <input class="form-control" id="id_place" type="text" name="{{ order_item.place.name }}" value="{{ order_item.place }}" placeholder="укажите место" required="id_place" >
+                          </div>
+                    </div>
+
+                    <div class="form-group row">
+                         <label for="id_price" class="col-2 col-form-label">Цена</label>
+                          <div class="col-10">
+                                <input class="form-control" id="id_price" type="number" name="{{ order_item.price.name }}" value="{{ order_item.price }}" placeholder="укажите цену" required="id_price " >
+                          </div>
+                    </div>
+
+                    <div class="form-group row">
+                         <label for="id_count" class="col-2 col-form-label">Количество</label>
+                          <div class="col-10">
+                                <input class="form-control" id="id_count" type="number" name="{{ order_item.quantity.name }}" value="{{ order_item.quantity }}" required="id_count">
+                          </div>
+                    </div>
+
+                    <div class="form-group row">
+                         <label for="example-text-input" class="col-2 col-form-label">Сумма заказа</label>
+                          <div class="col-10 col-form-label" id="check_sum">0</div>
+                    </div>
+                    <hr class="mb-4">
+                    <div class="form-group">
+                       <label for="id_comment_order">Коментарий к заказу</label>
+                       <textarea class="form-control" id="id_comment_order" name="{{ order_item.order_comment.name }}" placeholder="цвет, размер и пр." rows="3">{{ order_item.order_comment }}</textarea>
+                    </div>
+                    <div class="form-group">
+                       <label for="id_comment_customer">Коментарий для себя</label>
+                       <textarea class="form-control" id="id_comment_customer" name="{{ order_item.customer_comment.name }}" placeholder="заметка по товару и пр." rows="3">{{ order_item.customer_comment }}</textarea>
+                    </div>
+                    <div class="mb-4 text-center">
+                        <button class="btn btn-outline-secondary btn-sm" type="submit">Сохранить</button>
+                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:order_details' pk=order_item.order.id %}">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
 {% endblock content %}

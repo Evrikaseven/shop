@@ -1,18 +1,27 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Оплата товара{% endblock title %}
 
 {% block content %}
-
-<div class="container table-container">
-    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
-        Добавте чек с оплатой
+    <h3 class="font-weight-normal text-center">
+        Добавте чек с оплатой заказа
     </h3>
+    <hr class="mb-4">
+<div class="container">
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Сохранить</button>
+            <div class="form-group row">
+                 <label for="photo-input" class="col-2 col-form-label">Фото товара</label>
+                 <div class="col-10 custom-file">
+                     <input class="custom-file-input" type="file" name="{{ form.images.name }}" multiple="" id="photo-input">
+                     <label class="custom-file-label text-truncate">выберите файл</label>
+                 </div>
+            </div>
+        <div class="form-actions text-center">
+            <button type="submit" class="btn btn-secondary btn-sm">Сохранить</button>
+            <a class="btn btn-secondary btn-sm" href="{% url 'main:order_details' pk=order.id %}">Отмена</a>
+        </div>
     </form>
 </div>
-
+<script src="{% static '/js/name_to_photo.js' %}"></script>
 {% endblock content %}

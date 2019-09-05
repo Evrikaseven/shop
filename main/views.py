@@ -209,7 +209,7 @@ class JointReceiptForOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, Common
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # context['order'] = _models.Order.objects.get(id=self.order_id)
+        context['order'] = _models.Order.objects.get(id=self.order_id)
         # context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
@@ -240,7 +240,7 @@ class NewOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # context['order'] = _models.Order.objects.get(id=self.order_id)
+        context['order'] = _models.Order.objects.get(id=self.order_id)
         # context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
