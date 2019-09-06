@@ -77,6 +77,11 @@ class UserDetailsView(LoginRolesOwnerRequiredUpdateViewMixin, CommonContextViewM
     def get_success_url(self):
         return reverse_lazy('main:user_details', kwargs={'pk': self.kwargs['pk']})
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['roles_list'] = list(Roles)
+        return context
+
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
@@ -151,9 +156,7 @@ class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
         context['update_is_allowed'] = (self.user.role == Roles.ADMINISTRATOR or
                                         (self.user.role == Roles.ZAKAZSCHIK and
                                          self.object.status == OrderStatuses.CREATED))
-        context['user_role'] = self.user.role
         context['user_balance'] = self.object.created_by.balance
-        context['roles'] = Roles
         context['order_statuses'] = OrderStatuses
         context['order_statuses_list'] = list(OrderStatuses)
         delivery_prices = dict(DELIVERY_PRICES)

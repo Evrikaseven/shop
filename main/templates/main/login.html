@@ -10,6 +10,11 @@
     <div class="form-signin ">
         <form class="form-signin mb-3" method="post">
             {% csrf_token %}
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    Проверьте, пожалуйста, email и пароль
+                </div>
+            {% endif %}
             <div class="form-group row">
                 <label for="id_username" class="col-5 col-form-label">Email пользователя</label>
                 <div class="col-7">

@@ -11,13 +11,24 @@ class UserSignUpView(CommonContextViewMixin, CreateView):
     template_name = 'main/signup.html'
     form_class = UserSignUpForm
 
+    def __init__(self, *args, **kwargs):
+        self.post_fields_data = {}
+        super().__init__(*args, **kwargs)
+
     def get_success_url(self):
         return reverse_lazy('main:signup_done', kwargs={'pk': self.object.pk})
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'] = self.form_class
-        return context
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        fields = self.form_class.base_fields.keys()
+        kwargs['saved_values'] = {
+            field: self.post_fields_data[field] for field in fields if field in self.post_fields_data
+        }
+        return kwargs
+
+    def dispatch(self, request, *args, **kwargs):
+        self.post_fields_data = request.POST
+        return super().dispatch(request, *args, **kwargs)
 
 
 class SignUpDoneView(CommonContextViewMixin, TemplateView):
