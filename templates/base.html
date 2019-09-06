@@ -17,41 +17,65 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
-    <header style="background-color: #e9ecef;">
-        <div class="border-bottom mb-3">
-            <div class="container">
-            <div class="row justify-content-between">
-                <div class="col-5">
-                    <h2 class="d-flex justify-content-between align-items-center py-2">
-                         <a class="nav-link active" href="{% url 'main:index' %}" style="color: rgba(0,0,0,.5);">{{ shop_title }}</a>
-                    </h2>
-                </div>
-                    {% if user_is_authenticated %}
-                        <div class="col-7">
-                            <div class="py-2 text-right">
-                                <span> Привет, <a href="{% url 'main:user_details' pk=user_pk %}" title="Детальная информация о пользователе">{{ user_first_name }} ({{ email }})</a>!</span>
-                                <a class="btn btn-sm btn-outline-secondary" href="{% url 'main:logout' %}">Выход</a>
+    <header>
+            <nav class="navbar navbar-expand-lg navbar-light my-2" style="background-color: #e9ecef;">
+             <div class="container">
+                <a class="navbar-brand" href="{% url 'main:index' %}">{{ shop_title }}</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div id="navbarNavDropdown" class="navbar-collapse collapse">
+                    <ul class="navbar-nav mr-auto">
+        {#                <li class="nav-item active">#}
+        {#                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>#}
+        {#                </li>#}
+        {#                <li class="nav-item">#}
+        {#                    <a class="nav-link" href="#">Features</a>#}
+        {#                </li>#}
+        {#                <li class="nav-item">#}
+        {#                    <a class="nav-link" href="#">Pricing</a>#}
+        {#                </li>#}
+
+                    </ul>
+                    <ul class="navbar-nav">
+                        {% if user_is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link active disabled" href="#" tabindex="-1" aria-disabled="true">Привет, {{ user_first_name }}</a>
+                            </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              Личный кабинет
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                 {% if user_role == roles.ADMINISTRATOR %}
-                                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'main:administrator' %}">Личный кабинет</a>
+                                    <a class="dropdown-item" href="{% url 'main:orders' %}">Заказы</a>
+                                    <a class="dropdown-item" href="{% url 'main:products' %}">Выкупы</a>
+                                    <a class="dropdown-item" href="{% url 'main:users' %}">Пользователи</a>
+                                    <a class="dropdown-item" href="{% url 'main:settings' %}">Настройки</a>
+                                    <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
                                 {% elif user_role == roles.ZAKUPSCHIK %}
                                     <a class="btn btn-sm btn-outline-secondary" href="{% url 'main:zakupschik' %}">Личный кабинет</a>
+                                    <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
                                 {% else %} {# 'ZAKAZSCHIK' #}
-                                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'main:zakazschik' %}">Личный кабинет</a>
+                                    <a class="dropdown-item" href="{% url 'main:user_details' pk=user_pk %}">Настройки</a>
+                                    <a class="dropdown-item" href="{% url 'main:new_order' %}">Новый заказ</a>
+                                    <a class="dropdown-item" href="{% url 'main:orders' %}">Мои заказы</a>
+                                    <a class="dropdown-item" href="{% url 'main:catalog' %}">Выкупы</a>
+                                    <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
                                 {% endif %}
+
                             </div>
-                    {% else %}
-                        <div class="col-3 text-right">
-                            <div class="py-3 btn-group">
+                        </li>
+                        {% else %}
+                            <div class="btn-group">
                                 <a class="btn btn-sm btn-outline-secondary " href="{% url 'main:signup' %}">Регистрация</a>
                                 <a class="btn btn-sm btn-outline-secondary" href="{% url 'main:login' %}">Войти</a>
                             </div>
-                    {% endif %}
-                        </div>
-                        </div>
+                        {% endif %}
+                    </ul>
                 </div>
-            </div>
-        </div>
-{#        <div class="py-1" style="background-color: #fff"></div>#}
+             </div>
+    </nav>
     </header>
     <body class="bg-light">
     {% block content %}

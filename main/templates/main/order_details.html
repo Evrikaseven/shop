@@ -21,60 +21,67 @@
                     <span class="text-muted">Заказано товаров</span>
                     <span class="badge badge-secondary badge-pill">3</span>
                 </h4>
-                <li class="list-group-item d-flex justify-content-between lh-condensed">
-                    <div>
-                        <h6 class="my-0">К оплате: </h6>
-                        <small class="text-muted">С учетом наценки</small>
-                    </div>
-                    <span class="text-muted">{{ order.price }}</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between lh-condensed">
-                    <div>
-                        <h6 class="my-0">Оплачено: </h6>
-                    </div>
-                    <span class="text-muted">{{ order.paid_price }}</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between lh-condensed">
-                    <div>
-                        <h6 class="my-0">Баланс пользователя:</h6>
-                    </div>
-                    <span class="text-muted">{{ user_balance }}</span>
-                </li>
-
-                {% if update_is_allowed %}
-                    {% if user_role == roles.ADMINISTRATOR %}
-                        <div class="form-group row">
-                            <label for="id_status" class="col-2 col-form-label">Статус заказа:</label>
-                            <select class="form-control" name="status" id="id_status">
-                                {% for status, status_str in order_statuses_list %}
-                                    {% if status == order.status %}
-                                        <option value="{{ status }}" selected>{{ status_str }}</option>
-                                    {% else %}
-                                        <option value="{{ status }}">{{ status_str }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
                         <div>
-                            <label for="id_paid_price" class="col-2 col-form-label">Оплачено:</label>
-                            <input class="form-control" id="id_paid_price" name="paid_price" type="number" step="0.01">
+                            <h6 class="my-0">К оплате: </h6>
+                            <small class="text-muted">С учетом наценки</small>
                         </div>
+                        <span class="text-muted">{{ order.price }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Оплачено: </h6>
+                        </div>
+                        <span class="text-muted">{{ order.paid_price }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Баланс пользователя:</h6>
+                        </div>
+                        <span class="text-muted">{{ user_balance }}</span>
+                    </li>
+
+                    {% if update_is_allowed %}
+                        {% if user_role == roles.ADMINISTRATOR %}
+                            <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                <div>
+                                    <h6 class="my-0">Статус заказа:</h6>
+                                </div>
+                                <select class="form-control" name="status" id="id_status">
+                                    {% for status, status_str in order_statuses_list %}
+                                        {% if status == order.status %}
+                                            <option value="{{ status }}" selected>{{ status_str }}</option>
+                                        {% else %}
+                                            <option value="{{ status }}">{{ status_str }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                <div>
+                                    <h6 class="my-2 pr-2">Оплачено:</h6>
+                                </div>
+                                <div class="input-group-sm">
+                                <input class="form-control input-group-sm" id="id_paid_price" name="paid_price" type="number" step="0.01">
+                                </div>
+                            </li>
+                            <button class="btn btn-secondary btn-sm" type="submit">Сохранить</button>
+                        {% endif %}
+                    {% else %}
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0">Статус заказа:</h6>
+                            </div>
+                            <span class="text-muted">{{ order.status_to_string }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0">Тип доставки:</h6>
+                            </div>
+                            <span class="text-muted">{{ order.delivery_to_string }}</span>
+                        </li>
                     {% endif %}
-                {% else %}
-
-                    <li class="list-group-item d-flex justify-content-between lh-condensed">
-                        <div>
-                            <h6 class="my-0">Статус заказа:</h6>
-                        </div>
-                        <span class="text-muted">{{ order.status_to_string }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between lh-condensed">
-                        <div>
-                            <h6 class="my-0">Тип доставки:</h6>
-                        </div>
-                        <span class="text-muted">{{ order.delivery_to_string }}</span>
-                    </li>
-                {% endif %}
                 </ul>
                 </form>
                 <div class="py-3 pl-4 text-right">
@@ -83,7 +90,6 @@
                             <a class="btn btn-secondary btn-sm"
                                href="{% url 'main:receipt_for_order' pk=order.pk %}">
                                 Оплатить заказ</a>
-
                         {% endif %}
                     {% endif %}
                 </div>
@@ -94,35 +100,44 @@
                     <h5 class="d-flex justify-content-between align-items-center mb-3">
                         <span class="text-muted">Укажите способ доставки</span>
                     </h5>
-                    <li class="list-group-item d-flex justify-content-between h-condensed">
-                        <div class="form-group row">
-                            <select class="form-control" name="delivery" id="id_delivery">
-                                {% for delivery, delivery_str in delivery_types_list %}
-                                    {% if delivery == order.delivery %}
-                                        <option value="{{ delivery }}" selected>{{ delivery_str }}</option>
-                                    {% else %}
-                                        <option value="{{ delivery }}">{{ delivery_str }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </li>
-                    {% if show_delivery_address %}
+                    <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between h-condensed">
-                            <div>
-                                <div>
-                                    <h6 for="id_delivery">Адрес доставки:</h6>
-                                </div>
-                                <span class="text-muted">{{ order.delivery_address }}</span>
-{#                                <span class="form-control" id="id_delivery_address" name="delivery_address" type="text"#}
-{#                                       value="{{ order.delivery_address }}">#}
-
+                            <div class="form-group row">
+                                <select class="form-control" name="delivery" id="id_delivery">
+                                    {% for delivery, delivery_str in delivery_types_list %}
+                                        {% if delivery == order.delivery %}
+                                            <option value="{{ delivery }}" selected>{{ delivery_str }}</option>
+                                        {% else %}
+                                            <option value="{{ delivery }}">{{ delivery_str }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
                             </div>
                         </li>
-                    {% endif %}
+                        {% if show_delivery_address %}
+                            <li class="list-group-item d-flex justify-content-between h-condensed">
+                                <div>
+                                    <div>
+                                        <h6 for="id_delivery">Адрес доставки:</h6>
+                                    </div>
+                                    <span class="text-muted">{{ order.delivery_address }}</span>
+                                </div>
+                            </li>
+                        {% endif %}
                 {% endif %}
+                        <div class="collapse" id="hide-me">
+                            <li class="list-group-item d-flex justify-content-between h-condensed">
+                                <textarea class="form-control" id="id_delivery_address" name="delivery_address" placeholder="{{ order.delivery_address }}" rows="3">{{ order.customer_comment }}</textarea>
+                            </li>
+                        </div>
+                    </ul>
                 <div class="py-3 pl-4 text-right">
                     {% if update_is_allowed %}
+                        {% if show_delivery_address %}
+                            <button class="btn btn-secondary btn-sm" type="button" data-toggle="collapse" data-target="#hide-me" aria-controls="hide-me" aria-expanded="false" aria-label="Hide me">
+                                Изменить</button>
+                        {% endif %}
+
                         <button class="btn btn-secondary btn-sm" type="submit">Сохранить</button>
                     {% endif %}
                 </form>
@@ -130,7 +145,7 @@
         </div>
 
         <div class="col-md-9 order-md-1">
-            <div class="table-container">
+            <div class="table-container my-3 p-3 bg-white rounded shadow-sm">
                 <table class="table table-sm table-hover " id="OrderItemsTable">
                     <thead class="thead-light table-ts">
                     <tr>
@@ -178,7 +193,7 @@
                         <div>
                             {{ order_item.order_comment }}
                         </div>
-                    <div>
+                       <div>
                         {% if order_item.is_replacement %}
                             Данный товар является заменой
                         {% endif %}
@@ -206,15 +221,13 @@
                     </tbody>
                 </table>
             </div>
-            <hr class="mb-4">
 
             {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
                 <div class="text-center small">
                     <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:new_order_item' pk=order.id %}">Добавить
                         товар</a>
-                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:catalog' %}">Добавить товар из
-                        совместной
-                        закупки</a>
+                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:catalog' %}">
+                        Добавить товар из совместной закупки</a>
                 </div>
             {% endif %}
 

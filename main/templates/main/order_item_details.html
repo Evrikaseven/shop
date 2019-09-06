@@ -9,10 +9,10 @@
     </h3>
     <hr class="mb-4">
 
-    <div class="container py-3" style="background-color: #fff">
+    <div class="container my-3 p-3 bg-white rounded shadow-sm">
         <div class="row">
             <div class="col-3 text-center">
-                <img src="{{ MEDIA_URL }}{{ product_image }}" class="mb-3" height="200" width="200">
+                <img src="{{ MEDIA_URL }}{{ product_image }}" class="mb-3" id="id_image" height="200" width="200">
 
                 {% if order_item.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL%}{% if order_item.parent %}
                     <a class="btn btn-outline-dark btn-sm" href="{% url 'main:order_item_details' pk=order_item.parent.pk %}">
@@ -49,7 +49,7 @@
                     <div class="form-group row">
                          <label for="id_price" class="col-2 col-form-label">Цена</label>
                           <div class="col-10">
-                                <input class="form-control" id="id_price" type="number" name="{{ order_item.price.name }}" value="{{ order_item.price }}" placeholder="укажите цену" required="id_price " >
+                                <input class="form-control" id="id_price" type="number" name="{{ order_item.price.name }}" value="{{ order_item.price|stringformat:'s'}}" placeholder="укажите цену" required="id_price " >
                           </div>
                     </div>
 

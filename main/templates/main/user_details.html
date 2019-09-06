@@ -8,151 +8,146 @@
         Пользователь
     </h3>
     <hr class="mb-4">
-    <div class="container py-3" style="background-color: #fff">
-        <div class="row">
-            <form class="needs-validation" name="form" action="" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="form-group row">
-                    <label for="id_username" class="col-5 col-form-label">Email пользователя</label>
-                    <div class="col-7">
-                        <input class="form-control" id="id_username" type="email" name="{{ form.email.name }}"
-                               autofocus="" required="" value="{{ form.email.initial|default_if_none:'' }}"
-                                {% if form.email.field.disabled %}
-                               disabled=""
-                                {% endif %}
-                        >
-                    </div>
-                    {% if form.email.errors %}
-                        <div class="alert alert-danger">
-                            {{ form.email.errors }}
-                        </div>
-                    {% endif %}
-                </div>
+        <form class="form-signin my-3 p-3 bg-white rounded shadow-sm" name="setting"  id="setting" action="" method="POST" enctype="multipart/form-data">
+           {% csrf_token %}
+           <div class="form-group row">
+               <label for="id_username" class="col-5 col-form-label">Email пользователя</label>
+               <div class="col-7">
+                   <input class="form-control" id="id_username" type="email" name="{{ form.email.name }}"
+                          autofocus="" required="" value="{{ form.email.initial|default_if_none:'' }}"
+                           {% if form.email.field.disabled %}
+                          disabled=""
+                           {% endif %}
+                   >
+               </div>
+               {% if form.email.errors %}
+                   <div class="alert alert-danger">
+                       {{ form.email.errors }}
+                   </div>
+               {% endif %}
+           </div>
 
-                <div class="form-group row">
-                    <label for="id_first_name" class="col-5 col-form-label">Имя</label>
-                    <div class="col-7">
-                        <input class="form-control" id="id_first_name" type="text" name="{{ form.first_name.name }}"
-                               required="" value="{{ form.first_name.initial|default_if_none:'' }}"
-                                {% if form.first_name.field.disabled %}
-                               disabled=""
-                                {% endif %}
-                        >
-                    </div>
-                    {% if form.first_name.errors %}
-                        <div class="alert alert-danger">
-                            {{ form.first_name.errors }}
-                        </div>
-                    {% endif %}
-                </div>
+           <div class="form-group row">
+               <label for="id_first_name" class="col-5 col-form-label">Имя</label>
+               <div class="col-7">
+                   <input class="form-control" id="id_first_name" type="text" name="{{ form.first_name.name }}"
+                          required="" value="{{ form.first_name.initial|default_if_none:'' }}"
+                           {% if form.first_name.field.disabled %}
+                          disabled=""
+                           {% endif %}
+                   >
+               </div>
+               {% if form.first_name.errors %}
+                   <div class="alert alert-danger">
+                       {{ form.first_name.errors }}
+                   </div>
+               {% endif %}
+           </div>
 
-                <div class="form-group row">
-                    <label for="id_last_name" class="col-5 col-form-label">Фамилия</label>
-                    <div class="col-7">
-                        <input class="form-control" id="id_last_name" type="text" name="{{ form.last_name.name }}"
-                               required="" value="{{ form.last_name.initial|default_if_none:'' }}"
-                                {% if form.last_name.field.disabled %}
-                               disabled=""
-                                {% endif %}
-                        >
-                    </div>
-                    {% if form.last_name.errors %}
-                        <div class="alert alert-danger">
-                            {{ form.last_name.errors }}
-                        </div>
-                    {% endif %}
-                </div>
+           <div class="form-group row">
+               <label for="id_last_name" class="col-5 col-form-label">Фамилия</label>
+               <div class="col-7">
+                   <input class="form-control" id="id_last_name" type="text" name="{{ form.last_name.name }}"
+                          required="" value="{{ form.last_name.initial|default_if_none:'' }}"
+                           {% if form.last_name.field.disabled %}
+                          disabled=""
+                           {% endif %}
+                   >
+               </div>
+               {% if form.last_name.errors %}
+                   <div class="alert alert-danger">
+                       {{ form.last_name.errors }}
+                   </div>
+               {% endif %}
+           </div>
 
-                <div class="form-group row">
-                    <label for="id_role" class="col-5 col-form-label">Роль</label>
-                    <div class="col-7">
-                        <select class="form-control" name="role" id="id_role"
-                                {% if form.role.field.disabled %}
-                                disabled=""
-                                {% endif %}
-                        >
-                            {% for role, role_str in roles_list %}
-                                {% if role == object.role %}
-                                    <option value="{{ role }}" selected>{{ role_str }}</option>
-                                {% else %}
-                                    <option value="{{ role }}">{{ role_str }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
+           <div class="form-group row">
+               <label for="id_role" class="col-5 col-form-label">Роль</label>
+               <div class="col-7">
+                   <select class="form-control" name="role" id="id_role"
+                           {% if form.role.field.disabled %}
+                           disabled=""
+                           {% endif %}
+                   >
+                       {% for role, role_str in roles_list %}
+                           {% if role == object.role %}
+                               <option value="{{ role }}" selected>{{ role_str }}</option>
+                           {% else %}
+                               <option value="{{ role }}">{{ role_str }}</option>
+                           {% endif %}
+                       {% endfor %}
+                   </select>
+               </div>
+           </div>
 
-                <div class="form-group row">
-                    <label for="id_balance" class="col-5 col-form-label">Баланс</label>
-                    <div class="col-7">
-                        <input class="form-control" id="id_balance" type="number" step="0.01" name="{{ form.balance.name }}"
-                               required="" value="{{ object.balance|stringformat:'s'}}"
-                                {% if form.balance.field.disabled %}
-                               disabled=""
-                                {% endif %}
-                        >
-                    </div>
-                </div>
+           <div class="form-group row">
+               <label for="id_balance" class="col-5 col-form-label">Баланс</label>
+               <div class="col-7">
+                   <input class="form-control" id="id_balance" type="number" step="0.01" name="{{ form.balance.name }}"
+                          required="" value="{{ object.balance|stringformat:'s'}}"
+                           {% if form.balance.field.disabled %}
+                          disabled=""
+                           {% endif %}
+                   >
+               </div>
+           </div>
 
-                <div class="form-group row">
-                    <label for="id_phone" class="col-5 col-form-label">Телефон</label>
-                    <div class="col-7">
-                        <input class="form-control" id="id_phone" type="text" name="{{ form.phone.name }}"
-                               required="" value="{{ form.phone.initial|default_if_none:'' }}"
-                                {% if form.phone.field.disabled %}
-                               disabled=""
-                                {% endif %}
-                        >
-                    </div>
-                    {% if form.phone.errors %}
-                        <div class="alert alert-danger">
-                            {{ form.phone.errors }}
-                        </div>
-                    {% endif %}
-                </div>
+           <div class="form-group row">
+               <label for="id_phone" class="col-5 col-form-label">Телефон</label>
+               <div class="col-7">
+                   <input class="form-control" id="id_phone" type="text" name="{{ form.phone.name }}"
+                          required="" value="{{ form.phone.initial|default_if_none:'' }}"
+                           {% if form.phone.field.disabled %}
+                          disabled=""
+                           {% endif %}
+                   >
+               </div>
+               {% if form.phone.errors %}
+                   <div class="alert alert-danger">
+                       {{ form.phone.errors }}
+                   </div>
+               {% endif %}
+           </div>
 
-                <div class="form-group row">
-                    <label for="id_birth_date" class="col-5 col-form-label">Дата рождения</label>
-                    <div class="col-7">
-                        <input class="form-control" id="id_birth_date" type="date" name="{{ form.birth_date.name }}"
-                               required="" value="{{ object.birth_date|date:'Y-m-d' }}"
-                                {% if form.birth_date.field.disabled %}
-                               disabled=""
-                                {% endif %}
-                        >
-                    </div>
-                    {% if form.birth_date.errors %}
-                        <div class="alert alert-danger">
-                            {{ form.birth_date.errors }}
-                        </div>
-                    {% endif %}
-                </div>
+           <div class="form-group row">
+               <label for="id_birth_date" class="col-5 col-form-label">Дата рождения</label>
+               <div class="col-7">
+                   <input class="form-control" id="id_birth_date" type="date" name="{{ form.birth_date.name }}"
+                          required="" value="{{ object.birth_date|date:'Y-m-d' }}"
+                           {% if form.birth_date.field.disabled %}
+                          disabled=""
+                           {% endif %}
+                   >
+               </div>
+               {% if form.birth_date.errors %}
+                   <div class="alert alert-danger">
+                       {{ form.birth_date.errors }}
+                   </div>
+               {% endif %}
+           </div>
 
-                <div class="form-group row">
-                    <label for="id_delivery_address" class="col-5 col-form-label">Адрес доставки</label>
-                    <div class="col-7">
-                        <input class="form-control" id="id_delivery_address" type="text"
-                               name="{{ form.delivery_address.name }}"
-                               required="" value="{{ form.delivery_address.initial|default_if_none:'' }}"
-                                {% if form.delivery_address.field.disabled %}
-                               disabled=""
-                                {% endif %}
-                        >
-                    </div>
-                    {% if form.delivery_address.errors %}
-                        <div class="alert alert-danger">
-                            {{ form.delivery_address.errors }}
-                        </div>
-                    {% endif %}
-                </div>
+           <div class="form-group row">
+               <label for="id_delivery_address" class="col-5 col-form-label">Адрес доставки</label>
+               <div class="col-7">
+                   <input class="form-control" id="id_delivery_address" type="text"
+                          name="{{ form.delivery_address.name }}"
+                          required="" value="{{ form.delivery_address.initial|default_if_none:'' }}"
+                           {% if form.delivery_address.field.disabled %}
+                          disabled=""
+                           {% endif %}
+                   >
+               </div>
+               {% if form.delivery_address.errors %}
+                   <div class="alert alert-danger">
+                       {{ form.delivery_address.errors }}
+                   </div>
+               {% endif %}
+           </div>
 
-                <hr class="mb-4">
-                <div class="form-actions text-center">
-                    <button type="submit" class="btn btn-secondary">Сохранить</button>
-                </div>
-            </form>
+        </form>
+        <div class="form-actions text-center">
+           <button form="setting" type="submit" class="btn btn-secondary">Сохранить</button>
         </div>
-
     </div>
 
 {% endblock content %}
