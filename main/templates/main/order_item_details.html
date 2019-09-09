@@ -7,6 +7,7 @@
     <h3 class="font-weight-normal text-center">
         Товар #{{ order_item.id }}
     </h3>
+
     <hr class="mb-4">
 
     <div class="container my-3 p-3 bg-white rounded shadow-sm">
@@ -14,68 +15,175 @@
             <div class="col-3 text-center">
                 <img src="{{ MEDIA_URL }}{{ product_image }}" class="mb-3" id="id_image" height="200" width="200">
 
-                {% if order_item.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL%}{% if order_item.parent %}
-                    <a class="btn btn-outline-dark btn-sm" href="{% url 'main:order_item_details' pk=order_item.parent.pk %}">
-                        Заменяемый товар
-                    </a>
-                {% endif %}
-                    {% if child_order_item %}
-                        <a class="btn btn-outline-dark btn-sm" href="{% url 'main:order_item_details' pk=child_order_item.pk %}">
-                        Добавить Замена</a>
-                    {% else %}
-                        <a class="btn btn-outline-dark btn-sm" href="{% url 'main:replacement_order_item' pk=order_item.pk %}">
-                        Добавить замену</a>
+                <div class="text-center">
+                    {% if order_item.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL %}
+                        {% if order_item.parent %}
+                            <a class="btn btn-outline-dark btn-sm"
+                               href="{% url 'main:order_item_details' pk=order_item.parent.pk %}">
+                                Заменяемый товар
+                            </a>
+                        {% endif %}
+
+                        {% if child_order_item %}
+                            <a class="btn btn-outline-dark btn-sm"
+                               href="{% url 'main:order_item_details' pk=child_order_item.pk %}">
+                                Замена</a>
+                        {% else %}
+                            <a class="btn btn-outline-dark btn-sm"
+                               href="{% url 'main:replacement_order_item' pk=order_item.pk %}">
+                                Добавить замену</a>
+                        {% endif %}
                     {% endif %}
-                {% endif %}
+                </div>
             </div>
             <div class="col">
                 <form class="needs-validation" name="form" action="" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
 
                     <div class="form-group row">
-                         <label for="id_name" class="col-2 col-form-label">Название товара</label>
-                          <div class="col-10">
-                                <input class="form-control" type="text" id="id_name" name="{{ order_item.name }}" value="{{ order_item.name }}" placeholder="название товара" required="id_name" >
-                          </div>
+                        <label for="id_name" class="col-2 col-form-label">Название товара</label>
+                        <div class="col-10">
+                            <input class="form-control" type="text" id="id_name" name="{{ form.name.name }}"
+                                   value="{{ form.name.initial }}" placeholder="название товара" required="id_name"
+                                    {% if form.name.field.disabled %}
+                                   disabled=""
+                                    {% endif %}
+                            >
+                        </div>
+                        {% if form.name.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.name.errors }}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group row">
-                         <label for="id_place" class="col-2 col-form-label">Место</label>
-                          <div class="col-10">
-                                <input class="form-control" id="id_place" type="text" name="{{ order_item.place.name }}" value="{{ order_item.place }}" placeholder="укажите место" required="id_place" >
-                          </div>
+                        <label for="id_place" class="col-2 col-form-label">Место</label>
+                        <div class="col-10">
+                            <input class="form-control" id="id_place" type="text" name="{{ form.place.name }}"
+                                   value="{{ form.place.initial }}" placeholder="укажите место" required="id_place"
+                                    {% if form.place.field.disabled %}
+                                   disabled=""
+                                    {% endif %}
+                            >
+                        </div>
+                        {% if form.place.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.place.errors }}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group row">
-                         <label for="id_price" class="col-2 col-form-label">Цена</label>
-                          <div class="col-10">
-                                <input class="form-control" id="id_price" type="number" name="{{ order_item.price.name }}" value="{{ order_item.price|stringformat:'s'}}" placeholder="укажите цену" required="id_price " >
-                          </div>
+                        <label for="id_price" class="col-2 col-form-label">Цена</label>
+                        <div class="col-10">
+                            <input class="form-control" id="id_price" type="number" name="{{ form.price.name }}"
+                                   value="{{ form.price.initial|stringformat:'s' }}" placeholder="укажите цену"
+                                   required="id_price" step="0.01"
+                                    {% if form.price.field.disabled %}
+                                   disabled=""
+                                    {% endif %}
+                            >
+                        </div>
+                        {% if form.price.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.price.errors }}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group row">
-                         <label for="id_count" class="col-2 col-form-label">Количество</label>
-                          <div class="col-10">
-                                <input class="form-control" id="id_count" type="number" name="{{ order_item.quantity.name }}" value="{{ order_item.quantity }}" required="id_count">
-                          </div>
+                        <label for="id_quantity" class="col-2 col-form-label">Количество</label>
+                        <div class="col-10">
+                            <input class="form-control" id="id_quantity" type="number"
+                                   name="{{ form.quantity.name }}" value="{{ form.quantity.initial }}"
+                                   required="id_quantity"
+                                    {% if form.quantity.field.disabled %}
+                                   disabled=""
+                                    {% endif %}
+                            >
+                        </div>
+                        {% if form.quantity.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.quantity.errors }}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group row">
-                         <label for="example-text-input" class="col-2 col-form-label">Сумма заказа</label>
-                          <div class="col-10 col-form-label" id="check_sum">0</div>
+                        <label for="id_status" class="col-2 col-form-label">Статус</label>
+                        <div class="col-10">
+                            <select class="form-control" name="status" id="id_status"
+                                    {% if form.status.field.disabled %}
+                                    disabled=""
+                                    {% endif %}
+                            >
+                                {% for status, status_str in order_items_statuses_list %}
+                                    {% if status == order_item.status %}
+                                        <option value="{{ status }}" selected>{{ status_str }}</option>
+                                    {% else %}
+                                        <option value="{{ status }}">{{ status_str }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
+
+                    <div class="form-group row">
+                        <label for="id_delivery" class="col-2 col-form-label">Доставка</label>
+                        <div class="col-10">
+                            <select class="form-control" name="delivery" id="id_delivery"
+                                    {% if form.delivery.field.disabled %}
+                                    disabled=""
+                                    {% endif %}
+                            >
+                                {% for delivery, delivery_str in purchase_and_delivery_types_list %}
+                                    {% if delivery == order_item.delivery %}
+                                        <option value="{{ delivery }}" selected>{{ delivery_str }}</option>
+                                    {% else %}
+                                        <option value="{{ delivery }}">{{ delivery_str }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
                     <hr class="mb-4">
+
                     <div class="form-group">
-                       <label for="id_comment_order">Коментарий к заказу</label>
-                       <textarea class="form-control" id="id_comment_order" name="{{ order_item.order_comment.name }}" placeholder="цвет, размер и пр." rows="3">{{ order_item.order_comment }}</textarea>
+                        <label for="id_order_comment">Коментарий к заказу</label>
+                        <textarea class="form-control" id="id_order_comment" name="{{ form.order_comment.name }}"
+                                  placeholder="цвет, размер и пр." rows="3"
+                                {% if form.order_comment.field.disabled %}
+                                  disabled=""
+                                {% endif %}
+                        >{{ form.order_comment.initial }}</textarea>
+                        {% if form.order_comment.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.order_comment.errors }}
+                            </div>
+                        {% endif %}
                     </div>
+
                     <div class="form-group">
-                       <label for="id_comment_customer">Коментарий для себя</label>
-                       <textarea class="form-control" id="id_comment_customer" name="{{ order_item.customer_comment.name }}" placeholder="заметка по товару и пр." rows="3">{{ order_item.customer_comment }}</textarea>
+                        <label for="id_customer_comment">Коментарий для себя</label>
+                        <textarea class="form-control" id="id_customer_comment"
+                                  name="{{ form.customer_comment.name }}" placeholder="заметка по товару и пр."
+                                  rows="3"
+                                {% if form.customer_comment.field.disabled %}
+                                  disabled=""
+                                {% endif %}
+                        >{{ form.customer_comment.initial }}</textarea>
+                        {% if form.customer_comment.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.customer_comment.errors }}
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="mb-4 text-center">
                         <button class="btn btn-outline-secondary btn-sm" type="submit">Сохранить</button>
-                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:order_details' pk=order_item.order.id %}">Отмена</a>
+                        <a class="btn btn-outline-secondary btn-sm"
+                           href="{% url 'main:order_details' pk=order_item.order.id %}">Отмена</a>
                     </div>
                 </form>
             </div>
