@@ -18,7 +18,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
     <header>
-            <nav class="navbar navbar-expand-lg navbar-light my-2" style="background-color: #e9ecef;">
+            <nav class="navbar navbar-expand-lg navbar-light my-2 " style="background-color: #e9ecef;">
              <div class="container">
                 <a class="navbar-brand" href="{% url 'main:index' %}">{{ shop_title }}</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,15 +52,18 @@
                                     <a class="dropdown-item" href="{% url 'main:products' %}">Выкупы</a>
                                     <a class="dropdown-item" href="{% url 'main:users' %}">Пользователи</a>
                                     <a class="dropdown-item" href="{% url 'main:settings' %}">Настройки</a>
+                                    <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
                                 {% elif user_role == roles.ZAKUPSCHIK %}
-                                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'main:zakupschik' %}">Личный кабинет</a>
+                                    <a class="dropdown-item" href="{% url 'main:zakupschik' %}">Заказы на выкуп</a>
+                                    <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
                                 {% else %} {# 'ZAKAZSCHIK' #}
-                                    <a class="dropdown-item" href="{% url 'main:user_details' pk=user_pk %}">Настройки</a>
                                     <a class="dropdown-item" href="{% url 'main:new_order' %}">Новый заказ</a>
                                     <a class="dropdown-item" href="{% url 'main:orders' %}">Мои заказы</a>
                                     <a class="dropdown-item" href="{% url 'main:catalog' %}">Выкупы</a>
+                                    <a class="dropdown-item" href="{% url 'main:user_details' pk=user_pk %}">Настройки</a>
+                                    <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
                                 {% endif %}
 

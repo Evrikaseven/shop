@@ -6,33 +6,35 @@
 {% block content %}
 
     <div class="container">
-        <nav class="site-header sticky-top py-2" style="z-index: -1">
-          <div class="container d-flex flex-column flex-md-row justify-content-between">
-            <a class="py-2" href="#">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="d-block mx-auto" role="img" viewBox="0 0 24 24" focusable="false"><title>Product</title><circle cx="12" cy="12" r="10"></circle><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83m13.79-4l-5.74 9.94"></path></svg>
-            </a>
-            <a class="py-2 d-none d-md-inline-block" href="{% url 'main:catalog' %}">Каталог товаров</a>
-            {% if user.is_authenticated and pers_area_url == 'zakazschik' %}
-                <a class="py-2 d-none d-md-inline-block" href="#">Совместная закупка</a>
-            {% endif %}
-            <a class="py-2 d-none d-md-inline-block" href="#">Условия сотрудничества</a>
-            <a class="py-2 d-none d-md-inline-block" href="#">Новости</a>
-            <a class="py-2 d-none d-md-inline-block" href="#">Рабочие графики</a>
-            <a class="py-2 d-none d-md-inline-block" href="#">Контакты</a>
-          </div>
-        </nav>
-        <form class="mb-4">
-            <div class="form-row mt-4">
-                <div class="col-md-11">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                </div>
-                <div class="col-md-1">
-            <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Search</button>
-                </div>
-            </div>
-        </form>
+    <nav class="navbar navbar-expand-md navbar-light border-bottom">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a href="{% url 'main:catalog' %}" class="nav-link">Каталог товаров</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Новости</a>
+                </li>
+                <li class="nav-item">
+                    {% if user.is_authenticated and pers_area_url == 'zakazschik' %}
+                        <a href="#" class="nav-link" href="#">Совместная закупка</a>
+                    {% endif %}
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Рабочие графики</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Контакты</a>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="text" placeholder="Search">
+                <button class="btn btn-outline-secondary my-2 my-sm-0 btn-sm" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
 
-        <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
+        <h3 class="font-weight-normal text-center py-3 my-3 bg-white border-bottom box-shadow">
             {{ announcement }}
         </h3>
 

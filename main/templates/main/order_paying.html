@@ -4,26 +4,16 @@
 
 {% block content %}
 
-    <div class="container">
-        <h2 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
-            Ожидайте подтверждения оплаты
-        </h2>
-        <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
-            Как только оплата будет подтверждена, статус заказа будет обновлен
-        </h3>
-        <div class="mb-4 text-center">
-            <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Номер
-                заказа: {{ object.pk }}</h3>
+    <div class="container mt-5 text-center">
+        <div class="jumbotron bg-white rounded shadow-sm">
+            <h1 class="display-4">Ожидайте подтверждения оплаты</h1>
+            <p class="lead">Как только оплата будет подтверждена, статус заказа будет обновлен.</p>
+            <hr class="mb-4">
+            <p class="h3">Номер заказа: {{ object.pk }}</p>
+            <p class="">Цена: {{ object.price }}</p>
         </div>
-        <div class="mb-4 text-center">
-            <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Цена: {{ object.price }}</h3>
-        </div>
-
-        <div class="mb-4 text-center">
-            <a href="{% url 'main:order_details' pk=object.pk %}">
-                <button class="btn btn-outline-dark btn-sm" type="submit">Вернуться на страницу заказа</button>
-            </a>
+        <div class="mt-4 text-center">
+            <a class="btn btn-secondary btn-sm" href="{% url 'main:order_details' pk=object.pk %}">Вернуться на страницу заказа</a>
         </div>
     </div>
-
 {% endblock content %}
