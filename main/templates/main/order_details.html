@@ -224,9 +224,9 @@
 
             {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
                 <div class="text-center small">
-                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:new_order_item' pk=order.id %}">Добавить
+                    <a class="btn btn-secondary btn-sm" href="{% url 'main:new_order_item' pk=order.id %}">Добавить
                         товар</a>
-                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:catalog' %}">
+                    <a class="btn btn-secondary btn-sm" href="{% url 'main:catalog' %}">
                         Добавить товар из совместной закупки</a>
                 </div>
             {% endif %}

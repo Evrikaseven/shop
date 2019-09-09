@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div class="col">
-                <form class="needs-validation" name="form" action="" method="POST" enctype="multipart/form-data">
+                <form class="needs-validation" id="form_order" action="" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
 
                     <div class="form-group row">
@@ -180,14 +180,15 @@
                             </div>
                         {% endif %}
                     </div>
-                    <div class="mb-4 text-center">
-                        <button class="btn btn-outline-secondary btn-sm" type="submit">Сохранить</button>
-                        <a class="btn btn-outline-secondary btn-sm"
-                           href="{% url 'main:order_details' pk=order_item.order.id %}">Отмена</a>
-                    </div>
                 </form>
             </div>
         </div>
     </div>
+    <div class="mb-4 text-center">
+        <button class="btn btn-secondary btn-sm" type="submit" form="form_order">Сохранить</button>
+        <a class="btn btn-secondary btn-sm" href="{% url 'main:order_details' pk=order_item.order.id %}">Отмена</a>
+    </div>
+
+
 
 {% endblock content %}

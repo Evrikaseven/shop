@@ -4,39 +4,35 @@
 
 {% block content %}
 
-<div>
     <h3 class="font-weight-normal text-center py-3 border-bottom" style="margin-block-start: 0;  margin-block-end: 0;">
         Каталог товаров для совместных закупок</h3>
     <div class="bg-light mt-3">
-        <div class="container">
-                  <div class="row">
-        {% for p in products %}
+        <div class="container my-3 p-3 bg-white rounded shadow-sm">
+            <div class="row">
 
-            <div class="col-md-4">
-              <div class="card mb-4 shadow-sm">
+        {% for p in products %}
+            <div class="col-md-3">
+              <div class="card mb-3 shadow-sm">
                 <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail">
                     <title>Placeholder</title>
                     <rect width="100%" height="100%" fill="#55595c"></rect>
-                    <image xlink:href="{{ MEDIA_URL }}{{ p.image }}" x="0" y="0" width="100%" height="100%" />
-                    <text x="50%" y="50%" fill="#eceeef" dy=".3em">{{ p.name }}</text>
+                    <a href="{% url 'main:details' pk=p.id %}">
+                        <image xlink:href="{{ MEDIA_URL }}{{ p.image }}" x="0" y="0" width="100%" height="100%" />
+                    </a>
+                    <text x="15%" y="50%" fill="#eceeef" dy=".3em">{{ p.name }}</text>
                 </svg>
-                <div class="card-body">
-                  <p class="card-text">{{ p.comment }}</p>
+                <div class="card-body py-2">
                   <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                        <a class="btn btn-sm btn-outline-secondary" href="{% url 'main:details' pk=p.id %}">Посмотреть</a>
+                        <p class="pt-3">{{ p.price }} ₽</p>
                         <a class="btn btn-sm btn-outline-secondary" href="#">Заказать</a>
-                    </div>
-                    <small class="text-muted">{{ p.price }} ₽</small>
                   </div>
                 </div>
               </div>
             </div>
         {% endfor %}
           </div>
-
+        </div>
     </div>
-  </div>
-</div>
+
 
 {% endblock content %}

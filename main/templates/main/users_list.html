@@ -3,39 +3,39 @@
 {% block title %}Пользователи{% endblock title %}
 
 {% block content %}
-
-<div class="container table-container">
-    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
+    <h3 class="font-weight-normal text-center text-muted" style="color: #6c757d">
         Пользователи
     </h3>
-    <table border="1px" class="table">
-        <thead class="thead-dark">
-        <tr>
-            <th scope="col">Email</th>
-            <th scope="col">Имя</th>
-            <th scope="col">Фамилия</th>
-            <th scope="col">Роль</th>
-            <th scope="col">Баланс</th>
-            <th scope="col">Телефон</th>
-            <th scope="col">Адрес</th>
-            <th scope="col">Дата рождения</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for user in users %}
-        <tr>
-            <td><a href="{% url 'main:user_details' pk=user.pk %}">{{ user.email }}</a></td>
-            <td>{{ user.first_name }}</td>
-            <td>{{ user.last_name }}</td>
-            <td> {{ user.role_to_string }} </td>
-            <td> {{ user.balance }} </td>
-            <td>{{ user.phone }}</td>
-            <td>{{ user.delivery_address }}</td>
-            <td>{{ user.birth_date }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <hr class="mb-4">
+    <div class="container my-3 p-3 bg-white rounded shadow-sm">
+        <table class="table table-sm table-hover ">
+            <thead class="thead-light table-ts">
+            <tr>
+                <th scope="col">Email</th>
+                <th scope="col">Имя</th>
+                <th scope="col">Фамилия</th>
+                <th scope="col">Роль</th>
+                <th scope="col">Баланс</th>
+                <th scope="col">Телефон</th>
+                <th scope="col">Адрес</th>
+                <th scope="col">Дата рождения</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+            <tr class="text-left small">
+                <td><a href="{% url 'main:user_details' pk=user.pk %}">{{ user.email }}</a></td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.last_name }}</td>
+                <td>{{ user.role_to_string }} </td>
+                <td> {{ user.balance }} </td>
+                <td>{{ user.phone }}</td>
+                <td>{{ user.delivery_address }}</td>
+                <td>{{ user.birth_date }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 </div>
 
 {% endblock content %}

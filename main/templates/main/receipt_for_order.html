@@ -8,20 +8,23 @@
 </h3>
 <hr class="mb-4">
 <div class="container">
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-            <div class="form-group row">
-                 <label for="id_image" class="col-2 col-form-label">Фото товара</label>
-                 <div class="col-10 custom-file">
-                     <input class="custom-file-input" type="file" name="image" accept="image/*" multiple="" id="id_image">
-                     <label class="custom-file-label text-truncate">выберите файл</label>
-                 </div>
-            </div>
-        <div class="form-actions text-center">
-            <button type="submit" class="btn btn-secondary btn-sm">Сохранить</button>
-            <a class="btn btn-secondary btn-sm" href="{% url 'main:order_details' pk=order.id %}">Отмена</a>
-        </div>
     </form>
+       <div class="my-3 p-3 bg-white rounded shadow-sm">
+            <form class="needs-validation" id="receipt" action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group row">
+                     <label for="id_image" class="col-2 col-form-label">Фото товара</label>
+                     <div class="col-10 custom-file">
+                         <input class="custom-file-input" type="file" name="image" accept="image/*" multiple="" id="id_image">
+                         <label class="custom-file-label text-truncate">выберите файл</label>
+                     </div>
+                </div>
+            </form>
+       </div>
 </div>
+    <div class="form-actions text-center">
+        <button type="submit" class="btn btn-secondary btn-sm" form="receipt">Сохранить</button>
+        <a class="btn btn-secondary btn-sm" href="{% url 'main:order_details' pk=order.id %}">Отмена</a>
+    </div>
 <script src="{% static '/js/name_to_photo.js' %}"></script>
 {% endblock content %}

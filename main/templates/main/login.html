@@ -7,8 +7,8 @@
         Пожалуйста войдите
     </h3>
     <hr class="mb-4">
-    <div class="form-signin ">
-        <form class="form-signin mb-3" method="post">
+    <form class="form-signin my-3 p-3 bg-white rounded shadow-sm" id="login" name="login" method="post">
+
             {% csrf_token %}
             {% if form.errors %}
                 <div class="alert alert-danger">
@@ -29,13 +29,12 @@
                            required="">
                 </div>
             </div>
-            <hr class="mb-4">
-            <div class="form-actions text-center">
-                <button type="submit" class="btn btn-outline-secondary btn-sm">Войти</button>
-                <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:signup' %}">Регистрация</a>
-            </div>
-            <p class="mt-5 mb-3 text-muted text-center">© 2017-2019</p>
-        </form>
+    </form>
+    <div class="form-actions text-center">
+        <button type="submit" class="btn btn-secondary btn-sm" form="login">Войти</button>
+        <a class="btn btn-secondary btn-sm" href="{% url 'main:signup' %}">Регистрация</a>
     </div>
+    <p class="mt-5 mb-3 text-muted text-center">© 2017-2019</p>
+
 
 {% endblock %}

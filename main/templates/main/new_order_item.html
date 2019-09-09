@@ -9,7 +9,7 @@
     <hr class="mb-4">
 
     <div class="container my-3 p-3 bg-white rounded shadow-sm">
-        <form class="needs-validation" name="form" action="" method="POST" enctype="multipart/form-data">
+        <form class="needs-validation" id="form_order" action="" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group row">
                 <label for="id_image" class="col-2 col-form-label">Фото товара</label>
@@ -160,12 +160,13 @@
                         {% endif %}
                 >{{ form.customer_comment.initial }}</textarea>
             </div>
-    </div>
-    <div class="text-center">
-        <button class="btn btn-secondary btn-sm" type="submit">Добавить в заказ</button>
-        <a class="btn btn-secondary btn-sm" href="{% url 'main:order_details' pk=order.id %}">Отмена</a>
-    </div>
     </form>
+    </div>
+        <div class="text-center">
+            <button class="btn btn-secondary btn-sm" type="submit" form="form_order">Добавить в заказ</button>
+            <a class="btn btn-secondary btn-sm" href="{% url 'main:order_details' pk=order.id %}">Отмена</a>
+        </div>
+
 
     <script src="{% static '/js/name_to_photo.js' %}"></script>
 

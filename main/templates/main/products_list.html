@@ -3,42 +3,53 @@
 {% block title %}Товары{% endblock title %}
 
 {% block content %}
+    <h3 class="font-weight-normal text-center text-muted" style="color: #6c757d">
+        Список товаров для совместных закупок
+    </h3>
+    <hr class="mb-4">
 
-    <div class="container table-container">
-        <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
-            Список товаров для совместных закупок
-        </h3>
-        <table border="1px" class="table">
-            <thead class="thead-dark">
-            <tr>
-                <th scope="col">Фото</th>
-                <th scope="col">Название товара</th>
-                <th scope="col">Место</th>
-                <th scope="col">Цена</th>
-                <th scope="col">Количество</th>
-                <th scope="col">Комментарий</th>
-            </tr>
-            </thead>
-            <tbody>
+    <div class="container">
+        <div class="row">
             {% for p in products %}
-                <tr>
-                    <td>
+                <div class="card mb-3 my-3 rounded shadow-sm">
+                <h5 class="card-header" style="background-color: #e9ecef">{{ p.name }}</h5>
+                  <div class="row no-gutters">
+                    <div class="col-md-2 pt-3">
                         <a href="{% url 'main:update_joint_product' pk=p.id %}">
-                            <img src="{{ MEDIA_URL }}{{ p.image }}" height="150" width="150">
+                            <img class="card-img" src="{{ MEDIA_URL }}{{ p.image }}" height="150" width="150">
                         </a>
-                    </td>
-                    <td>{{ p.name }}</td>
-                    <td>{{ p.place }}</td>
-                    <td>{{ p.price }}</td>
-                    <td>{{ p.quantity }}</td>
-                    <td>{{ p.comment }}</td>
-                </tr>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="card-body">
+                            <p class="card-text">Цена: <small class="text-muted">{{ p.price }}</small></p>
+                            <p class="card-text">Место: <small class="text-muted">{{ p.place }}</small></p>
+                            <p class="card-text"> Количество: <small class="text-muted">{{ p.quantity }}</small></p>
+                      </div>
+                    </div>
+                      <div class="col-md-7">
+                          <div class="card-body">
+                              <p class="card-text">Описание продукта</p>
+                              <p class="card-text"><small class="text-muted">{{ p.comment }}</small></p>
+                          </div>
+                    </div>
+                  </div>
+                    <div class="card-footer text-right text-muted bg-white">
+                        <div class="btn-group">
+                            <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:update_joint_product' pk=p.id %}">
+                                Изменить
+                            </a>
+                            <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:delete_order_item' pk=p.id %}">
+                                Удалить
+                            </a>
+                        </div>
+                    </div>
+                </div>
             {% endfor %}
-            <a href="{% url 'main:new_joint_product' %}">
-                <button class="btn btn-outline-dark" type="submit">Добавить товар</button>
-            </a>
-            </tbody>
-        </table>
+        </div>
+    </div>
+    <div class="text-center small mb-3">
+        <a class="btn btn-secondary btn-sm text-center" href="{% url 'main:new_joint_product' %}">
+            Добавить товар</a>
     </div>
 
 {% endblock content %}
