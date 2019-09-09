@@ -10,7 +10,15 @@ from main.core.view_mixins import (
     OrderCreateStatusOnlyAllowUpdateViewMixin,
 )
 from . import models as _models
-from .core.constants import Roles, OrderStatuses, ShoppingTypes, DeliveryTypes, DELIVERY_PRICES
+from .core.constants import (
+    Roles,
+    OrderStatuses,
+    ShoppingTypes,
+    DeliveryTypes,
+    DELIVERY_PRICES,
+    OrderItemStatuses,
+    PurchaseAndDeliveryTypes,
+)
 from . import serializers as _serializers
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
@@ -245,6 +253,8 @@ class NewOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
         context = super().get_context_data(**kwargs)
         context['order'] = _models.Order.objects.get(id=self.order_id)
         # context['MEDIA_URL'] = settings.MEDIA_URL
+        context['order_items_statuses_list'] = list(OrderItemStatuses)
+        context['purchase_and_delivery_types_list'] = list(PurchaseAndDeliveryTypes)
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -316,6 +326,8 @@ class OrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextView
         context['child_order_item'] = getattr(self.object, 'orderitem', None)
         context['product_image'] = self.object.product.image
         context['MEDIA_URL'] = settings.MEDIA_URL
+        context['order_items_statuses_list'] = list(OrderItemStatuses)
+        context['purchase_and_delivery_types_list'] = list(PurchaseAndDeliveryTypes)
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -348,6 +360,9 @@ class ReplacementOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, Common
         context = super().get_context_data(**kwargs)
         context['product_image'] = self.order_item.product.image
         context['MEDIA_URL'] = settings.MEDIA_URL
+        context['order'] = self.order_item.order
+        context['order_items_statuses_list'] = list(OrderItemStatuses)
+        context['purchase_and_delivery_types_list'] = list(PurchaseAndDeliveryTypes)
         return context
 
     def dispatch(self, request, *args, **kwargs):
