@@ -4,28 +4,25 @@
 
 {% block content %}
 
-{#    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">#}
-{#        Новый товар#}
-{#    </h3>#}
-{#    <form method="post" enctype="multipart/form-data">#}
-{#        {% csrf_token %}#}
-{#        {{ form.as_p }}#}
-{#        <button class="btn btn-outline-dark" type="submit">Сохранить</button>#}
-{#    </form>#}
-
-   <h3 class="font-weight-normal text-center text-muted" style="color: #6c757d">
+    <h3 class="font-weight-normal text-center text-muted" style="color: #6c757d">
         Добавление нового товара в заказ #{{ order.id }}
-   </h3>
+    </h3>
 
     <hr class="mb-4">
 
     <div class="container my-3 p-3 bg-white rounded shadow-sm">
         <form class="needs-validation" id="form_order" action="" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
+            {% if product.image %}
+                <div>
+                    На данный момент: <a href="{{ MEDIA_URL }}{{ product.image }}">{{ product.image.name }}</a><br>
+                </div>
+            {% endif %}
             <div class="form-group row">
                 <label for="id_image" class="col-2 col-form-label">Фото товара</label>
                 <div class="col-10 custom-file">
-                    <input class="custom-file-input" type="file" name="image" accept="image/*" id="id_image" required=""
+                    <input class="custom-file-input" type="file" name="image" accept="image/*" id="id_image"
+                           value="{{ MEDIA_URL }}{{ form.image.initial }}"
                             {% if form.image.field.disabled %}
                            disabled=""
                             {% endif %}
@@ -116,7 +113,7 @@
                         {% if form.comment.field.disabled %}
                           disabled=""
                         {% endif %}
-                >{{ form.comment.initial }}</textarea>
+                >{{ form.comment.initial|default_if_none:'' }}</textarea>
                 {% if form.comment.errors %}
                     <div class="alert alert-danger">
                         {{ form.comment.errors }}
@@ -126,7 +123,7 @@
         </form>
     </div>
     <div class="text-center">
-        <button class="btn btn-secondary btn-sm" type="submit" form="form_order">Добавить</button>
+        <button class="btn btn-secondary btn-sm" type="submit" form="form_order">Сохранить</button>
         <a class="btn btn-secondary btn-sm" href="{% url 'main:products' %}">Отмена</a>
     </div>
 

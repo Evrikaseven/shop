@@ -438,7 +438,7 @@ class JointItemToOrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
 
 
 class ProductForm(WithUserDataUpdateFormMixin, forms.ModelForm):
-
+    image = forms.ImageField(label='Фото товара', required=False)
     comment = forms.CharField(label='Комментарий к товару', required=False, widget=forms.widgets.Textarea)
 
     class Meta:
@@ -451,15 +451,32 @@ class ProductForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         #TODO: remove if another shopping_type is necessary
         self.fields.pop('shopping_type')
 
+
+    def clean_image(self):
+        image = self.cleaned_data['image']
+        if not image:
+            raise ValidationError('Добавьте фото товара')
+        return image
+
     def clean_place(self):
         value = self.cleaned_data['place'].strip().replace(' ', '')
         if not value:
             raise ValidationError('Укажите, пожалуйста, номер места')
         return value
 
+    def clean_price(self):
+        value = self.cleaned_data['price']
+        if value < 1:
+            raise ValidationError('Цена должна быть больше 0')
+        return value
+
     def save(self, commit=True):
         # TODO: remove if another shopping_type is necessary
-        if not self.instance.pk:
+        if self.instance.pk:
+            if 'image' in self.changed_data:
+                old_image = Product.objects.get(pk=self.instance.pk).image
+                old_image.delete()
+        else:
             self.instance.shopping_type = ShoppingTypes.JOINT
         return super().save(commit=True)
 

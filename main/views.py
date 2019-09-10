@@ -392,6 +392,22 @@ class DeleteOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonConte
         return context
 
 
+class DeleteProductView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, DeleteView):
+    template_name = "main/delete_product.html"
+    url_name = "delete_product"
+    # allowed_roles = () Admin only is allowed
+    model = _models.Product
+
+    def get_success_url(self):
+        return reverse_lazy('main:products')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['MEDIA_URL'] = settings.MEDIA_URL
+        context['product'] = self.object
+        return context
+
+
 class CatalogOrderItems(LoginRolesRequiredViewMixin, CommonContextViewMixin, CreateView):
     template_name = 'main/catalog_items.html'
     url_name = 'catalog'
@@ -419,10 +435,6 @@ class CatalogOrderItems(LoginRolesRequiredViewMixin, CommonContextViewMixin, Cre
 
 class BuyoutsListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/buyouts_list.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
 
 
 class ProductsListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
@@ -459,7 +471,7 @@ class ProductsAddToOrderView(LoginRolesRequiredViewMixin, CommonContextViewMixin
 
 
 class NewJointProductView(LoginRolesRequiredViewMixin, CommonContextViewMixin, CreateView):
-    template_name = 'main/new_joint_product.html'
+    template_name = 'main/joint_product.html'
     url_name = 'new_joint_product'
     form_class = ProductForm
     # allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
@@ -478,7 +490,7 @@ class NewJointProductView(LoginRolesRequiredViewMixin, CommonContextViewMixin, C
 
 
 class UpdateJointProductView(LoginRolesRequiredViewMixin, CommonContextViewMixin, UpdateView):
-    template_name = 'main/new_joint_product.html'
+    template_name = 'main/joint_product.html'
     url_name = 'update_joint_product'
     form_class = ProductForm
     model = _models.Product
@@ -491,6 +503,11 @@ class UpdateJointProductView(LoginRolesRequiredViewMixin, CommonContextViewMixin
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.user
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['MEDIA_URL'] = settings.MEDIA_URL
+        return context
 
 
 class HelpView(CommonContextViewMixin, TemplateView):

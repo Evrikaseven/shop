@@ -26,6 +26,7 @@ urlpatterns = [
     path('products/<int:pk>/add_to_order/', main_views.ProductsAddToOrderView.as_view(), name=main_views.ProductsAddToOrderView.url_name),
     path('products/new_joint_product/', main_views.NewJointProductView.as_view(), name=main_views.NewJointProductView.url_name),
     path('products/<int:pk>', main_views.UpdateJointProductView.as_view(), name=main_views.UpdateJointProductView.url_name),
+    path('products/<int:pk>/delete/', main_views.DeleteProductView.as_view(), name=main_views.DeleteProductView.url_name),
     path('buyouts/', main_views.BuyoutsListView.as_view(), name='buyouts'),
     path('help/', main_views.HelpView.as_view(), name='help'),
 
@@ -42,7 +43,7 @@ urlpatterns = [
 
     path('order_item/<int:pk>', main_views.OrderItemView.as_view(), name=main_views.OrderItemView.url_name),
     path('order_item/<int:pk>/new_replacement/', main_views.ReplacementOrderItemView.as_view(), name=main_views.ReplacementOrderItemView.url_name),
-    path('order_item/<int:pk>/delete', main_views.DeleteOrderItemView.as_view(), name=main_views.DeleteOrderItemView.url_name),
+    path('order_item/<int:pk>/delete/', main_views.DeleteOrderItemView.as_view(), name=main_views.DeleteOrderItemView.url_name),
 
      #Catalog items
     path('catalog/', main_views.CatalogOrderItems.as_view(), name='catalog'),
