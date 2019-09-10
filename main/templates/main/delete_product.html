@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Удаление товара{% endblock title %}
+
+{% block content %}
+
+    <div>
+        <h3 class="font-weight-normal text-center">
+            Вы точно хотите удалить?
+        </h3>
+
+        <hr class="mb-4">
+
+        <div class="container my-3 p-3 bg-white rounded shadow-sm">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-4 text-center">
+                    {#                <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="150" width="150">#}
+                    <img src="{{ MEDIA_URL }}{{ product.image }}">
+                </div>
+                <div class="mb-4 text-center">
+                    <button class="btn btn-outline-secondary btn-sm" type="submit">Удалить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock content %}

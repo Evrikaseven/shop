@@ -1,11 +1,10 @@
 import os.path
 import shutil
-from datetime import timedelta
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.db.models.signals import pre_delete, post_save, post_delete
+from django.db.models.signals import pre_delete, post_delete
 from django.conf import settings
 from main.core.models import ModelWithTimestamp, ModelWithUser
 from main.core.constants import (
