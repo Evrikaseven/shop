@@ -9,45 +9,42 @@
     <hr class="mb-4">
 
     <div class="container">
-        <div class="row">
-            {% for p in products %}
-                <div class="card mb-3 my-3 rounded shadow-sm">
-                <h5 class="card-header" style="background-color: #e9ecef">{{ p.name }}</h5>
-                  <div class="row no-gutters">
-                    <div class="col-md-2 pt-3">
-                        <a href="{% url 'main:update_joint_product' pk=p.id %}">
-                            <img class="card-img" src="{{ MEDIA_URL }}{{ p.image }}" height="150" width="150">
-                        </a>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="card-body">
-                            <p class="card-text">Цена: <small class="text-muted">{{ p.price }}</small></p>
-                            <p class="card-text">Место: <small class="text-muted">{{ p.place }}</small></p>
-                            <p class="card-text"> Количество: <small class="text-muted">{{ p.quantity }}</small></p>
-                      </div>
-                    </div>
-                      <div class="col-md-7">
-                          <div class="card-body">
-                              <p class="card-text">Описание продукта</p>
-                              <p class="card-text"><small class="text-muted">{{ p.comment }}</small></p>
-                          </div>
-                    </div>
-                  </div>
-                    <div class="card-footer text-right text-muted bg-white">
-                        <div class="btn-group">
-                            <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:update_joint_product' pk=p.id %}">
-                                Изменить
-                            </a>
-                            <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:delete_product' pk=p.id %}">
-                                Удалить
-                            </a>
-                        </div>
-                    </div>
+      {% for p in products %}
+          <div class="card my-3 rounded shadow-sm">
+          <div class="card-header d-flex justify-content-between"  style="background-color: #e9ecef">
+              <h5>{{ p.name }}</h5>
+              <div class="btn-group">
+                  <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:update_joint_product' pk=p.id %}">
+                      Изменить
+                  </a>
+                  <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:delete_product' pk=p.id %}">
+                      Удалить
+                  </a>
+              </div>
+          </div>
+           <div class="row py-2 no-gutters">
+              <div class="col-md-2">
+                  <a href="{% url 'main:update_joint_product' pk=p.id %}">
+                      <img class="card-img" src="{{ MEDIA_URL }}{{ p.image }}" height="150" width="150">
+                  </a>
+              </div>
+              <div class="col-md-3">
+                <div class="card-body">
+                      <p class="card-text">Цена: <small class="text-muted">{{ p.price }}</small></p>
+                      <p class="card-text">Место: <small class="text-muted">{{ p.place }}</small></p>
+                      <p class="card-text"> Количество: <small class="text-muted">{{ p.quantity }}</small></p>
                 </div>
-                <div class="card mb-3" style="max-width: 540px;">
-            {% endfor %}
-        </div>
-    </div>
+              </div>
+                <div class="col-md-7">
+                    <div class="card-body">
+                        <p class="card-text">Описание продукта</p>
+                        <p class="card-text"><small class="text-muted">{{ p.comment }}</small></p>
+                    </div>
+              </div>
+            </div>
+          </div>
+      {% endfor %}
+     </div>
     <div class="text-center small mb-3">
         <a class="btn btn-secondary btn-sm text-center" href="{% url 'main:new_joint_product' %}">
             Добавить товар</a>
