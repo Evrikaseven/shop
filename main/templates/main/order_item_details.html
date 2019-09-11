@@ -13,7 +13,9 @@
     <div class="container my-3 p-3 bg-white rounded shadow-sm">
         <div class="row">
             <div class="col-3 text-center">
-                <img src="{{ MEDIA_URL }}{{ product_image }}" class="mb-3" id="id_image" height="200" width="200">
+                <a href="{{ MEDIA_URL }}{{ product_image }}">
+                    <img src="{{ MEDIA_URL }}{{ product_image }}" class="mb-3" id="id_image" height="200" width="200">
+                </a>
 
                 <div class="text-center">
                     {% if order_item.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL %}
