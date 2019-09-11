@@ -11,116 +11,123 @@
     <hr class="mb-4">
 
     <div class="container my-3 p-3 bg-white rounded shadow-sm">
-        <form class="needs-validation" id="form_order" action="" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
+        <div class="row">
             {% if product.image %}
-                <div>
-                    На данный момент: <a href="{{ MEDIA_URL }}{{ product.image }}">{{ product.image.name }}</a><br>
+                <div class="col-3 text-center">
+                    На данный момент:
+                    <a href="{{ MEDIA_URL }}{{ product.image }}">
+                        <img src="{{ MEDIA_URL }}{{ product.image }}" height="200" width="200">
+                    </a><br>
                 </div>
             {% endif %}
-            <div class="form-group row">
-                <label for="id_image" class="col-2 col-form-label">Фото товара</label>
-                <div class="col-10 custom-file">
-                    <input class="custom-file-input" type="file" name="image" accept="image/*" id="id_image"
-                           value="{{ MEDIA_URL }}{{ form.image.initial }}"
-                            {% if form.image.field.disabled %}
-                           disabled=""
-                            {% endif %}
-                    >
-                    <label class="custom-file-label text-truncate">выберите файл</label>
-                </div>
-                {% if form.image.errors %}
-                    <div class="alert alert-danger">
-                        {{ form.image.errors }}
-                    </div>
-                {% endif %}
-            </div>
-
-            <div class="form-group row">
-                <label for="id_name" class="col-2 col-form-label">Название товара</label>
-                <div class="col-10">
-                    <input class="form-control" type="text" id="id_name" name="{{ form.name.name }}"
-                           value="{{ form.name.initial }}" placeholder="название товара" required="id_name"
-                            {% if form.name.field.disabled %}
-                           disabled=""
-                            {% endif %}
-                    >
-                </div>
-                {% if form.name.errors %}
-                    <div class="alert alert-danger">
-                        {{ form.name.errors }}
-                    </div>
-                {% endif %}
-            </div>
-
-            <div class="form-group row">
-                <label for="id_place" class="col-2 col-form-label">Место</label>
-                <div class="col-10">
-                    <input class="form-control" id="id_place" type="text" name="{{ form.place.name }}"
-                           value="{{ form.place.initial }}" placeholder="укажите место" required=""
-                            {% if form.place.field.disabled %}
-                           disabled=""
-                            {% endif %}
-                    >
-                </div>
-                {% if form.place.errors %}
-                    <div class="alert alert-danger">
-                        {{ form.place.errors }}
-                    </div>
-                {% endif %}
-            </div>
-
-            <div class="form-group row">
-                <label for="id_price" class="col-2 col-form-label">Цена</label>
-                <div class="col-10">
-                    <input class="form-control" id="id_price" type="number" name="{{ form.price.name }}"
-                           value="{{ form.price.initial|stringformat:'s' }}" placeholder="укажите цену"
-                           required="" step="0.01"
-                            {% if form.price.field.disabled %}
-                           disabled=""
-                            {% endif %}
-                    >
-                </div>
-                {% if form.price.errors %}
-                    <div class="alert alert-danger">
-                        {{ form.price.errors }}
-                    </div>
-                {% endif %}
-            </div>
-
-            <div class="form-group row">
-                <label for="id_quantity" class="col-2 col-form-label">Количество</label>
-                <div class="col-10">
-                    <input class="form-control" id="id_quantity" type="number" name="{{ form.quantity.name }}"
-                           value="{{ form.quantity.initial }}" required=""
-                            {% if form.quantity.field.disabled %}
-                           disabled=""
-                            {% endif %}
-                    >
-                </div>
-                {% if form.quantity.errors %}
-                    <div class="alert alert-danger">
-                        {{ form.quantity.errors }}
-                    </div>
-                {% endif %}
-            </div>
-
-            <hr class="mb-4">
-            <div class="form-group">
-                <label for="id_comment">Коментарий к заказу</label>
-                <textarea class="form-control" id="id_comment" name="{{ form.comment.name }}"
-                          placeholder="цвет, размер и пр." rows="3"
-                        {% if form.comment.field.disabled %}
-                          disabled=""
+            <div class="col">
+                <form class="needs-validation" id="form_order" action="" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group row">
+                        <label for="id_image" class="col-2 col-form-label">Фото товара</label>
+                        <div class="col-10 custom-file">
+                            <input class="custom-file-input" type="file" name="image" accept="image/*" id="id_image"
+                                   value="{{ MEDIA_URL }}{{ form.image.initial }}"
+                                    {% if form.image.field.disabled %}
+                                   disabled=""
+                                    {% endif %}
+                            >
+                            <label class="custom-file-label text-truncate">выберите файл</label>
+                        </div>
+                        {% if form.image.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.image.errors }}
+                            </div>
                         {% endif %}
-                >{{ form.comment.initial|default_if_none:'' }}</textarea>
-                {% if form.comment.errors %}
-                    <div class="alert alert-danger">
-                        {{ form.comment.errors }}
                     </div>
-                {% endif %}
+
+                    <div class="form-group row">
+                        <label for="id_name" class="col-2 col-form-label">Название товара</label>
+                        <div class="col-10">
+                            <input class="form-control" type="text" id="id_name" name="{{ form.name.name }}"
+                                   value="{{ form.name.initial }}" placeholder="название товара" required="id_name"
+                                    {% if form.name.field.disabled %}
+                                   disabled=""
+                                    {% endif %}
+                            >
+                        </div>
+                        {% if form.name.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.name.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="id_place" class="col-2 col-form-label">Место</label>
+                        <div class="col-10">
+                            <input class="form-control" id="id_place" type="text" name="{{ form.place.name }}"
+                                   value="{{ form.place.initial }}" placeholder="укажите место" required=""
+                                    {% if form.place.field.disabled %}
+                                   disabled=""
+                                    {% endif %}
+                            >
+                        </div>
+                        {% if form.place.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.place.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="id_price" class="col-2 col-form-label">Цена</label>
+                        <div class="col-10">
+                            <input class="form-control" id="id_price" type="number" name="{{ form.price.name }}"
+                                   value="{{ form.price.initial|stringformat:'s' }}" placeholder="укажите цену"
+                                   required="" step="0.01"
+                                    {% if form.price.field.disabled %}
+                                   disabled=""
+                                    {% endif %}
+                            >
+                        </div>
+                        {% if form.price.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.price.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="id_quantity" class="col-2 col-form-label">Количество</label>
+                        <div class="col-10">
+                            <input class="form-control" id="id_quantity" type="number" name="{{ form.quantity.name }}"
+                                   value="{{ form.quantity.initial }}" required=""
+                                    {% if form.quantity.field.disabled %}
+                                   disabled=""
+                                    {% endif %}
+                            >
+                        </div>
+                        {% if form.quantity.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.quantity.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <hr class="mb-4">
+                    <div class="form-group">
+                        <label for="id_comment">Коментарий к заказу</label>
+                        <textarea class="form-control" id="id_comment" name="{{ form.comment.name }}"
+                                  placeholder="цвет, размер и пр." rows="3"
+                                {% if form.comment.field.disabled %}
+                                  disabled=""
+                                {% endif %}
+                        >{{ form.comment.initial|default_if_none:'' }}</textarea>
+                        {% if form.comment.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.comment.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
     <div class="text-center">
         <button class="btn btn-secondary btn-sm" type="submit" form="form_order">Сохранить</button>
