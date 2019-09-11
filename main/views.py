@@ -36,6 +36,7 @@ from .forms import (
 
 class IndexView(CommonContextViewMixin, TemplateView):
     template_name = 'main/index.html'
+    url_name = 'index'
 
     def __init__(self, *args, **kwargs):
         self.user = None
@@ -264,7 +265,7 @@ class NewOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
 
 class NewJointOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, CreateView):
     template_name = 'main/new_joint_order_item.html'
-    #url_name = 'new_joint_order_item'
+    url_name = 'new_joint_order_item'
     form_class = JointItemToOrderForm
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
 
@@ -285,7 +286,8 @@ class NewJointOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonCon
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # context['order'] = _models.Order.objects.get(id=self.order_id)
+        context['order'] = _models.Order.objects.get(id=self.order_id)
+        context['product'] = _models.Product.objects.get(id=self.product_id)
         # context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
@@ -426,6 +428,7 @@ class CatalogOrderItems(LoginRolesRequiredViewMixin, CommonContextViewMixin, Cre
         context = super().get_context_data(**kwargs)
         context['products'] = _models.Product.objects.get_joint_products()
         context['MEDIA_URL'] = settings.MEDIA_URL
+        context['order'] = _models.Order.objects.get(pk=self.order_id) if self.order_id else None
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -457,16 +460,19 @@ class ProductsAddToOrderView(LoginRolesRequiredViewMixin, CommonContextViewMixin
 
     def __init__(self, *args, **kwargs):
         self.product_id = None
+        self.order_id = None
         super().__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['product'] = _models.Product.objects.get(id=self.product_id)
+        context['order'] = _models.Order.objects.get(id=self.order_id) if self.order_id else None
         context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
     def dispatch(self, request, *args, **kwargs):
         self.product_id = kwargs['pk']
+        self.order_id = kwargs.get('order_pk', None)
         return super().dispatch(request, *args, **kwargs)
 
 

@@ -226,7 +226,7 @@
                 <div class="text-center small">
                     <a class="btn btn-secondary btn-sm" href="{% url 'main:new_order_item' pk=order.id %}">Добавить
                         товар</a>
-                    <a class="btn btn-secondary btn-sm" href="{% url 'main:catalog' %}">
+                    <a class="btn btn-secondary btn-sm" href="{% url 'main:catalog' pk=order.id %}">
                         Добавить товар из совместной закупки</a>
                 </div>
             {% endif %}

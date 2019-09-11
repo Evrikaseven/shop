@@ -1,18 +1,80 @@
 {% extends 'base.html' %}
 
-{% block title %}Новый товар{% endblock title %}
+{% block title %}Выкуп{% endblock title %}
 
 {% block content %}
-
-<div class="container table-container">
-    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
-        Новый товар
+    <h3 class="font-weight-normal text-center">
+        Выкуп: {{ product.name }}
     </h3>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Сохранить</button>
-    </form>
-</div>
+
+    <hr class="mb-4">
+
+    <div class="container my-3 p-3 bg-white rounded shadow-sm">
+        <div class="row">
+            <div class="col">
+                <form class="needs-validation" id="joint_order_item_form" action="" method="POST"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="form-group row">
+                        <label for="id_quantity" class="col-2 col-form-label">Количество</label>
+                        <div class="col-10">
+                            <input class="form-control" id="id_quantity" type="number"
+                                   name="{{ form.quantity.name }}" value="{{ form.quantity.initial }}"
+                                   required="id_quantity"
+                                    {% if form.quantity.field.disabled %}
+                                   disabled=""
+                                    {% endif %}
+                            >
+                        </div>
+                        {% if form.quantity.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.quantity.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <hr class="mb-4">
+
+                    <div class="form-group">
+                        <label for="id_order_comment">Коментарий к заказу</label>
+                        <textarea class="form-control" id="id_order_comment" name="{{ form.order_comment.name }}"
+                                  placeholder="цвет, размер и пр." rows="3"
+                                {% if form.order_comment.field.disabled %}
+                                  disabled=""
+                                {% endif %}
+                        >{{ form.order_comment.initial }}</textarea>
+                        {% if form.order_comment.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.order_comment.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_customer_comment">Коментарий для себя</label>
+                        <textarea class="form-control" id="id_customer_comment"
+                                  name="{{ form.customer_comment.name }}" placeholder="заметка по товару и пр."
+                                  rows="3"
+                                {% if form.customer_comment.field.disabled %}
+                                  disabled=""
+                                {% endif %}
+                        >{{ form.customer_comment.initial }}</textarea>
+                        {% if form.customer_comment.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.customer_comment.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-4 text-center">
+        <button class="btn btn-secondary btn-sm" type="submit" form="joint_order_item_form">Сохранить</button>
+        <a class="btn btn-secondary btn-sm" href="{% url 'main:order_details' pk=order.id %}">Отмена</a>
+    </div>
 
 {% endblock content %}
