@@ -8,24 +8,35 @@
     </h3>
     <div class="container">
         <div class="card mb-3">
-          <div class="row no-gutters">
-            <div class="col-md-4">
-              <img src="{{ MEDIA_URL }}{{ product.image }}" class="card-img" alt="...">
+            <div class="row no-gutters">
+                <div class="col-md-4">
+                    <img src="{{ MEDIA_URL }}{{ product.image }}" class="card-img" alt="...">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">{% if product.name %} {{ product.name }} {% else %} Без
+                            названия {% endif %}</h5>
+                        <p class="card-text">{{ product.place }}</p>
+                        <p class="card-text">{{ product.quantity }}</p>
+                        <p class="card-text">{{ product.comment }}</p>
+                        <p class="card-text">
+                            <small class="text-muted">Цена за 1 шт: {{ product.price }} ₽</small>
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-8">
-              <div class="card-body">
-                <h5 class="card-title">{% if product.name %} {{ product.name }} {% else %} Без названия {% endif %}</h5>
-                <p class="card-text">{{ product.place }}</p>
-                <p class="card-text">{{ product.quantity }}</p>
-                <p class="card-text">{{ product.comment }}</p>
-                <p class="card-text"><small class="text-muted">Цена за 1 шт: {{ product.price }} ₽</small></p>
-              </div>
-            </div>
-          </div>
             <div class="card-footer d-flex justify-content-between align-items-center">
-{#                <div class="card-text">Сумма заказа:</div>#}
                 {% if product.quantity > 0 %}
-                    <a class="btn btn-sm btn-outline-dark" href="{% url 'main:product_to_orders' product.id %}">Добавить в заказ</a>
+                    {% if order %}
+                        <a href="{% url 'main:joint_item_to_product' pk=order.id product_pk=product.id %}"
+                                               class="btn btn-sm btn-outline-dark">
+                            Добавить в заказ
+                        </a>
+                    {% else %}
+                        <a class="btn btn-sm btn-outline-dark" href="{% url 'main:product_to_orders' product.id %}">
+                            Добавить в заказ
+                        </a>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>

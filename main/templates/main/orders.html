@@ -12,25 +12,29 @@
     </h3>
     <hr class="mb-4">
     <div class="container my-3 p-3 bg-white rounded shadow-sm">
-    {% if product_id %}
-        <a class="btn btn-sm btn-outline-dark my-3" href="#">Создать новый заказ</a>
-    {% endif %}
+        {% if product_id %}
+            <a class="btn btn-sm btn-outline-dark my-3" href="#">Добавить в новый заказ</a>
+        {% endif %}
         <div class="list-group">
             {% for o in orders %}
-                  <a href="{% url 'main:order_details' pk=o.id %}" class="list-group-item list-group-item-action ">
-                    <div class="d-flex w-100 justify-content-between">
-                      <h5 class="mb-1">Заказ #{{ o.id }}</h5>
-                        <p class="mb-1">{{ o.status_to_string }}</p>
-                        <small>Создан {{ o.created_date }}</small>
-                    </div>
+                {% if product_id %}
+                    <a href="{% url 'main:joint_item_to_product' pk=o.id product_pk=product_id %}" class="list-group-item list-group-item-action ">
+                {% else %}
+                    <a href="{% url 'main:order_details' pk=o.id %}" class="list-group-item list-group-item-action ">
+                {% endif %}
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Заказ #{{ o.id }}</h5>
+                    <p class="mb-1">{{ o.status_to_string }}</p>
+                    <small>Создан {{ o.created_date }}</small>
+                </div>
 
-                      <div class="d-flex w-100">
+                <div class="d-flex w-100">
 
-                        <h6 class="mr-2">К оплате:</h6>
-                        <small>{{ o.price }}</small>
-                    </div>
-                  </a>
-{#                  <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>#}
+                    <h6 class="mr-2">К оплате:</h6>
+                    <small>{{ o.price }}</small>
+                </div>
+                </a>
+                {#                  <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>#}
             {% endfor %}
         </div>
     </div>
