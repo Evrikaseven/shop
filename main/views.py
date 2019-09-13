@@ -1,6 +1,7 @@
 
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, FormView, DeleteView
+from django.views.generic.list import ListView
 from django.urls import reverse_lazy
 from django.conf import settings
 from main.core.view_mixins import (
@@ -36,7 +37,6 @@ from .forms import (
 
 class IndexView(CommonContextViewMixin, TemplateView):
     template_name = 'main/index.html'
-    url_name = 'index'
 
     def __init__(self, *args, **kwargs):
         self.user = None
@@ -73,7 +73,6 @@ class UsersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, Templat
 
 class UserDetailsView(LoginRolesOwnerRequiredUpdateViewMixin, CommonContextViewMixin, UpdateView):
     template_name = 'main/user_details.html'
-    url_name = 'user_details'
     form_class = UserForm
     allowed_roles = (Roles.UNREGISTERED, Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
     model = _models.User
@@ -146,7 +145,6 @@ class OrdersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, Templa
 
 class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, UpdateView):
     template_name = 'main/order_details.html'
-    url_name = 'order_details'
     form_class = OrderForm
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
     allowed_non_owner_roles = (Roles.ZAKUPSCHIK, )
@@ -185,7 +183,6 @@ class OrderPayingView(LoginRolesOwnerRequiredUpdateViewMixin, CommonContextViewM
     form_class = OrderForm
     allowed_roles = (Roles.ZAKAZSCHIK,)
     allowed_non_owner_roles = (Roles.ZAKAZSCHIK,)
-    url_name = 'order_paying'
     model = _models.Order
 
     def get_form_kwargs(self):
@@ -202,7 +199,6 @@ class OrderPayingView(LoginRolesOwnerRequiredUpdateViewMixin, CommonContextViewM
 
 class JointReceiptForOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, CreateView):
     template_name = 'main/receipt_for_order.html'
-    url_name = 'receipt_for_order'
     form_class = ReceiptForOrderForm
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
 
@@ -233,7 +229,6 @@ class JointReceiptForOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, Common
 
 class NewOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, CreateView):
     template_name = 'main/new_order_item.html'
-    url_name = 'new_order_item'
     form_class = OrderItemForm
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
 
@@ -265,7 +260,6 @@ class NewOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
 
 class NewJointOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, CreateView):
     template_name = 'main/new_joint_order_item.html'
-    url_name = 'new_joint_order_item'
     form_class = JointItemToOrderForm
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
 
@@ -275,7 +269,9 @@ class NewJointOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonCon
         super().__init__(*args, **kwargs)
 
     def get_success_url(self):
-        return reverse_lazy('main:order_details', kwargs={'pk': self.kwargs['pk']})
+        if not self.order_id:
+            self.order_id = self.object.order.id
+        return reverse_lazy('main:order_details', kwargs={'pk': self.order_id })
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -286,20 +282,18 @@ class NewJointOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonCon
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['order'] = _models.Order.objects.get(id=self.order_id)
         context['product'] = _models.Product.objects.get(id=self.product_id)
         # context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
     def dispatch(self, request, *args, **kwargs):
-        self.order_id = kwargs['pk']
+        self.order_id = kwargs.get('pk')
         self.product_id = kwargs['product_pk']
         return super().dispatch(request, *args, **kwargs)
 
 
 class OrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, UpdateView):
     template_name = 'main/order_item_details.html'
-    url_name = 'order_item_details'
     form_class = OrderItemForm
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
     allowed_non_owner_roles = (Roles.ZAKUPSCHIK,)
@@ -339,7 +333,6 @@ class OrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextView
 
 class ReplacementOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, CreateView):
     template_name = 'main/new_order_item.html'
-    url_name = 'replacement_order_item'
     form_class = OrderItemForm
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
 
@@ -375,7 +368,6 @@ class ReplacementOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, Common
 
 class DeleteOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, DeleteView):
     template_name = "main/delete_order_item.html"
-    url_name = "delete_order_item"
     allowed_roles = (Roles.ZAKAZSCHIK,)
     model = _models.OrderItem
 
@@ -396,7 +388,6 @@ class DeleteOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonConte
 
 class DeleteProductView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, DeleteView):
     template_name = "main/delete_product.html"
-    url_name = "delete_product"
     # allowed_roles = () Admin only is allowed
     model = _models.Product
 
@@ -410,9 +401,8 @@ class DeleteProductView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContext
         return context
 
 
-class CatalogOrderItems(LoginRolesRequiredViewMixin, CommonContextViewMixin, CreateView):
+class CatalogOrderItems(LoginRolesRequiredViewMixin, CommonContextViewMixin, ListView):
     template_name = 'main/catalog_items.html'
-    url_name = 'catalog'
     form_class = ProductForm
     model = _models.Product
     allowed_roles = (Roles.ZAKAZSCHIK,)
@@ -420,9 +410,6 @@ class CatalogOrderItems(LoginRolesRequiredViewMixin, CommonContextViewMixin, Cre
     def __init__(self, *args, **kwargs):
         self.order_id = None
         super().__init__(*args, **kwargs)
-
-    def get_success_url(self):
-        return reverse_lazy('main:main_views.ProductsDetailsView.url_name', kwargs={'pk': self.kwargs['pk']})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -442,7 +429,6 @@ class BuyoutsListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, Templ
 
 class ProductsListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/products_list.html'
-    url_name = 'products'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -453,7 +439,6 @@ class ProductsListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, Temp
 
 class ProductsAddToOrderView(LoginRolesRequiredViewMixin, CommonContextViewMixin, FormView):
     template_name = 'main/products_add.html'
-    url_name = 'details'
     allowed_roles = (Roles.ZAKAZSCHIK,)
     model = _models.Product
     form_class = ProductForm
@@ -478,7 +463,6 @@ class ProductsAddToOrderView(LoginRolesRequiredViewMixin, CommonContextViewMixin
 
 class NewJointProductView(LoginRolesRequiredViewMixin, CommonContextViewMixin, CreateView):
     template_name = 'main/joint_product.html'
-    url_name = 'new_joint_product'
     form_class = ProductForm
     # allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
 
@@ -497,7 +481,6 @@ class NewJointProductView(LoginRolesRequiredViewMixin, CommonContextViewMixin, C
 
 class UpdateJointProductView(LoginRolesRequiredViewMixin, CommonContextViewMixin, UpdateView):
     template_name = 'main/joint_product.html'
-    url_name = 'update_joint_product'
     form_class = ProductForm
     model = _models.Product
     # allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
@@ -523,10 +506,9 @@ class HelpView(CommonContextViewMixin, TemplateView):
 class SettingsView(LoginRolesRequiredViewMixin, CommonContextViewMixin, FormView):
     template_name = 'main/settings.html'
     form_class = SettingsForm
-    url_name = 'settings'
 
     def get_success_url(self):
-        return reverse_lazy('main:administrator')
+        return reverse_lazy('main:settings')
 
     def form_valid(self, form):
         form.save()

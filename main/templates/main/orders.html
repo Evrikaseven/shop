@@ -13,7 +13,17 @@
     <hr class="mb-4">
     <div class="container my-3 p-3 bg-white rounded shadow-sm">
         {% if product_id %}
-            <a class="btn btn-sm btn-outline-dark my-3" href="#">Добавить в новый заказ</a>
+
+            <a class="btn btn-sm btn-outline-dark my-3"
+               href="{% url 'main:joint_item_to_product_new_order' product_pk=product_id %}" >
+                Добавить в новый заказ
+            </a>
+
+{#            <a class="list-group-item list-group-item-action"#}
+{#               href="{% url 'main:joint_item_to_product_new_order' product_pk=product_id %}" >#}
+{#                Добавить в новый заказ#}
+{#            </a>#}
+
         {% endif %}
         <div class="list-group">
             {% for o in orders %}

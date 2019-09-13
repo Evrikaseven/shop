@@ -6,6 +6,5 @@ from .fetchers import ZakazschikFetcher
 
 class ZakazschikMainView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/zakazschik.html'
-    url_name = 'zakazschik'
     allowed_roles = (Roles.ZAKAZSCHIK,)
 

@@ -337,53 +337,11 @@ class OrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         self.instance = super().save(commit=commit)
         if self.instance.pk:
             product = self.instance.product
-            if product and product.shopping_type == ShoppingTypes.JOINT:
-                if product.quantity == 0:
-                    for oi in product.orderitem_set.filter(
-                            state__in=(OrderItemStates.NOT_ACTIVE, OrderItemStates.ACTIVE)):
-                        oi.state = OrderItemStates.USED
-                        oi.save()
-                    for oi in product.orderitem_set.filter(state=OrderItemStates.USED):
-                        oi.order.update_actual_price_with_user_balance()
-                else:  # product.quantity > 0
-                    for oi in product.orderitem_set.filter(state=OrderItemStates.USED):
-                        oi.state = OrderItemStates.NOT_ACTIVE
-                        oi.save()
-                    for oi in product.orderitem_set.all():
-                        oi.order.update_actual_price_with_user_balance()
+            if product:
+                product.update_order_price()
             else:
                 self.instance.order.update_actual_price_with_user_balance()
         return self.instance
-
-
-class JointOrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
-    product = forms.ModelChoiceField(queryset=Product.objects.get_joint_products(), label='Совместный товар', widget=forms.widgets.Select())
-    price = forms.DecimalField(label='Цена товара', required=False, disabled=True)
-
-    def __init__(self, **kwargs):
-        self.order_id = kwargs.pop('order_id', None)
-        self.user = kwargs.pop('user', None)
-        self.is_image_update_forbidden = kwargs.pop('is_image_update_forbidden', None)
-        super().__init__(**kwargs)
-
-    class Meta:
-        model = OrderItem
-        fields = ('product', 'price', 'quantity', 'status', 'order_comment', 'customer_comment')
-
-    def clean_place(self):
-        value = self.cleaned_data['place'].strip().replace(' ', '')
-        if not value:
-            raise ValidationError('Укажите, пожалуйста, номер места')
-        return value
-
-    @transaction.atomic
-    def save(self, commit=True):
-        if not self.instance.pk:
-            self.instance.order = Order.objects.get(pk=self.order_id)
-            # product = Product(image=self.cleaned_data['image'], created_by=self.user, updated_by=self.user)
-            # product.save()
-            # self.instance.product = product
-        return super().save(commit=commit)
 
 
 class JointItemToOrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
@@ -417,6 +375,9 @@ class JointItemToOrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
     @transaction.atomic
     def save(self, commit=True):
         if not self.instance.pk:
+            if not self.order:
+                self.order = Order(created_by=self.user, updated_by=self.user)
+                self.order.save()
             self.instance.order = self.order
             self.instance.product = self.product
             self.instance.state = OrderItemStates.ACTIVE
@@ -425,15 +386,13 @@ class JointItemToOrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
 
             if self.product.quantity == 0:
                 # update all order items states
-                for oi in self.product.orderitem_set.all():
-                    oi.state = OrderItemStates.USED
-                    oi.save()
-
+                self.product.orderitem_set.all().update(state=OrderItemStates.USED)
                 self.instance.state = OrderItemStates.USED
+
         self.instance = super().save(commit=commit)
-        if self.instance.pk and self.product.quantity == 0:
-            for oi in self.product.orderitem_set.all():
-                oi.order.update_actual_price_with_user_balance()
+
+        if self.instance.pk:
+            self.instance.product.update_order_price()
         return self.instance
 
 
