@@ -5,7 +5,7 @@
 {% block content %}
 
     <h3 class="font-weight-normal text-center text-muted" style="color: #6c757d">
-        Добавление нового товара в заказ #{{ order.id }}
+         Выкуп
     </h3>
 
     <hr class="mb-4">
@@ -14,7 +14,6 @@
         <div class="row">
             {% if product.image %}
                 <div class="col-3 text-center">
-                    На данный момент:
                     <a href="{{ MEDIA_URL }}{{ product.image }}">
                         <img src="{{ MEDIA_URL }}{{ product.image }}" height="200" width="200">
                     </a><br>

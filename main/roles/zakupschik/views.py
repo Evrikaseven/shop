@@ -8,13 +8,11 @@ from main.core.constants import Roles
 
 class ZakupschikMainView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/zakupschik.html'
-    url_name = 'zakupschik'
     allowed_roles = (Roles.ZAKUPSCHIK,)
 
 
 class ZakupschikOrdersPlacesView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/zakupschik_orders.html'
-    url_name = 'zakupschik_orders_places'
     allowed_roles = (Roles.ZAKUPSCHIK,)
 
     def get_context_data(self, **kwargs):
@@ -26,7 +24,6 @@ class ZakupschikOrdersPlacesView(LoginRolesRequiredViewMixin, CommonContextViewM
 
 class ZakupschikOrdersByPlacesView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/zakupschik_order_items_by_place.html'
-    url_name = 'zakupschik_order_details_by_place'
     allowed_roles = (Roles.ZAKUPSCHIK,)
 
     def __init__(self, *args, **kwargs):
@@ -48,7 +45,6 @@ class ZakupschikOrdersByPlacesView(LoginRolesRequiredViewMixin, CommonContextVie
 
 class ZakupschikUsersWithProductsToDeliverView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/zakupschik_products_ready_to_delivery.html'
-    url_name = 'zakupschik_products_ready_to_delivery'
     allowed_roles = (Roles.ZAKUPSCHIK,)
 
     def get_context_data(self, **kwargs):

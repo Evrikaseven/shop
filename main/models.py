@@ -301,6 +301,20 @@ class Product(ModelWithTimestamp, ModelWithUser):
     def shopping_type_to_string(self):
         return ShoppingTypes[self.shopping_type]
 
+    def update_order_price(self):
+        if self.shopping_type == ShoppingTypes.JOINT:
+            if self.quantity == 0:
+                self.orderitem_set.all().update(state=OrderItemStates.USED)
+                for oi in self.orderitem_set.all():
+                    oi.order.update_actual_price_with_user_balance()
+            else:  # product.quantity > 0
+                self.orderitem_set.all().update(state=OrderItemStates.NOT_ACTIVE)
+                for oi in self.orderitem_set.all():
+                    oi.order.update_actual_price_with_user_balance()
+        else:
+            for oi in self.orderitem_set.all():
+                oi.order.update_actual_price_with_user_balance()
+
 
 def remove_product_image_from_disc(sender, **kwargs):
     instance = kwargs['instance']
@@ -315,32 +329,21 @@ def remove_receipts_images_from_disc(sender, **kwargs):
 
 
 @transaction.atomic
-def pre_remove_order_item(sender, **kwargs):
+def post_remove_order_item(sender, **kwargs):
     instance = kwargs['instance']
-    # TODO: add items handling if CASCADE deleting is not necessary
     if instance.product.shopping_type == ShoppingTypes.INDIVIDUAL:
         instance.product.delete()
 
     if instance.product.shopping_type == ShoppingTypes.JOINT:
         product = instance.product
-        # Update other order items statuses to ACTIVE first
-        for oi in product.orderitem_set.all():
-            if oi.pk != instance.pk:
-                oi.state = OrderItemStates.ACTIVE
-                oi.save()
         # Return quantity back to product
         product.quantity += instance.quantity
         product.save()
-
-
-def post_remove_order_item(sender, **kwargs):
-    instance = kwargs['instance']
-    order = instance.order
-    order.update_actual_price_with_user_balance()
+        product.update_order_price()
+    instance.order.update_actual_price_with_user_balance()
 
 
 pre_delete.connect(remove_product_image_from_disc, sender=Product)
 pre_delete.connect(remove_receipts_images_from_disc, sender=Order)
-pre_delete.connect(pre_remove_order_item, sender=OrderItem)
 post_delete.connect(post_remove_order_item, sender=OrderItem)
 

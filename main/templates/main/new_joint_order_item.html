@@ -17,7 +17,7 @@
                     {% csrf_token %}
 
                     <div class="form-group row">
-                        <label for="id_quantity" class="col-2 col-form-label">Количество</label>
+                        <label for="id_quantity" class="col-2 col-form-label">Количество (досутпно: {{ product.quantity }})</label>
                         <div class="col-10">
                             <input class="form-control" id="id_quantity" type="number"
                                    name="{{ form.quantity.name }}" value="{{ form.quantity.initial }}"
@@ -74,7 +74,7 @@
 
     <div class="mb-4 text-center">
         <button class="btn btn-secondary btn-sm" type="submit" form="joint_order_item_form">Сохранить</button>
-        <a class="btn btn-secondary btn-sm" href="{% url 'main:order_details' pk=order.id %}">Отмена</a>
+        <a class="btn btn-secondary btn-sm" href="{% url 'main:index' %}">Отмена</a>
     </div>
 
 {% endblock content %}

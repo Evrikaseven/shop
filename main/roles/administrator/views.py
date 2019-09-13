@@ -4,4 +4,3 @@ from main.core.view_mixins import LoginRolesRequiredViewMixin, CommonContextView
 
 class AdministratorMainView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/administrator.html'
-    url_name = 'administrator'
