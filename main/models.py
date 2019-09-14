@@ -6,6 +6,7 @@ from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db.models.signals import pre_delete, post_delete
 from django.conf import settings
+from django.utils.translation import ugettext as _u
 from main.core.models import ModelWithTimestamp, ModelWithUser
 from main.core.constants import (
     OrderStatuses,
@@ -17,7 +18,6 @@ from main.core.constants import (
     DeliveryTypes,
     DELIVERY_PRICES,
 )
-
 
 MEDIA_PROD_IMAGE_DIR_PREFFIX = 'product_images'
 MEDIA_ORDER_DIR_PREFFIX = 'order_'
@@ -38,12 +38,13 @@ class CustomUserManager(BaseUserManager):
     Custom user model manager where email is the unique identifiers
     for authentication instead of usernames.
     """
+
     def create_user(self, email, password, **extra_fields):
         """
         Create and save a User with the given email and password.
         """
         if not email:
-            raise ValueError(_('The Email must be set'))
+            raise ValueError(_u('The Email must be set'))
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -58,9 +59,9 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
         if extra_fields.get('is_staff') is not True:
-            raise ValueError(_('Superuser must have is_staff=True.'))
+            raise ValueError(_u('Superuser must have is_staff=True.'))
         if extra_fields.get('is_superuser') is not True:
-            raise ValueError(_('Superuser must have is_superuser=True.'))
+            raise ValueError(_u('Superuser must have is_superuser=True.'))
         return self.create_user(email, password, **extra_fields)
 
     def get_list(self, **kwargs):
@@ -68,7 +69,6 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -116,13 +116,13 @@ class Order(ModelWithTimestamp, ModelWithUser):
         extra_charge = SettingOptionHandler('extra_charge').value
         extra_delivery_price = dict(DELIVERY_PRICES)[self.delivery]
         return (
-                sum(oi.price * oi.quantity for oi in order_items_qs.filter(
-                    delivery=PurchaseAndDeliveryTypes.PURCHASE_AND_DELIVERY
-                )) * (1 + extra_charge / 100) +
-                sum(oi.price * oi.quantity for oi in order_items_qs.filter(
-                    delivery=PurchaseAndDeliveryTypes.DELIVERY_ONLY
-                )) * (extra_charge / 100)
-        ) + extra_delivery_price
+                       sum(oi.price * oi.quantity for oi in order_items_qs.filter(
+                           delivery=PurchaseAndDeliveryTypes.PURCHASE_AND_DELIVERY
+                       )) * (1 + extra_charge / 100) +
+                       sum(oi.price * oi.quantity for oi in order_items_qs.filter(
+                           delivery=PurchaseAndDeliveryTypes.DELIVERY_ONLY
+                       )) * (extra_charge / 100)
+               ) + extra_delivery_price
 
     @property
     def actual_price_diff(self):
@@ -271,8 +271,8 @@ def get_path_to_receipt_image(instance, name):
 
 
 class Receipt(ModelWithTimestamp, ModelWithUser):
-   order = models.ForeignKey(Order, verbose_name='Заказ', on_delete=models.CASCADE)
-   image = models.ImageField(verbose_name='Фото чека', upload_to=get_path_to_receipt_image)
+    order = models.ForeignKey(Order, verbose_name='Заказ', on_delete=models.CASCADE)
+    image = models.ImageField(verbose_name='Фото чека', upload_to=get_path_to_receipt_image)
 
 
 class ProductManager(models.Manager):
@@ -287,7 +287,7 @@ class ProductManager(models.Manager):
 class Product(ModelWithTimestamp, ModelWithUser):
     objects = ProductManager()
 
-    name = models.CharField(verbose_name='Название',  max_length=100, default='')
+    name = models.CharField(verbose_name='Название', max_length=100, default='')
     image = models.ImageField(verbose_name='Фото товара', upload_to=get_path_to_product_image)
     place = models.CharField(verbose_name='Место', max_length=150, default='')
     price = models.DecimalField(verbose_name='Цена', max_digits=10, decimal_places=2, default=0)
@@ -346,4 +346,3 @@ def post_remove_order_item(sender, **kwargs):
 pre_delete.connect(remove_product_image_from_disc, sender=Product)
 pre_delete.connect(remove_receipts_images_from_disc, sender=Order)
 post_delete.connect(post_remove_order_item, sender=OrderItem)
-

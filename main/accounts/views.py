@@ -20,7 +20,7 @@ class UserSignUpView(CommonContextViewMixin, CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        fields = self.form_class.base_fields.keys()
+        fields = self.form_class._meta.fields   # pylint: disable=no-member
         kwargs['saved_values'] = {
             field: self.post_fields_data[field] for field in fields if field in self.post_fields_data
         }

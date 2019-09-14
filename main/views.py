@@ -271,7 +271,7 @@ class NewJointOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonCon
     def get_success_url(self):
         if not self.order_id:
             self.order_id = self.object.order.id
-        return reverse_lazy('main:order_details', kwargs={'pk': self.order_id })
+        return reverse_lazy('main:order_details', kwargs={'pk': self.order_id})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -373,11 +373,6 @@ class DeleteOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonConte
 
     def get_success_url(self):
         return reverse_lazy('main:order_details', kwargs={'pk': self.object.order.id})
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['order_id'] = self.object.order.id
-        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

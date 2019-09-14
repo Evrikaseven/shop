@@ -1,4 +1,4 @@
-from main.models import Order, OrderItem
+from main.models import OrderItem
 from main.core.constants import OrderStatuses, OrderItemStatuses
 from collections import defaultdict
 
