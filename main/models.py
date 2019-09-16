@@ -331,15 +331,16 @@ def remove_receipts_images_from_disc(sender, **kwargs):
 @transaction.atomic
 def post_remove_order_item(sender, **kwargs):
     instance = kwargs['instance']
-    if instance.product.shopping_type == ShoppingTypes.INDIVIDUAL:
-        instance.product.delete()
+    if instance.product:
+        if instance.product.shopping_type == ShoppingTypes.INDIVIDUAL:
+            instance.product.delete()
 
-    if instance.product.shopping_type == ShoppingTypes.JOINT:
-        product = instance.product
-        # Return quantity back to product
-        product.quantity += instance.quantity
-        product.save()
-        product.update_order_price()
+        if instance.product.shopping_type == ShoppingTypes.JOINT:
+            product = instance.product
+            # Return quantity back to product
+            product.quantity += instance.quantity
+            product.save()
+            product.update_order_price()
     instance.order.update_actual_price_with_user_balance()
 
 
