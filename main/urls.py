@@ -8,12 +8,10 @@ from rest_framework.routers import DefaultRouter
 
 app_name = 'main'
 
-
 router = DefaultRouter()
 router.register('users', main_views.UsersResourceView)
 router.register('orders', main_views.OrdersResourceView)
 router.register('providers', main_views.ProvidersResourceView)
-
 
 urlpatterns = [
     path('', main_views.IndexView.as_view(), name='index'),
@@ -40,26 +38,28 @@ urlpatterns = [
     path('orders/<int:pk>/new_item/', main_views.NewOrderItemView.as_view(), name='new_order_item'),
     path('orders/<int:pk>/new_joint_item/', main_views.NewJointOrderItemView.as_view(), name='new_joint_order_item'),
 
-    path('orders/joint_item_to_product/<int:product_pk>', main_views.NewJointOrderItemView.as_view(), name='joint_item_to_product_new_order'),
-    path('orders/<int:pk>/joint_item_to_product/<int:product_pk>', main_views.NewJointOrderItemView.as_view(), name='joint_item_to_product'),
+    path('orders/joint_item_to_product/<int:product_pk>', main_views.NewJointOrderItemView.as_view(),
+         name='joint_item_to_product_new_order'),
+    path('orders/<int:pk>/joint_item_to_product/<int:product_pk>', main_views.NewJointOrderItemView.as_view(),
+         name='joint_item_to_product'),
 
     path('order_item/<int:pk>', main_views.OrderItemView.as_view(), name='order_item_details'),
-    path('order_item/<int:pk>/new_replacement/', main_views.ReplacementOrderItemView.as_view(), name='replacement_order_item'),
+    path('order_item/<int:pk>/new_replacement/', main_views.ReplacementOrderItemView.as_view(),
+         name='replacement_order_item'),
     path('order_item/<int:pk>/delete/', main_views.DeleteOrderItemView.as_view(), name='delete_order_item'),
 
-    #Catalog items
+    # Catalog items
     path('catalog/', main_views.CatalogOrderItems.as_view(), name='catalog'),
     path('catalog/<int:pk>/', main_views.CatalogOrderItems.as_view(), name='catalog'),
 
-    #Check image
-    path('orders/<int:pk>/paying/',  main_views.JointReceiptForOrderView.as_view(), name='receipt_for_order'),
+    # Check image
+    path('orders/<int:pk>/paying/', main_views.JointReceiptForOrderView.as_view(), name='receipt_for_order'),
 
     path('settings/', main_views.SettingsView.as_view(), name='settings'),
 
     # Django REST framework related
     path('api/', include(router.urls))
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

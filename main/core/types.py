@@ -1,6 +1,5 @@
 
 
-
 class EnumMetaWithStrings(type):
     def __new__(mcs, class_name, bases, class_attrs):
         attrs = ((name, value) for name, value in class_attrs.items() if not name.startswith('__'))

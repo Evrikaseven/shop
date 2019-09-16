@@ -70,7 +70,8 @@ class NewOrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
             # order_item = OrderItem(order=self.instance, product=product, created_by=self.user, updated_by=self.user)
             # order_item.save()
             # to optimize with bulk create
-            order_items.append(OrderItem(order=self.instance, product=product, created_by=self.user, updated_by=self.user))
+            order_items.append(
+                OrderItem(order=self.instance, product=product, created_by=self.user, updated_by=self.user))
         if order_items:
             OrderItem.objects.bulk_create(order_items)
         return self.instance
@@ -107,17 +108,6 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         old_user_balance = user.balance
         self.instance.save()
 
-        email_data = {
-            'order_pk': self.instance.pk,
-            'order_price': self.instance.price,
-            'email': user.email,
-            'status': OrderStatuses.PAYING_TO_BE_CONFIRMED_STR,
-            'paid_price': self.instance.paid_price,
-            'user_balance': user.balance,
-            'status_changed': True,
-            'paid_price_changed': False,
-            'user_balance_changed': False,
-        }
         if old_user_balance != user.balance:
             user_data_email(user=user,
                             subject='Баланс пользователя изменен',
@@ -257,7 +247,8 @@ class OrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
             self.joint_quantity_delta = value - prev_value
             product = self.instance.product
             if (product.quantity - self.joint_quantity_delta) < 0:
-                raise ValidationError('Указанное количество ({}) больше доступного ({})'.format(value, product.quantity))
+                raise ValidationError(
+                    'Указанное количество ({}) больше доступного ({})'.format(value, product.quantity))
         return value
 
     @transaction.atomic
@@ -407,9 +398,8 @@ class ProductForm(WithUserDataUpdateFormMixin, forms.ModelForm):
     def __init__(self, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(**kwargs)
-        #TODO: remove if another shopping_type is necessary
+        # TODO: remove if another shopping_type is necessary
         self.fields.pop('shopping_type')
-
 
     def clean_image(self):
         image = self.cleaned_data['image']
@@ -486,5 +476,3 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = User
         fields = ('email',)
-
-

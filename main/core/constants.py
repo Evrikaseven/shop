@@ -1,5 +1,4 @@
 from .types import EnumMetaWithStrings
-from decimal import Decimal
 
 
 class Roles(metaclass=EnumMetaWithStrings):
@@ -56,7 +55,4 @@ DELIVERY_PRICES = (
     (DeliveryTypes.TK, 150),
 )
 
-
 SHOP_TITLE = chr(214) + 'П*ТЫ'
-
-

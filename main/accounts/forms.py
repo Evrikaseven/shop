@@ -19,4 +19,3 @@ class UserSignUpForm(UserCreationForm):
         for field in saved_values:
             if field in self.fields:
                 self.fields[field].initial = saved_values[field]
-

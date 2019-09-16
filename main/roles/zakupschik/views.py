@@ -1,5 +1,4 @@
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import FormView
 from main.core.view_mixins import LoginRolesRequiredViewMixin, CommonContextViewMixin
 from django.conf import settings
 from .fetchers import ZakupschikFetcher
@@ -53,4 +52,3 @@ class ZakupschikUsersWithProductsToDeliverView(LoginRolesRequiredViewMixin, Comm
         context['data'] = fetcher.users_with_ready_to_deliver_products()
         context['MEDIA_URL'] = settings.MEDIA_URL
         return context
-
