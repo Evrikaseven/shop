@@ -122,7 +122,7 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         return paid_price if paid_price else 0
 
     def clean(self):
-        cleaned_data = self.cleaned_data
+        cleaned_data = super().clean()
         if self.instance.pk:
             paid_price = cleaned_data['paid_price']
             cleaned_data['paid_price'] = self.instance.paid_price + paid_price
