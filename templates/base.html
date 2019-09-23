@@ -56,7 +56,8 @@
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
                                 {% elif user_role == roles.ZAKUPSCHIK %}
-                                    <a class="dropdown-item" href="{% url 'main:zakupschik' %}">Заказы на выкуп</a>
+                                    <a class="dropdown-item" href="{% url 'main:zakupschik_orders_places' %}">Заказы на выкуп</a>
+                                    <a class="dropdown-item" href="{% url 'main:zakupschik_products_ready_to_delivery' %}">Выдача товаров</a>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
                                 {% else %} {# 'ZAKAZSCHIK' #}

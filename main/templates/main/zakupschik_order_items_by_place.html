@@ -4,35 +4,41 @@
 
 
 {% block content %}
-    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Список товаров для
-        места {{ place }}</h3>
-    <div class="container px-0">
-        {% for product_data in products %}
-            <div class="d-flex font-weight-normal px-4 my-1 card-header">
-                <img src="{{ MEDIA_URL }}{{ product_data.product.image }}" height="100" width="200">
+    <h3 class="font-weight-normal text-center py-3 border-bottom" style="margin-block-start: 0;  margin-block-end: 0;">
+        Список товаров для места {{ place }}
+    </h3>
+    <div class="container my-3 p-3 bg-white rounded shadow-sm">
+        <div class="row">
+            {% for p in products %}
+                <div class="col-md-4">
+                    <div class="card mb-3 shadow-sm">
+                        <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
+                             xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
+                             focusable="false" role="img" aria-label="Placeholder: Thumbnail">
 
-                <div class="my-1 mr-md-3">{{ product_data.product.name }}</div>
-                <div class="my-1 mr-md-3">Цена: {{ product_data.price }}</div>
-                <div class="my-1 mr-md-3">Количество: {{ product_data.total_quantity }}</div>
-                <div class="my-1 mr-md-3">Статус: {{ product_data.item_status_str }}</div>
-                <a class="btn btn-sm btn-outline-primary" data-toggle="collapse"
-                   data-target="#hide-me{{ forloop.counter }}" aria-expanded="true" href="#">Детальная информация</a>
-            </div>
-            <div id="hide-me{{ forloop.counter }}" class="collapse in container border-right border-left">
-                {% for order_item in product_data.items %}
-                    <div class="container table-container">
-                        <h5>Заказчик: {{ order_item.order.created_by.email }}
-                            ({{ order_item.order.created_by.first_name }} {{ order_item.order.created_by.last_name }}) </h5>
-                        <div>Количество: {{ order_item.quantity }}</div>
-                        <div>Комментарий к заказу: {{ order_item.order_comment }}</div>
-                        <div>Комментарий заказчика: {{ order_item.customer_comment }}</div>
-                        <a class="btn btn-outline-dark" href="{% url 'main:order_item_details' pk=order_item.id %}">
-                            Обновить статус
-                        </a>
-                        <hr class="mb-3">
+                            <title>Placeholder</title>
+                            <rect width="100%" height="100%" fill="#55595c"></rect>
+                        {% for order_item in p.items %}
+                            <a href="{% url 'main:order_item_details' pk=order_item.id %}">
+                                <image xlink:href="{{ MEDIA_URL }}{{ p.product.image }}" x="0" y="0" width="100%" height="100%"/>
+                            </a>
+
+                            <text x="15%" y="10%" fill="#eceeef" dy=".3em">{{ p.product.name }}</text>
+                            <text x="15%" y="20%" fill="#eceeef" dy=".3em" class="bg">Количество: {{ p.total_quantity }}</text>
+                            <text x="15%" y="50%" fill="#eceeef" dy=".3em">Комментарий:</text>
+                            <text x="15%" y="60%" fill="#eceeef" dy=".3em">{{ order_item.order_comment }}</text>
+                        {% endfor %}
+                        </svg>
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <p class="pt-3">{{ p.price }} ₽</p>
+                                <p class="pt-3">Статус: {{ p.item_status_str }}</p>
+                            </div>
+                        </div>
                     </div>
-                {% endfor %}
-            </div>
-        {% endfor %}
+                </div>
+           {% endfor %}
+        </div>
     </div>
+
 {% endblock content %}

@@ -4,7 +4,9 @@
 
 
 {% block content %}
-    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Список пользователей с готовыми для выдачи товарами</h3>
+    <h3 class="font-weight-normal text-center py-3 border-bottom" style="margin-block-start: 0;  margin-block-end: 0;">
+        Список пользователей с готовыми для выдачи товарами
+    </h3>
     <div class="container px-0">
         {% for user_data in data %}
             <div class="d-flex font-weight-normal px-4 my-1 card-header">
@@ -14,20 +16,40 @@
                 <a class="btn btn-sm btn-outline-primary" data-toggle="collapse"
                    data-target="#hide-me{{ forloop.counter }}" aria-expanded="true" href="#">Список товаров</a>
             </div>
-            <div id="hide-me{{ forloop.counter }}" class="collapse in container border-right border-left">
+            <div id="hide-me{{ forloop.counter }}" class="collapse in container my-3 p-3 bg-white rounded shadow-sm">
+
+                <div class="row">
                 {% for order_item in user_data.items %}
-                    <div class="container table-container">
-                        <a href="{% url 'main:order_item_details' pk=order_item.id %}">
-                            <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="100" width="200">
-                            <div>Название товара: {{ order_item.name }}</div>
-                            <div>Количество: {{ order_item.quantity }}</div>
-                            <div>Комментарий к заказу: {{ order_item.order_comment }}</div>
-                            <div>Комментарий заказчика: {{ order_item.customer_comment }}</div>
-                        </a>
-                        <hr class="mb-3">
+
+                <div class="col-md-4">
+                    <div class="card mb-3 shadow-sm">
+                        <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
+                             xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
+                             focusable="false" role="img" aria-label="Placeholder: Thumbnail">
+
+                            <title>Placeholder</title>
+                            <rect width="100%" height="100%" fill="#55595c"></rect>
+                             <a href="{% url 'main:order_item_details' pk=order_item.id %}">
+                                <image xlink:href="{{ MEDIA_URL }}{{ order_item.product.image }}" x="0" y="0" width="100%" height="100%"/>
+                            </a>
+
+                            <text x="15%" y="10%" fill="#eceeef" dy=".3em">{{ order_item.name }}</text>
+                            <text x="15%" y="20%" fill="#eceeef" dy=".3em" class="bg">Количество: {{ order_item.total_quantity }}</text>
+                            <text x="15%" y="50%" fill="#eceeef" dy=".3em">Комментарий:</text>
+                            <text x="15%" y="60%" fill="#eceeef" dy=".3em">{{ order_item.order_comment }}</text>
+                         </svg>
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <p class="pt-3">{{ order_item.price }} ₽</p>
+                                <p class="pt-3">Статус: {{ order_item.item_status_str }}</p>
+                            </div>
+                        </div>
                     </div>
+                </div>
                 {% endfor %}
             </div>
+        </div>
         {% endfor %}
     </div>
+
 {% endblock content %}

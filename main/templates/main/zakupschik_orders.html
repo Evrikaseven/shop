@@ -4,10 +4,14 @@
 
 
 {% block content %}
-    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">Список мест с новыми заказами</h3>
-    <div class="container">
+    <h3 class="font-weight-normal text-center text-muted" style="color: #6c757d">
+        Список мест с новыми заказами
+    </h3>
+    <div class="container my-3 p-3 bg-white rounded shadow-sm">
+        <div class="list-group">
         {% for place in places %}
-            <div><a href="{% url 'main:zakupschik_order_details_by_place' place=place %}">{{ place }}</a></div>
+            <a class="list-group-item list-group-item-action"  href="{% url 'main:zakupschik_order_details_by_place' place=place %}">Место: {{ place }} </a>
         {% endfor %}
+        </div>
     </div>
 {% endblock content %}

@@ -188,7 +188,11 @@
     </div>
     <div class="mb-4 text-center">
         <button class="btn btn-secondary btn-sm" type="submit" form="form_order">Сохранить</button>
-        <a class="btn btn-secondary btn-sm" href="{% url 'main:order_details' pk=order_item.order.id %}">Отмена</a>
+        {% if user_role == roles.ZAKUPSCHIK %}
+            <a class="btn btn-secondary btn-sm" href="{% url 'main:zakupschik_order_details_by_place' place=order_item.place %}">Отмена</a>
+        {% else %}
+            <a class="btn btn-secondary btn-sm" href="{% url 'main:order_details' pk=order_item.order.id %}">Отмена</a>
+        {% endif %}
     </div>
 
 
