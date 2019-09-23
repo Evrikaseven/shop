@@ -1,6 +1,7 @@
 
 $('.custom-file-input').on('change', function() {
-   let fileName = $(this).val().split('\\').pop();
+   let fileName = $(this).val().split('\\');
+   console.log($(this).val());
    $(this).next('.custom-file-label').addClass("selected").html(fileName);
 });
 

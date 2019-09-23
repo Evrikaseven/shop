@@ -3,35 +3,55 @@
 {% block title %}Настройки{% endblock title %}
 
 {% block content %}
+    <h3 class="font-weight-normal text-center text-muted" style="color: #6c757d">
+        Настройки сайта
+    </h3>
+    <hr class="mb-4">
 
-    <div class="container table-container">
-        <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
-            Настройки
-        </h3>
-        <form method="post" enctype="multipart/form-data">
+    <div class="container">
+        <form class="form-signin my-3 p-3 bg-white rounded shadow-sm" id="settings" name="settings" method="post">
             {% csrf_token %}
-            <img src="{{ MEDIA_URL }}{{ product_image }}">
-            {{ form.as_p }}
-            <button class="btn btn-outline-dark" type="submit">Сохранить</button>
-
-{#            {% if order_item.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL%}#}
-{#                {% if order_item.parent %}#}
-{#                    <a class="btn btn-outline-dark" href="{% url 'main:order_item_details' pk=order_item.parent.pk %}">#}
-{#                        Заменяемый товар#}
-{#                    </a>#}
-{#                {% endif %}#}
-{##}
-{#                {% if child_order_item %}#}
-{#                    <a class="btn btn-outline-dark" href="{% url 'main:order_item_details' pk=child_order_item.pk %}">#}
-{#                        Замена#}
-{#                    </a>#}
-{#                {% else %}#}
-{#                    <a class="btn btn-outline-dark" href="{% url 'main:replacement_order_item' pk=order_item.pk %}">#}
-{#                        Добавить замену#}
-{#                    </a>#}
-{#                {% endif %}#}
-{#            {% endif %}#}
+            <div class="form-group row border-bottom py-2">
+                <label for="id_extra_charge" class="col-3 col-form-label">Наценка в %</label>
+                <div class="col-9">
+                    <input class="form-control" id="id_extra_charge" type="number" name="{{ form.extra_charge.name }}"
+                           value="{{ form.extra_charge.initial }}" required=""
+                            {% if form.extra_charge.field.disabled %}
+                           disabled=""
+                            {% endif %}
+                    >
+                </div>
+                {% if form.extra_charge.errors %}
+                    <div class="alert alert-danger">
+                        {{ form.extra_charge.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_announcement">Объявление для главной страницы сайта:</label>
+                <textarea class="form-control" id="id_announcement"
+                      name="{{ form.announcement.name }}" placeholder="заметка по товару и пр."
+                      rows="3">
+                {{ form.announcement.initial }}</textarea>
+            </div>
         </form>
+        <div class="text-center">
+            <button type="submit" class="btn btn-secondary" id="save" form="settings">Сохранить</button>
+        </div>
+    {% if is_submitted %}
+
+    <div class="toast text-center" data-delay="1500" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-body">
+          Настройки сохранены
+        </div>
     </div>
+ {% endif %}
+
+    </div>
+    <script>
+            $(document).ready(function(){
+                $('.toast').toast('show');
+            });
+    </script>
 
 {% endblock content %}

@@ -1,3 +1,5 @@
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, FormView, DeleteView
@@ -503,11 +505,30 @@ class SettingsView(LoginRolesRequiredViewMixin, CommonContextViewMixin, FormView
     form_class = SettingsForm
 
     def get_success_url(self):
-        return reverse_lazy('main:settings')
+        return reverse_lazy('main:settings', kwargs={'is_submitted': self.kwargs['pk']})
 
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        if form.is_valid():
+            form.save()
+            return self.form_valid(form, **kwargs)
+        else:
+            return self.form_invalid(form, **kwargs)
+
+    def form_invalid(self, form, **kwargs):
+        context = self.get_context_data(**kwargs)
+        context['form'] = form
+        # here you can add things like:
+        context['is_submitted'] = False
+        return self.re.render_to_response(context)
+
+    def form_valid(self, form, **kwargs):
+        context = self.get_context_data(**kwargs)
+        context['form'] = form
+        # here you can add things like:
+        context['is_submitted'] = True
+        return self.render_to_response(context)
 
 
 # Resources
