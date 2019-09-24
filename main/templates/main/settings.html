@@ -8,36 +8,68 @@
     </h3>
     <hr class="mb-4">
 
-    <div class="container">
-        <form class="form-signin my-3 p-3 bg-white rounded shadow-sm" id="settings" name="settings" method="post">
-            {% csrf_token %}
-            <div class="form-group row border-bottom py-2">
-                <label for="id_extra_charge" class="col-3 col-form-label">Наценка в %</label>
-                <div class="col-9">
-                    <input class="form-control" id="id_extra_charge" type="number" name="{{ form.extra_charge.name }}"
-                           value="{{ form.extra_charge.initial }}" required=""
-                            {% if form.extra_charge.field.disabled %}
-                           disabled=""
-                            {% endif %}
-                    >
-                </div>
-                {% if form.extra_charge.errors %}
-                    <div class="alert alert-danger">
-                        {{ form.extra_charge.errors }}
+    <div class="container ">
+        <div class="bd-example bd-example-tabs">
+          <div class="row">
+            <div class="col-3">
+              <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <a class="nav-link active" class="text-secondary" id="nav-home-tab" data-toggle="pill" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Главная страница</a>
+                <a class="nav-link" class="text-secondary" id="nav-money-tab" data-toggle="pill" href="#nav-money" role="tab" aria-controls="nav-money" aria-selected="false">Финансы</a>
+                <a class="nav-link" id="nav-news-tab" data-toggle="pill" href="#nav-news" role="tab" aria-controls="nav-news" aria-selected="false">Новости</a>
+                <a class="nav-link" id="nav-work-tab" data-toggle="pill" href="#nav-work" role="tab" aria-controls="nav-work" aria-selected="false">График работы</a>
+                <a class="nav-link" id="nav-deal-tab" data-toggle="pill" href="#nav-deal" role="tab" aria-controls="nav-deal" aria-selected="false">Условия сотрудничества</a>
+                <a class="nav-link" id="nav-contact-tab" data-toggle="pill" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Контакты</a>
+              </div>
+            </div>
+            <div class="col-9">
+              <div class="tab-content" id="v-pills-tabContent">
+              <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                  <form id="settings" name="settings" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_announcement">Объявление для главной страницы сайта:</label>
+                        <textarea class="form-control" id="id_announcement"
+                              name="{{ form.announcement.name }}" placeholder="заметка по товару и пр."
+                              rows="3">
+                        {{ form.announcement.initial }}</textarea>
                     </div>
-                {% endif %}
+                    <div class="my-3 text-center">
+                        <button type="submit" class="btn btn-secondary" id="save" >Сохранить</button>
+                    </div>
+                </form>
+              </div>
+              <div class="tab-pane fade" id="nav-money" role="tabpanel" aria-labelledby="nav-money-tab">
+                  <form id="settings" name="settings" method="post">
+                        <div class="form-group row">
+                            <label for="id_extra_charge" class="col-3 col-form-label">Наценка для всех заказов в %</label>
+                            <div class="col-9">
+                                <input class="form-control" id="id_extra_charge" type="number" name="{{ form.extra_charge.name }}"
+                                       value="{{ form.extra_charge.initial }}" required=""
+                                        {% if form.extra_charge.field.disabled %}
+                                       disabled=""
+                                        {% endif %}
+                                >
+                            </div>
+                            {% if form.extra_charge.errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.extra_charge.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="my-3 text-center">
+                            <button type="submit" class="btn btn-secondary" id="save" form="settings">Сохранить</button>
+                        </div>
+                  </form>
+              </div>
+              <div class="tab-pane fade" id="nav-news" role="tabpanel" aria-labelledby="nav-news-tab">...</div>
+              <div class="tab-pane fade" id="nav-work" role="tabpanel" aria-labelledby="nav-work-tab">...</div>
+              <div class="tab-pane fade" id="nav-deal" role="tabpanel" aria-labelledby="nav-deal-tab">...</div>
+              <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>
+              </div>
             </div>
-            <div class="form-group">
-                <label for="id_announcement">Объявление для главной страницы сайта:</label>
-                <textarea class="form-control" id="id_announcement"
-                      name="{{ form.announcement.name }}" placeholder="заметка по товару и пр."
-                      rows="3">
-                {{ form.announcement.initial }}</textarea>
-            </div>
-        </form>
-        <div class="text-center">
-            <button type="submit" class="btn btn-secondary" id="save" form="settings">Сохранить</button>
+          </div>
         </div>
+
     {% if is_submitted %}
 
     <div class="toast text-center" data-delay="1500" role="alert" aria-live="assertive" aria-atomic="true">
