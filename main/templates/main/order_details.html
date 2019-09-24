@@ -100,6 +100,33 @@
                         {% endif %}
                     {% endif %}
                 </div>
+            {% if receipts.count > 0 %}
+                <div id="accordion" class="py-3">
+                    <h5 class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Чеки с оплатой заказа</span>
+                    </h5>
+
+                    {% for r in receipts %}
+                      <div class="card">
+                        <div id="heading1">
+                          <h6 class="mb-0">
+                            <button class="btn btn-sm btn-link" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                                >   Чек {{ forloop.counter }}
+                            </button>
+                          </h6>
+                        </div>
+
+                        <div id="collapse{{ forloop.counter }}" class="collapse" aria-labelledby="heading{{ forloop.counter }}" data-parent="#accordion">
+                          <div class="card-body">
+                              <a href="{{ MEDIA_URL }}{{ r.image }}">
+                                <img src="{{ MEDIA_URL }}{{ r.image }}" height="100" width="100">
+                              </a>
+                          </div>
+                        </div>
+                      </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
             <form class="needs-validation" id="order" action="" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
 
@@ -228,16 +255,18 @@
                     </tbody>
                 </table>
             </div>
-
+            <div class="text-center small">
             {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
-                <div class="text-center small">
-                    <a class="btn btn-secondary btn-sm" href="{% url 'main:new_order_item' pk=order.id %}">Добавить
-                        товар</a>
+
+                    <a class="btn btn-secondary btn-sm" href="{% url 'main:new_order_item' pk=order.id %}">
+                        Добавить товар</a>
                     <a class="btn btn-secondary btn-sm" href="{% url 'main:catalog' pk=order.id %}">
                         Добавить товар из совместной закупки</a>
-                </div>
+            {% else %}
+                <a class="btn btn-secondary btn-sm" href="{% url 'main:orders' %}">
+                        Вернуться на список заказов</a>
             {% endif %}
-
+            </div>
         </div>
     </div>
     </div>

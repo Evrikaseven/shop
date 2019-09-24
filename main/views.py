@@ -177,6 +177,7 @@ class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
         context['order'] = self.object
         context['SHOPPING_TYPES'] = ShoppingTypes
         context['MEDIA_URL'] = settings.MEDIA_URL
+        context['receipts'] = _models.Receipt.objects.filter(order=self.object.id)
         return context
 
 
