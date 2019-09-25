@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Настройки{% endblock title %}
 
@@ -12,13 +13,13 @@
         <div class="bd-example bd-example-tabs">
           <div class="row">
             <div class="col-3">
-              <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                <a class="nav-link active" class="text-secondary" id="nav-home-tab" data-toggle="pill" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Главная страница</a>
-                <a class="nav-link" class="text-secondary" id="nav-money-tab" data-toggle="pill" href="#nav-money" role="tab" aria-controls="nav-money" aria-selected="false">Финансы</a>
-                <a class="nav-link" id="nav-news-tab" data-toggle="pill" href="#nav-news" role="tab" aria-controls="nav-news" aria-selected="false">Новости</a>
-                <a class="nav-link" id="nav-work-tab" data-toggle="pill" href="#nav-work" role="tab" aria-controls="nav-work" aria-selected="false">График работы</a>
-                <a class="nav-link" id="nav-deal-tab" data-toggle="pill" href="#nav-deal" role="tab" aria-controls="nav-deal" aria-selected="false">Условия сотрудничества</a>
-                <a class="nav-link" id="nav-contact-tab" data-toggle="pill" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Контакты</a>
+              <div class="nav flex-column navbar-light nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <a class="nav-link active text-secondary" id="nav-home-tab" data-toggle="pill" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Главная страница</a>
+                <a class="nav-link text-secondary" id="nav-money-tab" data-toggle="pill" href="#nav-money" role="tab" aria-controls="nav-money" aria-selected="false">Финансы</a>
+                <a class="nav-link text-secondary" id="nav-news-tab" data-toggle="pill" href="#nav-news" role="tab" aria-controls="nav-news" aria-selected="false">Новости</a>
+                <a class="nav-link text-secondary" id="nav-work-tab" data-toggle="pill" href="#nav-work" role="tab" aria-controls="nav-work" aria-selected="false">График работы</a>
+                <a class="nav-link text-secondary" id="nav-deal-tab" data-toggle="pill" href="#nav-deal" role="tab" aria-controls="nav-deal" aria-selected="false">Условия сотрудничества</a>
+                <a class="nav-link text-secondary" id="nav-contact-tab" data-toggle="pill" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Контакты</a>
               </div>
             </div>
             <div class="col-9">
@@ -62,7 +63,21 @@
                   </form>
               </div>
               <div class="tab-pane fade" id="nav-news" role="tabpanel" aria-labelledby="nav-news-tab">...</div>
-              <div class="tab-pane fade" id="nav-work" role="tabpanel" aria-labelledby="nav-work-tab">...</div>
+              <div class="tab-pane fade" id="nav-work" role="tabpanel" aria-labelledby="nav-work-tab">
+                      <form class="needs-validation" id="receipt" action="" method="POST" enctype="multipart/form-data">
+                          {% csrf_token %}
+                          <div class="form-group">
+                              <label for="id_image" class="mb-3">Загрузить изображение с графиком работы</label>
+                              <div class="custom-file">
+                                  <input class="custom-file-input" type="file" name="image" accept="image/*" id="id_image">
+                                  <label class="custom-file-label text-truncate">выберите файл</label>
+                              </div>
+                          </div>
+                      </form>
+                  <div class="form-actions text-center">
+                      <button type="submit" class="btn btn-secondary btn-sm" form="receipt">Сохранить</button>
+                  </div>
+              </div>
               <div class="tab-pane fade" id="nav-deal" role="tabpanel" aria-labelledby="nav-deal-tab">...</div>
               <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>
               </div>
@@ -85,5 +100,5 @@
                 $('.toast').toast('show');
             });
     </script>
-
+<script src="{% static '/js/name_to_photo.js' %}"></script>
 {% endblock content %}
