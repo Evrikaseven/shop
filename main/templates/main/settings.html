@@ -25,7 +25,7 @@
             <div class="col-9">
               <div class="tab-content" id="v-pills-tabContent">
               <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-                  <form id="settings" name="settings" method="post">
+                  <form id="noticeForm" method="post">
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="id_announcement">Объявление для главной страницы сайта:</label>
@@ -35,12 +35,13 @@
                         {{ form.announcement.initial }}</textarea>
                     </div>
                     <div class="my-3 text-center">
-                        <button type="submit" class="btn btn-secondary" id="save" >Сохранить</button>
+                        <button type="submit" class="btn btn-secondary" form="noticeForm">Сохранить</button>
                     </div>
                 </form>
               </div>
               <div class="tab-pane fade" id="nav-money" role="tabpanel" aria-labelledby="nav-money-tab">
-                  <form id="settings" name="settings" method="post">
+                  <form id="markupForm" method="post">
+                    {% csrf_token %}
                         <div class="form-group row">
                             <label for="id_extra_charge" class="col-3 col-form-label">Наценка для всех заказов в %</label>
                             <div class="col-9">
@@ -58,7 +59,7 @@
                             {% endif %}
                         </div>
                         <div class="my-3 text-center">
-                            <button type="submit" class="btn btn-secondary" id="save" form="settings">Сохранить</button>
+                            <button type="submit" class="btn btn-secondary" form="markupForm">Сохранить</button>
                         </div>
                   </form>
               </div>
@@ -86,13 +87,18 @@
         </div>
 
     {% if is_submitted %}
-
-    <div class="toast text-center" data-delay="1500" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-body">
-          Настройки сохранены
+        <div class="toast text-center" data-delay="1500" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-body">
+              Настройки сохранены
+            </div>
         </div>
-    </div>
- {% endif %}
+    {% else %}
+        <div class="toast text-center" data-delay="1500" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-body">
+              Настройки не сохранены!
+            </div>
+        </div>
+    {% endif %}
 
     </div>
     <script>

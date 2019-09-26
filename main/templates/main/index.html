@@ -30,6 +30,11 @@
                       Контакты
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="modal" data-target="#ModalPartnership" href="#">
+                      Условия сотрудничества
+                    </a>
+                </li>
             </ul>
             <form class="form-inline my-2 my-lg-0">
                 <input class="form-control mr-sm-2" type="text">
@@ -77,11 +82,40 @@
             </div>
           </div>
         </div>
-        <div class="jumbotron jumbotron-fluid mt-3 p-md-3 text-secondary rounded bg-lg">
+        <!-- Modal Partnership-->
+        <div class="modal fade" id="ModalPartnership" tabindex="-1" role="dialog" aria-labelledby="ModalPartnershipLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="ModalPartnershipLabel">Рабочие графики</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>Уважаемые участники группы.
+Заказывая товар в группе вы должны знать следующее:<br>
+☑ Не уверен - не заказывай! 1000 раз обдумайте покупку!<br>
+☑ После сообщения "счет запросили", "оплачиваем" отказы не принимаются, оплачивайте и потом сообщайте, что вам нужен Пристрой товара (будем искать покупателя на товар).<br>
+☑ На некоторые товары нет гарантии на цвет, цвет может отличаться как на тон, так и совсем прийти другой.<br>
+☑ Также прийти может модель немного отличная от картинки (кармана нет, или наоборот их два, цветочек не такой, украшения по-другому и др) учитываем это при заказе.<br>
+☑ Заказ формируется не один день, поэтому рассчитываем, что размер возможно нужен побольше. Если нужен срочно - то уточняйте скоро ли Стоп.<br>
+☑ Может оказаться, что пока собираем заказ, вещь немного подорожает или совсем закончится - в этом случае предлагается идентичная вещь или вы выбираете другой товар.<br>
+☑ Размер вещей смотрите строго по размерной таблице соответствующей фирмы, если производитель не сообщает, что товар маломерит или большемерит.<br>
+☑ Если приехал брак - делаем возврат - деньги возвращаются вам. Пришел товар не той расцветки, внешний вид другой, вам не нравится, качество не такое, не подошел по размеру и др. - самостоятельный пристрой.</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Закрыть</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {# Announcement#}
+         <div class="jumbotron jumbotron-fluid mt-3 p-md-3 text-secondary rounded bg-lg">
             <div class="col-md-6 px-0">
               <h1 class="display-5 font-italic">Обьявление</h1>
               <p class="lead my-3">{{ announcement }}</p>
-              <p class="lead mb-0"><a href="#" class="text-secondary font-weight-bold">Continue reading...</a></p>
+              <p class="lead mb-0"><a href="#" class="text-secondary font-weight-bold">Подробее...</a></p>
             </div>
         </div>
 

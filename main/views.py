@@ -522,7 +522,7 @@ class SettingsView(LoginRolesRequiredViewMixin, CommonContextViewMixin, FormView
         context['form'] = form
         # here you can add things like:
         context['is_submitted'] = False
-        return self.re.render_to_response(context)
+        return self.render_to_response(context)
 
     def form_valid(self, form, **kwargs):
         context = self.get_context_data(**kwargs)
