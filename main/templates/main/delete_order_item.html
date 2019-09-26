@@ -3,25 +3,25 @@
 {% block title %}Удаление товара{% endblock title %}
 
 {% block content %}
+    <h3 class="font-weight-normal text-center">
+        Вы точно хотите удалить?
+    </h3>
 
-    <div>
-        <h3 class="font-weight-normal text-center">
-            Вы точно хотите удалить?
-        </h3>
+    <hr class="mb-4">
 
-        <hr class="mb-4">
-
-        <div class="container my-3 p-3 bg-white rounded shadow-sm">
-            <form method="post" enctype="multipart/form-data">
+    <div class="container">
+        <div class="bg-white shadow-sm">
+            <form method="post" enctype="multipart/form-data" id="DeleteForm">
                 {% csrf_token %}
                 <div class="mb-4 text-center">
                     {#                <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="150" width="150">#}
-                    <img src="{{ MEDIA_URL }}{{ order_item.product.image }}">
-                </div>
-                <div class="mb-4 text-center">
-                    <button class="btn btn-outline-secondary btn-sm" type="submit">Удалить</button>
+                    <img class="img-fluid img-thumbnail" src="{{ MEDIA_URL }}{{ order_item.product.image }}">
                 </div>
             </form>
+        </div>
+        <div class="mb-4 text-center">
+            <button class="btn btn-secondary btn-sm" type="submit" form="DeleteForm">Удалить</button>
+            <a class="btn btn-secondary btn-sm" href="{% url 'main:order_details' pk=order_item.order.id %}">Отмена</a>
         </div>
     </div>
 

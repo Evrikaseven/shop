@@ -19,7 +19,7 @@
 
                 <h4 class="d-flex justify-content-between align-items-center mb-3">
                     <span class="text-muted">Заказано товаров</span>
-                    <span class="badge badge-secondary badge-pill">3</span>
+                    <span class="badge badge-secondary badge-pill">{{ order.orderitem_set.all.count }}</span>
                 </h4>
                 <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between lh-condensed">
@@ -245,6 +245,32 @@
                                     <a class="btn btn-outline-secondary btn-sm"
                                        href="{% url 'main:delete_order_item' pk=order_item.id %}">
                                         Удалить</a>
+                                    <a class="nav-link" data-toggle="modal" data-target="#ModalWork" href="#">
+                                        Удалить из заказа
+                                    </a>
+                                    <!-- Modal Work time-->
+                                    <div class="modal fade" id="ModalWork" tabindex="-1" role="dialog" aria-labelledby="ModalWorklLabel" aria-hidden="true">
+                                      <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <h5 class="modal-title" id="ModalWorkLabel">Вы действительно хотите удалить?</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                            </button>
+                                          </div>
+                                          <div class="modal-body">
+                                             <form method="post" enctype="multipart/form-data" id="delete_form">
+                                                {% csrf_token %}
+                                                <img class="d-block w-100" src="{{ MEDIA_URL }}{{ order_item.product.image }}">
+                                             </form>
+                                          </div>
+                                          <div class="modal-footer">
+                                                <button class="btn btn-secondary btn-sm" type="submit" form="delete_form">Удалить</button>
+                                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Отмена</button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
                                 {% endif %}
                             </div>
                         </td>
