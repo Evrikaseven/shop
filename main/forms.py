@@ -34,7 +34,7 @@ class ProviderForm(forms.ModelForm):
 
     class Meta:
         model = Provider
-        exclude = []
+        fields = ['name', 'vk_link', 'place', 'description', 'picture', 'product_type']
 
 
 class NewOrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):

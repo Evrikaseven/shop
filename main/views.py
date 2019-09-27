@@ -34,6 +34,7 @@ from .forms import (
     ProductForm,
     SettingsForm,
     ReceiptForOrderForm,
+    ProviderForm,
 )
 
 
@@ -58,9 +59,13 @@ class IndexView(CommonContextViewMixin, TemplateView):
 
 class ProvidersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/providers_list.html'
+    allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+    form_class = ProviderForm
+    model = _models.Provider
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['form'] = self.form_class
         context['providers'] = _models.Provider.objects.all()
         return context
 

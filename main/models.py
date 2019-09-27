@@ -27,7 +27,7 @@ MEDIA_ORDER_DIR_PREFFIX = 'order_'
 class Provider(models.Model):
     name = models.CharField(max_length=256)
     vk_link = models.CharField(max_length=256)
-    place = models.CharField(max_length=150)
+    place = models.CharField(verbose_name='Место', max_length=150, default='')
     description = models.TextField(blank=True, default='')
     picture = models.CharField(max_length=256)
     product_type = models.CharField(max_length=256, blank=True, default='')

@@ -4,13 +4,13 @@
 
 {% block content %}
 
-<div class="container table-container">
-    {#{% if providers %}#}
-    <h3 class="font-weight-normal text-center py-3 mb-3 border-bottom box-shadow">
-        Поставщики
+    <h3 class="font-weight-normal text-center text-muted" style="color: #6c757d">
+        Пользователи
     </h3>
-    <table border="1px" class="table">
-        <thead class="thead-dark">
+    <hr class="mb-4">
+    <div class="container my-3 p-3 bg-white rounded shadow-sm">
+        <table class="table table-sm table-hover ">
+            <thead class="thead-light table-ts">
         <tr>
             <th scope="col">Место</th>
             <th scope="col">Фото</th>
@@ -31,7 +31,36 @@
         {% endfor %}
         </tbody>
     </table>
-    {#{% endif %}#}
 </div>
+    {% if user_role == roles.ADMINISTRATOR %}
+        <div class="form-actions text-center">
+            <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#exampleModal">
+              Добавить
+            </button>
+        </div>
+    {% endif %}
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <form type="post" id="submitForm">
+              {% csrf_token %}
+              {{ form }}
+          </form>
 
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" form="submitForm">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}
