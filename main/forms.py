@@ -435,6 +435,8 @@ class SettingsForm(forms.Form):
                                       min_value=0.01, max_value=100,
                                       max_digits=5, decimal_places=2)
     announcement = forms.CharField(label='Объявление', max_length=300, widget=forms.Textarea)
+    contacts = forms.CharField(label='Контакты', max_length=300, widget=forms.Textarea)
+    partnership = forms.CharField(label='Сотрудничество', max_length=300, widget=forms.Textarea)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

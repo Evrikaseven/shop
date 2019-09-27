@@ -238,6 +238,8 @@ class SettingOption(models.Model):
     objects = SettingOptionManager()
     s_name = models.CharField(max_length=100, primary_key=True)
     s_value = models.TextField()
+    contacts = models.TextField(verbose_name='Контакты', max_length=255, blank=True, default='')
+    partnership = models.TextField(verbose_name='Сотрудничество', max_length=1024, blank=True, default='')
 
 
 class SettingOptionHandler(object):

@@ -21,6 +21,7 @@
                 <a class="nav-link text-secondary" id="nav-deal-tab" data-toggle="pill" href="#nav-deal" role="tab" aria-controls="nav-deal" aria-selected="false">Условия сотрудничества</a>
                 <a class="nav-link text-secondary" id="nav-contact-tab" data-toggle="pill" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Контакты</a>
               </div>
+                <button type="submit" class="btn btn-secondary" form="noticeForm">Сохранить</button>
             </div>
             <div class="col-9">
               <div class="tab-content" id="v-pills-tabContent">
@@ -34,14 +35,22 @@
                               rows="3">
                         {{ form.announcement.initial }}</textarea>
                     </div>
-                    <div class="my-3 text-center">
-                        <button type="submit" class="btn btn-secondary" form="noticeForm">Сохранить</button>
-                    </div>
-                </form>
+                      <div class="form-group">
+                            <label for="id_contacts">Контакты:</label>
+                            <textarea class="form-control" id="id_contacts"
+                                  name="{{ form.contacts.name }}" placeholder="заметка по товару и пр."
+                                  rows="3">
+                            {{ form.contacts.initial }}</textarea>
+                      </div>
+                      <div class="form-group">
+                            <label for="id_partnership">Условия сотрудничества:</label>
+                            <textarea class="form-control" id="id_partnership"
+                                  name="{{ form.partnership.name }}" placeholder="заметка по товару и пр."
+                                  rows="3">
+                            {{ form.partnership.initial }}</textarea>
+                      </div>
               </div>
               <div class="tab-pane fade" id="nav-money" role="tabpanel" aria-labelledby="nav-money-tab">
-                  <form id="markupForm" method="post">
-                    {% csrf_token %}
                         <div class="form-group row">
                             <label for="id_extra_charge" class="col-3 col-form-label">Наценка для всех заказов в %</label>
                             <div class="col-9">
@@ -59,7 +68,7 @@
                             {% endif %}
                         </div>
                         <div class="my-3 text-center">
-                            <button type="submit" class="btn btn-secondary" form="markupForm">Сохранить</button>
+                            <button type="submit" class="btn btn-secondary" form="noticeForm">Сохранить</button>
                         </div>
                   </form>
               </div>
