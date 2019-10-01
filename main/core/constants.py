@@ -35,8 +35,8 @@ class ShoppingTypes(metaclass=EnumMetaWithStrings):
 
 
 class PurchaseAndDeliveryTypes(metaclass=EnumMetaWithStrings):
-    PURCHASE_AND_DELIVERY = 0, 'Закупка вместе с доставкой'
-    DELIVERY_ONLY = 1, 'Только доставка'
+    PURCHASE_AND_DELIVERY = 0, 'Закупка вместе с процентом'
+    DELIVERY_ONLY = 1, 'Только процент'
 
 
 class DeliveryTypes(metaclass=EnumMetaWithStrings):

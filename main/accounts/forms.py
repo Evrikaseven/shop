@@ -1,5 +1,6 @@
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
 from django import forms
+from django.core.exceptions import ValidationError
 from main.models import User
 
 
@@ -19,3 +20,13 @@ class UserSignUpForm(UserCreationForm):
         for field in saved_values:
             if field in self.fields:
                 self.fields[field].initial = saved_values[field]
+
+
+class CustomPasswordResetForm(PasswordResetForm):
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if not User.objects.filter(email=email).count():
+            raise ValidationError('Пользователь с {email} не найдет, проверьте, пожалуйста, введенный email'
+                                  .format(email=email))
+        return email
