@@ -35,6 +35,7 @@ from .forms import (
     SettingsForm,
     ReceiptForOrderForm,
     ProviderForm,
+    NewsForm,
 )
 
 
@@ -508,12 +509,29 @@ class HelpView(CommonContextViewMixin, TemplateView):
     template_name = 'main/help.html'
 
 
+class NewsView(CommonContextViewMixin, TemplateView):
+    template_name = 'main/news.html'
+    form_class = NewsForm
+    models = _models.News
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['news'] = _models.News.objects.all()
+
+        return context
+
+
 class SettingsView(LoginRolesRequiredViewMixin, CommonContextViewMixin, FormView):
     template_name = 'main/settings.html'
     form_class = SettingsForm
 
     def get_success_url(self):
         return reverse_lazy('main:settings', kwargs={'is_submitted': self.kwargs['pk']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['news'] = _models.News.objects.all()
+        return context
 
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()

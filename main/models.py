@@ -263,6 +263,12 @@ class SettingOptionHandler(object):
         self.instance.save()
 
 
+class News(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField(null=True, blank=True)
+    published = models.DateTimeField(auto_now_add=True, db_index=True)
+
+
 def get_path_to_product_image(instance, name):
     return '{}/{}'.format(MEDIA_PROD_IMAGE_DIR_PREFFIX, name)
 

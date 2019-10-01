@@ -1,10 +1,9 @@
 
 $('.custom-file-input').on('change', function() {
-   let fileName = $(this).val().split('\\');
-   console.log($(this).val());
+   let fileName = $('.custom-file-input')[0].files;
+   console.log(fileName);
    $(this).next('.custom-file-label').addClass("selected").html(fileName);
 });
-
 
 // $(function() {
 //   $('#order').change(function(){

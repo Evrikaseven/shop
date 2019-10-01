@@ -72,7 +72,67 @@
                         </div>
                   </form>
               </div>
-              <div class="tab-pane fade" id="nav-news" role="tabpanel" aria-labelledby="nav-news-tab">...</div>
+              <div class="tab-pane fade" id="nav-news" role="tabpanel" aria-labelledby="nav-news-tab">
+                    {% csrf_token %}
+
+                    {% for n in news %}
+                        <div class="flex-md-row mb-4">
+                            <a class="text-dark" href="#" data-toggle="modal" data-target="#ModalNews{{ forloop.counter }}">{{ n.published }} {{n.title }}</a>
+                        </div>
+                        <!-- Modal for News -->
+                        <div class="modal fade" id="ModalNews{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="ModalNewslLabel{{ forloop.counter }}" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="ModalNewsLabel{{ forloop.counter }}">Изменить новость</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                  <h3 class="mb-0">
+                                    <a class="text-dark" href="#">{{ n.title }}</a>
+                                  </h3>
+                                  <div class="mb-3 text-muted">{{ n.published|date:"d.m.Y" }}</div>
+                                  <p class="card-text mb-auto">{{ n.content }}</p>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Сохранить</button>
+                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Удалить</button>
+                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Отмена</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    {% endfor %}
+                        <div class="flex-md-row mb-4">
+                            <button class="btn btn-secondary btn-sm" href="#" data-toggle="modal" data-target="#ModalNew">Добавить новость</button>
+                        </div>
+                        <!-- Modal for News -->
+                        <div class="modal fade" id="ModalNew" tabindex="-1" role="dialog" aria-labelledby="ModalNewlLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="ModalNewLabel">Добавть новость на сайт</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                  <h3 class="mb-0">
+                                    <a class="text-dark" href="#">{{ n.title }}</a>
+                                  </h3>
+                                  <div class="mb-3 text-muted">{{ n.published|date:"d.m.Y" }}</div>
+                                  <p class="card-text mb-auto">{{ n.content }}</p>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Сохранить</button>
+                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Отмена</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+              </div>
               <div class="tab-pane fade" id="nav-work" role="tabpanel" aria-labelledby="nav-work-tab">
                       <form class="needs-validation" id="receipt" action="" method="POST" enctype="multipart/form-data">
                           {% csrf_token %}

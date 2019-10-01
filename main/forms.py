@@ -11,6 +11,7 @@ from .models import (
     User,
     SettingOptionHandler,
     Receipt,
+    News,
 )
 from main.core import widgets as custom_widgets, form_fields as custom_form_fields
 from main.core.constants import (
@@ -451,6 +452,12 @@ class SettingsForm(forms.Form):
         for setting in self.cleaned_data:
             instance = SettingOptionHandler(setting)
             instance.value = self.cleaned_data[setting]
+
+
+class NewsForm(forms.Form):
+    class Meta:
+        model = News
+        fields = ('title', 'content', 'published')
 
 
 class UserForm(forms.ModelForm):

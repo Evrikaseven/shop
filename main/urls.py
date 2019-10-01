@@ -28,6 +28,7 @@ urlpatterns = [
     path('products/<int:pk>/delete/', main_views.DeleteProductView.as_view(), name='delete_product'),
     path('buyouts/', main_views.BuyoutsListView.as_view(), name='buyouts'),
     path('help/', main_views.HelpView.as_view(), name='help'),
+    path('news/', main_views.NewsView.as_view(), name='news'),
 
     # Order related
     path('new_order/', main_views.NewOrderView.as_view(), name='new_order'),
