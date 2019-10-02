@@ -63,7 +63,8 @@
                                     <h6 class="my-2 pr-2">Оплачено:</h6>
                                 </div>
                                 <div class="input-group-sm">
-                                <input class="form-control input-group-sm" id="id_paid_price" name="paid_price" type="number" step="0.01">
+                                    <input class="form-control input-group-sm" id="id_paid_price" name="paid_price"
+                                           type="number" step="0.01">
                                 </div>
                             </li>
                             <button class="btn btn-secondary btn-sm" type="submit">Сохранить</button>
@@ -87,54 +88,58 @@
                 <div class="py-3 pl-4 text-right">
                     {% if update_is_allowed %}
                         {% if user_role == roles.ZAKAZSCHIK %}
-                            {% if order.price > 0 %}
+                            {% if order.price > 0 and order.all_prices_updated %}
                                 <a class="btn btn-secondary btn-sm"
                                    href="{% url 'main:receipt_for_order' pk=order.pk %}">
                                     Оплатить заказ
                                 </a>
                             {% else %}
-                                <div class="btn btn-secondary btn-sm" title="Заказ должен быть на сумму отличную от 0">
+                                <div class="btn btn-secondary btn-sm"
+                                     title="Заказ должен быть на сумму отличную от 0 и все товары с ненулевой ценой">
                                     Оплатить заказ
                                 </div>
                             {% endif %}
                         {% endif %}
                     {% endif %}
                 </div>
-            {% if receipts.count > 0 %}
-                <div id="accordion" class="py-3">
-                    <h5 class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Чеки с оплатой заказа</span>
-                    </h5>
+                {% if receipts.count > 0 %}
+                    <div id="accordion" class="py-3">
+                        <h5 class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted">Чеки с оплатой заказа</span>
+                        </h5>
 
-                    {% for r in receipts %}
-                      <div class="card">
-                        <div id="heading1">
-                          <h6 class="mb-0">
-                            <button class="btn btn-sm btn-link" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
-                                >   Чек {{ forloop.counter }}
-                            </button>
-                          </h6>
-                        </div>
+                        {% for r in receipts %}
+                            <div class="card">
+                                <div id="heading1">
+                                    <h6 class="mb-0">
+                                        <button class="btn btn-sm btn-link" data-toggle="collapse"
+                                                data-target="#collapse{{ forloop.counter }}" aria-expanded="false"
+                                                aria-controls="collapse{{ forloop.counter }}">
+                                            > Чек {{ forloop.counter }}
+                                        </button>
+                                    </h6>
+                                </div>
 
-                        <div id="collapse{{ forloop.counter }}" class="collapse" aria-labelledby="heading{{ forloop.counter }}" data-parent="#accordion">
-                          <div class="card-body">
-                              <a href="{{ MEDIA_URL }}{{ r.image }}">
-                                <img src="{{ MEDIA_URL }}{{ r.image }}" height="100" width="100">
-                              </a>
-                          </div>
-                        </div>
-                      </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-            <form class="needs-validation" id="order" action="" method="POST" enctype="multipart/form-data">
+                                <div id="collapse{{ forloop.counter }}" class="collapse"
+                                     aria-labelledby="heading{{ forloop.counter }}" data-parent="#accordion">
+                                    <div class="card-body">
+                                        <a href="{{ MEDIA_URL }}{{ r.image }}">
+                                            <img src="{{ MEDIA_URL }}{{ r.image }}" height="100" width="100">
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <form class="needs-validation" id="order" action="" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
 
-                {% if update_is_allowed %}
-                    <h5 class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Укажите способ доставки</span>
-                    </h5>
-                    <ul class="list-group">
+                    {% if update_is_allowed %}
+                        <h5 class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted">Укажите способ доставки</span>
+                        </h5>
+                        <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between h-condensed">
                             <div class="form-group row">
                                 <select class="form-control" name="delivery" id="id_delivery">
@@ -158,22 +163,27 @@
                                 </div>
                             </li>
                         {% endif %}
-                {% endif %}
-                        <div class="collapse" id="hide-me">
-                            <li class="list-group-item d-flex justify-content-between h-condensed">
-                                <textarea class="form-control" id="id_delivery_address" name="delivery_address" placeholder="Введите адрес доставки" rows="3">{{ order.delivery_address }}</textarea>
-                            </li>
-                        </div>
-                    </ul>
-                <div class="py-3 pl-4 text-right">
-                    {% if update_is_allowed %}
-                        {% if show_delivery_address %}
-                            <button class="btn btn-secondary btn-sm" type="button" data-toggle="collapse" data-target="#hide-me" aria-controls="hide-me" aria-expanded="false" aria-label="Hide me">
-                                Изменить</button>
-                        {% endif %}
-
-                        <button class="btn btn-secondary btn-sm" type="submit">Сохранить</button>
                     {% endif %}
+                    <div class="collapse" id="hide-me">
+                        <li class="list-group-item d-flex justify-content-between h-condensed">
+                            <textarea class="form-control" id="id_delivery_address" name="delivery_address"
+                                      placeholder="Введите адрес доставки"
+                                      rows="3">{{ order.delivery_address }}</textarea>
+                        </li>
+                    </div>
+                    </ul>
+                    <div class="py-3 pl-4 text-right">
+                        {% if update_is_allowed %}
+                            {% if show_delivery_address %}
+                                <button class="btn btn-secondary btn-sm" type="button" data-toggle="collapse"
+                                        data-target="#hide-me" aria-controls="hide-me" aria-expanded="false"
+                                        aria-label="Hide me">
+                                    Изменить
+                                </button>
+                            {% endif %}
+
+                            <button class="btn btn-secondary btn-sm" type="submit">Сохранить</button>
+                        {% endif %}
                 </form>
             </div>
         </div>
@@ -213,6 +223,13 @@
                     <td class="text-left small">{{ order_item.product.shopping_type_to_string }}</td>
                     <td class="text-left small">
                         <div>
+                            {% if not order_item.price %}
+                                <div style="color: red">
+                                    <em>
+                                        Укажите цену
+                                    </em>
+                                </div>
+                            {% endif %}
                             {% if order_item.product.shopping_type == SHOPPING_TYPES.JOINT %}
                                 {% if order_item.product.quantity == 0 %}
                                     Выкуп собран
@@ -227,11 +244,11 @@
                         <div>
                             {{ order_item.order_comment }}
                         </div>
-                       <div>
-                        {% if order_item.is_replacement %}
-                            Данный товар является заменой
-                        {% endif %}
-                    </div>
+                        <div>
+                            {% if order_item.is_replacement %}
+                                Данный товар является заменой
+                            {% endif %}
+                        </div>
                     </td>
                     <td class="text-left small">{{ order_item.customer_comment }}</td>
                     {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
@@ -249,27 +266,35 @@
                                         Удалить из заказа
                                     </a>
                                     <!-- Modal Work time-->
-                                    <div class="modal fade" id="ModalWork" tabindex="-1" role="dialog" aria-labelledby="ModalWorklLabel" aria-hidden="true">
-                                      <div class="modal-dialog modal-dialog-centered" role="document">
-                                        <div class="modal-content">
-                                          <div class="modal-header">
-                                            <h5 class="modal-title" id="ModalWorkLabel">Вы действительно хотите удалить?</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                              <span aria-hidden="true">&times;</span>
-                                            </button>
-                                          </div>
-                                          <div class="modal-body">
-                                             <form method="post" enctype="multipart/form-data" id="delete_form">
-                                                {% csrf_token %}
-                                                <img class="d-block w-100" src="{{ MEDIA_URL }}{{ order_item.product.image }}">
-                                             </form>
-                                          </div>
-                                          <div class="modal-footer">
-                                                <button class="btn btn-secondary btn-sm" type="submit" form="delete_form">Удалить</button>
-                                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Отмена</button>
-                                          </div>
+                                    <div class="modal fade" id="ModalWork" tabindex="-1" role="dialog"
+                                         aria-labelledby="ModalWorklLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="ModalWorkLabel">Вы действительно хотите
+                                                        удалить?</h5>
+                                                    <button type="button" class="close" data-dismiss="modal"
+                                                            aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form method="post" enctype="multipart/form-data" id="delete_form">
+                                                        {% csrf_token %}
+                                                        <img class="d-block w-100"
+                                                             src="{{ MEDIA_URL }}{{ order_item.product.image }}">
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button class="btn btn-secondary btn-sm" type="submit"
+                                                            form="delete_form">Удалить
+                                                    </button>
+                                                    <button type="button" class="btn btn-secondary btn-sm"
+                                                            data-dismiss="modal">Отмена
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                      </div>
                                     </div>
                                 {% endif %}
                             </div>
@@ -282,16 +307,16 @@
                 </table>
             </div>
             <div class="text-center small">
-            {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
+                {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
 
                     <a class="btn btn-secondary btn-sm" href="{% url 'main:new_order_item' pk=order.id %}">
                         Добавить товар</a>
                     <a class="btn btn-secondary btn-sm" href="{% url 'main:catalog' pk=order.id %}">
                         Добавить товар из совместной закупки</a>
-            {% else %}
-                <a class="btn btn-secondary btn-sm" href="{% url 'main:orders' %}">
+                {% else %}
+                    <a class="btn btn-secondary btn-sm" href="{% url 'main:orders' %}">
                         Вернуться на список заказов</a>
-            {% endif %}
+                {% endif %}
             </div>
         </div>
     </div>
