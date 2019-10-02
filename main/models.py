@@ -158,6 +158,12 @@ class Order(ModelWithTimestamp, ModelWithUser):
             self.created_by.delivery_address = value
             self.created_by.save()
 
+    @property
+    def all_prices_updated(self):
+        if self.orderitem_set.filter(product__price=0).count():
+            return False
+        return True
+
     @transaction.atomic
     def save(self, **kwargs):
         if self.actual_price_diff:
