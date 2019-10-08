@@ -9,10 +9,22 @@
         </button>
       </div>
       <div class="modal-body">
-        {{ modal_body }}
+          {% if delete_flag == True %}
+
+
+          <img class="d-block w-100"
+                 src="{{ MEDIA_URL }}{{ modal_body }}">
+          {% else %}
+                  {{ modal_body }}
+          {% endif %}
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Закрыть</button>
+          {% if delete_flag == True %}
+              <button class="btn btn-secondary btn-sm" type="submit" form="delete_form">Удалить</button>
+              <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Отмена</button>
+          {% else %}
+              <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Закрыть</button>
+          {% endif %}
       </div>
     </div>
   </div>

@@ -186,126 +186,72 @@
                         {% endif %}
                 </form>
             </div>
-        </div>
+         </div>
 
-        <div class="col-md-9 order-md-1">
-            <div class="table-container my-3 p-3 bg-white rounded shadow-sm">
-                <table class="table table-sm table-hover " id="OrderItemsTable">
-                    <thead class="thead-light table-ts">
-                    <tr>
-                        <th scope="col">Изображение товара</th>
-                        <th scope="col">Название товара</th>
-                        <th scope="col">Место</th>
-                        <th scope="col">Количество</th>
-                        <th scope="col">Цена</th>
-                        <th scope="col">Статус товара</th>
-                        <th scope="col">Вид закупки</th>
-                        <th scope="col">Коментарий к заказу</th>
-                        <th scope="col">Коментарий для себя</th>
-                        <th scope="col"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for order_item in order.orderitem_set.all %}
-                        {% if order_item.is_replacement %}
-                            <tr style="background-color: #BBBBBB">
-                                {% else %}
-                            <tr>
-                        {% endif %}
-                    <td>
-                        <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" height="100" width="100">
-                    </td>
-                    <td class="text-left small">{{ order_item.name }}</td>
-                    <td class="text-left small">{{ order_item.place }}</td>
-                    <td class="text-left small">{{ order_item.quantity }}</td>
-                    <td class="text-left small">{{ order_item.price }}</td>
-                    <td class="text-left small">{{ order_item.status_to_string }}</td>
-                    <td class="text-left small">{{ order_item.product.shopping_type_to_string }}</td>
-                    <td class="text-left small">
-                        <div>
-                            {% if not order_item.price %}
-                                <div style="color: red">
-                                    <em>
-                                        Укажите цену
-                                    </em>
-                                </div>
-                            {% endif %}
-                            {% if order_item.product.shopping_type == SHOPPING_TYPES.JOINT %}
-                                {% if order_item.product.quantity == 0 %}
-                                    Выкуп собран
-                                {% else %}
-                                    Выкуп в процессе сборки
-                                {% endif %}
-                            {% endif %}
+         <div class="col-md-9 order-md-1">
+         {% for order_item in order.orderitem_set.all %}
+            <div class="card mb-3">
+                <div class="row no-gutters">
+                    <div class="col-md-3 m-2">
+                        <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" class="card-img" alt="...">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">{% if order_item.name %} {{ order_item.name }} {% else %} Без
+                                названия {% endif %}</h5>
+                            <p class="card-text">Место: <small class="text-muted">{{ order_item.place }}</small></p>
+                            <p class="card-text">Количество: {{ order_item.quantity }}</p>
+                            <p class="card-text">Цена: {{ order_item.price }}</p>
+                            <p class="card-text">Статус товара: {{ order_item.status_to_string }}</p>
+                            <p class="card-text">Вид закупки: {{ order_item.product.shopping_type_to_string }}</p>
+                            <p class="card-text">Коментарий к заказу:
+
+                                    {% if not order_item.price %}
+                                        <div style="color: red">
+                                            <em>
+                                                Укажите цену
+                                            </em>
+                                        </div>
+                                    {% endif %}
+                                    {% if order_item.product.shopping_type == SHOPPING_TYPES.JOINT %}
+                                        {% if order_item.product.quantity == 0 %}
+                                            Выкуп собран
+                                        {% else %}
+                                            Выкуп в процессе сборки
+                                        {% endif %}
+                                    {% endif %}
+
+
+                                    {{ order_item.delivery_to_string }}
+
+                                    {{ order_item.order_comment }}
+
+
+                                    {% if order_item.is_replacement %}
+                                        Данный товар является заменой
+                                    {% endif %}
+
+                            </p>
                         </div>
-                        <div>
-                            {{ order_item.delivery_to_string }}
-                        </div>
-                        <div>
-                            {{ order_item.order_comment }}
-                        </div>
-                        <div>
-                            {% if order_item.is_replacement %}
-                                Данный товар является заменой
-                            {% endif %}
-                        </div>
-                    </td>
-                    <td class="text-left small">{{ order_item.customer_comment }}</td>
-                    {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
-                        <td>
-                            <div class="btn-group-vertical py-3">
-                                <a class="btn btn-outline-secondary btn-sm"
+                    </div>
+                </div>
+                <div class="card-footer text-right">
+                        {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
+                            <div class="btn-group">
+                                <a class="btn btn-outline-secondary "
                                    href="{% url 'main:order_item_details' pk=order_item.id %}">
                                     Изменить</a>
 
                                 {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
-                                    <a class="btn btn-outline-secondary btn-sm"
+                                    <a class="btn btn-outline-secondary"
                                        href="{% url 'main:delete_order_item' pk=order_item.id %}">
                                         Удалить</a>
-                                    <a class="nav-link" data-toggle="modal" data-target="#ModalWork" href="#">
-                                        Удалить из заказа
-                                    </a>
-                                    <!-- Modal Work time-->
-                                    <div class="modal fade" id="ModalWork" tabindex="-1" role="dialog"
-                                         aria-labelledby="ModalWorklLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="ModalWorkLabel">Вы действительно хотите
-                                                        удалить?</h5>
-                                                    <button type="button" class="close" data-dismiss="modal"
-                                                            aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form method="post" enctype="multipart/form-data" id="delete_form">
-                                                        {% csrf_token %}
-                                                        <img class="d-block w-100"
-                                                             src="{{ MEDIA_URL }}{{ order_item.product.image }}">
-                                                    </form>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button class="btn btn-secondary btn-sm" type="submit"
-                                                            form="delete_form">Удалить
-                                                    </button>
-                                                    <button type="button" class="btn btn-secondary btn-sm"
-                                                            data-dismiss="modal">Отмена
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 {% endif %}
                             </div>
-                        </td>
-
                     {% endif %}
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                </div>
             </div>
+         {%  endfor  %}
             <div class="text-center small">
                 {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
 
@@ -318,8 +264,8 @@
                         Вернуться на список заказов</a>
                 {% endif %}
             </div>
+            </div>
         </div>
-    </div>
     </div>
 
 {% endblock content %}
