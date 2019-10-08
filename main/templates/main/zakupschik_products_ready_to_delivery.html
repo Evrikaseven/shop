@@ -7,45 +7,25 @@
     <h3 class="font-weight-normal text-center py-3 border-bottom" style="margin-block-start: 0;  margin-block-end: 0;">
         Товары готовые к выдаче
     </h3>
-    <div class="container px-0">
+    <div class="container">
         {% for user_data in data %}
-            <div class="d-flex font-weight-normal px-4 my-1 card-header">
-                <div class="my-1 mr-md-3">{{ user_data.user.email }}</div>
-                <div class="my-1 mr-md-3">{{ user_data.user.first_name }}</div>
-                <div class="my-1 mr-md-3">{{ user_data.user.last_name }}</div>
-                <a class="btn btn-sm btn-outline-primary" data-toggle="collapse"
-                   data-target="#hide-me{{ forloop.counter }}" aria-expanded="true" href="#">Список товаров</a>
-            </div>
-            <div id="hide-me{{ forloop.counter }}" class="collapse in container my-3 p-3 bg-white rounded shadow-sm">
-
-                <div class="row">
-                {% for order_item in user_data.items %}
-
-                <div class="col-md-4">
-                    <div class="card mb-3 shadow-sm">
-                        <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
-                             xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
-                             focusable="false" role="img" aria-label="Placeholder: Thumbnail">
-
-                            <title>Placeholder</title>
-                            <rect width="100%" height="100%" fill="#55595c"></rect>
-                             <a href="{% url 'main:order_item_details' pk=order_item.id %}">
-                                <image xlink:href="{{ MEDIA_URL }}{{ order_item.product.image }}" x="0" y="0" width="100%" height="100%"/>
-                            </a>
-
-                            <text x="15%" y="10%" fill="#eceeef" dy=".3em">{{ order_item.name }}</text>
-                            <text x="15%" y="20%" fill="#eceeef" dy=".3em" class="bg">Количество: {{ order_item.total_quantity }}</text>
-                            <text x="15%" y="50%" fill="#eceeef" dy=".3em">Комментарий:</text>
-                            <text x="15%" y="60%" fill="#eceeef" dy=".3em">{{ order_item.order_comment }}</text>
-                         </svg>
-                        <div class="card-body py-2">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <p class="pt-3">{{ order_item.price }} ₽</p>
-                                <p class="pt-3">Статус: {{ order_item.item_status_str }}</p>
-                            </div>
-                        </div>
-                    </div>
+            <div class="row font-weight-normal py-2 m-2 bg-lg shadow-sm">
+                <div class="col-7 row">
+                    <div class="m-2">{{ user_data.user.email }}</div>
+                    <div class="m-2">{{ user_data.user.first_name }}</div>
+                    <div class="m-2">{{ user_data.user.last_name }}</div>
                 </div>
+                <div class="col-5 text-right">
+                <a class="btn btn-sm btn-outline-secondary m-2" data-toggle="collapse"
+                   data-target="#hide-me{{ forloop.counter }}" aria-expanded="true" href="#">Список товаров</a>
+                </div>
+            </div>
+            <div id="hide-me{{ forloop.counter }}" class="collapse in container my-3 p-3">
+                <div class="row">
+                {% for item in user_data.items %}
+                    <div class="col-md-4">
+                        {% include 'main/include/item_card_img_template.html' with order_item=item %}
+                    </div>
                 {% endfor %}
             </div>
         </div>

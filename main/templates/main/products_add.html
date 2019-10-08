@@ -28,8 +28,7 @@
             <div class="card-footer d-flex justify-content-between align-items-center">
                 {% if product.quantity > 0 %}
                     {% if order %}
-                        <a href="{% url 'main:joint_item_to_product' pk=order.id product_pk=product.id %}"
-                                               class="btn btn-sm btn-outline-dark">
+                        <a class="btn btn-sm btn-outline-dark" href="{% url 'main:joint_item_to_product' pk=order.id product_pk=product.id %}">
                             Добавить в заказ
                         </a>
                     {% else %}

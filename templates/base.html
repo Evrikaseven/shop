@@ -5,8 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>
         {% block title %}
             Test Shop Title
@@ -20,8 +19,8 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
-
-<nav class="navbar navbar-expand-lg navbar-light my-2 bg-lg">
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light my-2 bg-lg">
     <div class="container">
         <a class="navbar-brand" href="{% url 'main:index' %}">{{ shop_title }}</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
@@ -83,7 +82,7 @@
                         </div>
                     </li>
                 {% else %}
-                    <div class="btn-group">
+                    <div class="btn-group my-2">
                         <a class="btn btn-sm btn-outline-secondary " href="{% url 'main:signup' %}">Регистрация</a>
                         <a class="btn btn-sm btn-outline-secondary" href="{% url 'main:login' %}">Войти</a>
                     </div>
@@ -93,11 +92,11 @@
     </div>
 </nav>
 
-<body class="bg-light">
+
 {% block content %}
     No content
 {% endblock %}
-
+<footer>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
@@ -107,5 +106,6 @@
 <script src="{% static 'bootstrap-4.3.1-dist/js/bootstrap.min.js' %}"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+</footer>
 </body>
 </html>

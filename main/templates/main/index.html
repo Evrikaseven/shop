@@ -6,105 +6,23 @@
 {% block content %}
 
     <div class="container">
-    <nav class="navbar navbar-expand-md navbar-light border-bottom">
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a href="{% url 'main:catalog' %}" class="nav-link">Каталог товаров</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'main:news' %}">Новости</a>
-                </li>
-                <li class="nav-item">
-                    {% if user.is_authenticated and pers_area_url == 'zakazschik' %}
-                        <a href="#" class="nav-link" href="#">Совместная закупка</a>
-                    {% endif %}
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="modal" data-target="#ModalWork" href="#">
-                      Рабочие графики
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="modal" data-target="#ModalContacts" href="#">
-                      Контакты
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="modal" data-target="#ModalPartnership" href="#">
-                      Условия сотрудничества
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'main:providers' %}" class="nav-link"> Наши поставщики</a>
-                </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="text">
-                <button class="btn btn-outline-secondary my-2 my-sm-0 btn-sm" type="submit">Поиск</button>
-            </form>
-        </div>
-    </nav>
-        <!-- Modal Work time-->
-        <div class="modal fade" id="ModalWork" tabindex="-1" role="dialog" aria-labelledby="ModalWorklLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="ModalWorkLabel">Рабочие графики</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <img class="d-block w-100" src="https://sun9-54.userapi.com/c851236/v851236800/1c9ee8/eZePSOebxUs.jpg">
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Закрыть</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Modal Contacts-->
-        <div class="modal fade" id="ModalContacts" tabindex="-1" role="dialog" aria-labelledby="ModalContactslLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="ModalContactslLabel">Контакты для связи</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <blockquote>
-                    <p><strong>Наталья</strong> +7 999 12345678</p>
-                    {{ contacts }}
-                </blockquote>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Закрыть</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Modal Partnership-->
-        <div class="modal fade" id="ModalPartnership" tabindex="-1" role="dialog" aria-labelledby="ModalPartnershipLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="ModalPartnershipLabel">Условия сотрудничества:</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                {{ partnership }}
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Закрыть</button>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div class="nav-scroller py-1 mb-2">
+        <nav class="nav d-flex justify-content-between">
+          <a class="p-2 text-muted" href="{% url 'main:catalog' %}">Каталог товаров</a>
+          <a class="p-2 text-muted" href="{% url 'main:news' %}">Новости</a>
+          <a class="p-2 text-muted" data-toggle="modal" data-target="#ModalWork" href="#">Рабочие графики</a>
+          <a class="p-2 text-muted" data-toggle="modal" data-target="#ModalContacts" href="#">Контакты</a>
+          <a class="p-2 text-muted" data-toggle="modal" data-target="#ModalPartnership" href="#">Условия сотрудничества</a>
+          <a class="p-2 text-muted" href="{% url 'main:providers' %}">Наши поставщики</a>
+        </nav>
+      </div>
+
+        {% include 'main/include/modal_window_template.html' with title="Рабочие графики" modal_lable="ModalWork" modal_body="<img class=\"d-block w-100\" src=\"https://sun9-54.userapi.com/c851236/v851236800/1c9ee8/eZePSOebxUs.jpg\">" %}
+
+        {% include 'main/include/modal_window_template.html' with title="Контакты" modal_lable="ModalContacts" modal_body=contacts %}
+
+        {% include 'main/include/modal_window_template.html' with title="Условия сотрудничества" modal_lable="ModalPartnership" modal_body="sadfgasf {{ announcement }} <p>" %}
+
         {# Announcement#}
          <div class="jumbotron jumbotron-fluid mt-3 p-md-3 text-secondary rounded bg-lg">
             <div class="col-md-6 px-0">

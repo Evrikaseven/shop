@@ -6,14 +6,16 @@
 
     <h3 class="font-weight-normal text-center py-3 border-bottom" style="margin-block-start: 0;  margin-block-end: 0;">
         Каталог товаров для совместных закупок</h3>
-    <div class="bg-light mt-3">
-        <div class="container my-3 p-3 bg-white rounded shadow-sm">
+    <div class="container">
             <div class="row">
 
                 {% for p in products %}
 
-                    <div class="col-md-3">
+
+                    <div class="col-md-3 mt-2">
                         <div class="card mb-3 shadow-sm">
+{#                    {% include 'main/include/item_card_img_template.html' with order_item=p %}#}
+
                             <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
                                  xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
                                  focusable="false" role="img" aria-label="Placeholder: Thumbnail">
@@ -52,7 +54,6 @@
 
             </div>
         </div>
-    </div>
 
 
 {% endblock content %}
