@@ -77,19 +77,22 @@ class OrderCreateStatusOnlyAllowUpdateViewMixin(LoginRolesOwnerRequiredUpdateVie
 
     def _is_it_allowed_to_update_order(self, **kwargs):
         pk = kwargs.get('pk') or kwargs.get('id')
+        order = None
+
         if self.model is Order:
             order = self.model.objects.get(pk=pk)
-            if (order.status != OrderStatuses.CREATED and
-                    self.user.role in self.roles_allowed_to_update_order_in_create_status_only):
-                return False
         elif self.model is OrderItem:
             if hasattr(self, 'order_id') and self.order_id:
                 order = Order.objects.get(pk=self.order_id)
             else:
                 order = self.model.objects.get(pk=pk).order
-            if (order.status != OrderStatuses.CREATED and
-                    self.user.role in self.roles_allowed_to_update_order_in_create_status_only):
-                return False
+        elif getattr(self, 'order_item', None):
+            order_item = getattr(self, 'order_item', None)
+            order = order_item.order
+
+        if (order and order.status != OrderStatuses.CREATED and
+                self.user.role in self.roles_allowed_to_update_order_in_create_status_only):
+            return False
         return super()._is_it_allowed(**kwargs)
 
     def post(self, *args, **kwargs):
