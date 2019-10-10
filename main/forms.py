@@ -435,9 +435,9 @@ class SettingsForm(forms.Form):
     extra_charge = forms.DecimalField(label='Наценка в %',
                                       min_value=0.01, max_value=100,
                                       max_digits=5, decimal_places=2)
-    announcement = forms.CharField(label='Объявление', max_length=300, widget=forms.Textarea)
-    contacts = forms.CharField(label='Контакты', max_length=300, widget=forms.Textarea)
-    partnership = forms.CharField(label='Сотрудничество', max_length=300, widget=forms.Textarea)
+    announcement = forms.CharField(label='Объявление', max_length=300, widget=forms.Textarea, required=False)
+    contacts = forms.CharField(label='Контакты', max_length=300, widget=forms.Textarea, required=False)
+    partnership = forms.CharField(label='Сотрудничество', max_length=300, widget=forms.Textarea, required=False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
