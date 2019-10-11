@@ -78,6 +78,7 @@ header{
   -ms-flex: 1;
   flex: 1;
 }
+
 @media (min-width: 768px) {
   .flex-md-equal > * {
     -ms-flex: 1;
@@ -111,4 +112,12 @@ header{
 
 .bg-lg{
     background-color:  #e9ecef;
+}
+
+.example {
+    width: 650px;
+}
+
+@media only screen and (min-width: 600px) {
+  .example {width: 400px;}
 }

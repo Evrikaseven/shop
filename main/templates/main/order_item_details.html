@@ -10,35 +10,14 @@
 
     <hr class="mb-4">
 
-    <div class="container my-3 p-3 bg-white rounded shadow-sm">
+    <div class="container">
         <div class="row">
-            <div class="col-3 text-center">
+            <div class="col-md-3 mb-3">
                 <a href="{{ MEDIA_URL }}{{ product_image }}">
-                    <img src="{{ MEDIA_URL }}{{ product_image }}" class="mb-3" id="id_image" height="200" width="200">
+                    <img src="{{ MEDIA_URL }}{{ product_image }}" class="card-img">
                 </a>
-
-                <div class="text-center">
-                    {% if order_item.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL %}
-                        {% if order_item.parent %}
-                            <a class="btn btn-outline-dark btn-sm"
-                               href="{% url 'main:order_item_details' pk=order_item.parent.pk %}">
-                                Заменяемый товар
-                            </a>
-                        {% endif %}
-
-                        {% if child_order_item %}
-                            <a class="btn btn-outline-dark btn-sm"
-                               href="{% url 'main:order_item_details' pk=child_order_item.pk %}">
-                                Замена</a>
-                        {% else %}
-                            <a class="btn btn-outline-dark btn-sm"
-                               href="{% url 'main:replacement_order_item' pk=order_item.pk %}">
-                                Добавить замену</a>
-                        {% endif %}
-                    {% endif %}
-                </div>
             </div>
-            <div class="col">
+            <div class="col-md-9">
                 <form class="needs-validation" id="form_order" action="" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
 
@@ -186,6 +165,7 @@
             </div>
         </div>
     </div>
+    <hr>
     <div class="mb-4 text-center">
         <button class="btn btn-secondary btn-sm" type="submit" form="form_order">Сохранить</button>
         {% if user_role == roles.ZAKUPSCHIK %}
