@@ -124,22 +124,19 @@
                               </div>
                           </div>
 
-                  <div class="ml-auto example" >
-                    <div class="row">
-                        <div class="text-right">
-                            <button type="submit" class="btn btn-secondary mr-2 " form="noticeForm">Сохранить</button>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-secondary" form="noticeForm">Сохранить</button>
                         </div>
                          {% if messages %}
                             {% for message in messages %}
                                  <div class="toast" data-delay="1500" role="alert" aria-live="assertive" aria-atomic="true">
-                                     <div class="toast-body">
+                                     <div class="toast-body text-white bg-success">
                                          {{ message }}
                                      </div>
                                  </div>
                             {% endfor %}
                          {% endif %}
 
-                    </div>
                   </form>
 
               </div>

@@ -152,12 +152,13 @@ class OrdersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, Templa
         return super().dispatch(request, *args, **kwargs)
 
 
-class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, UpdateView):
+class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, SuccessMessageMixin, UpdateView):
     template_name = 'main/order_details.html'
     form_class = OrderForm
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
     allowed_non_owner_roles = (Roles.ZAKUPSCHIK, )
     model = _models.Order
+    success_message = 'Настройки сохранены'
 
     def get_success_url(self):
         return reverse_lazy('main:order_details', kwargs={'pk': self.kwargs['pk']})
