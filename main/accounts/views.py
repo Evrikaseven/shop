@@ -11,7 +11,7 @@ from django.contrib.auth.views import (
 from django.urls import reverse_lazy
 from .forms import UserSignUpForm, CustomPasswordResetForm
 from main.models import User
-from main.core.utils import user_data_email
+from main.emails import user_data_email
 from main.core.view_mixins import CommonContextViewMixin
 from main.core.constants import SHOP_TITLE
 

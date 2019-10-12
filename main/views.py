@@ -4,7 +4,6 @@ from django.views.generic.edit import CreateView, UpdateView, FormView, DeleteVi
 from django.views.generic.list import ListView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
-from django.conf import settings
 from main.core.view_mixins import (
     LoginRolesRequiredViewMixin,
     LoginRolesOwnerRequiredUpdateViewMixin,
@@ -50,6 +49,7 @@ class IndexView(CommonContextViewMixin, TemplateView):
         context['announcement'] = _models.SettingOptionHandler('announcement').value
         context['contacts'] = _models.SettingOptionHandler('contacts').value
         context['partnership'] = _models.SettingOptionHandler('partnership').value
+        context['work_schedule'] = _models.SettingOptionHandler('work_schedule').value
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -184,7 +184,6 @@ class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
                                                                     DeliveryTypes.POST_MAIL)
         context['order'] = self.object
         context['SHOPPING_TYPES'] = ShoppingTypes
-        context['MEDIA_URL'] = settings.MEDIA_URL
         context['receipts'] = _models.Receipt.objects.filter(order=self.object.id)
         return context
 
@@ -229,7 +228,6 @@ class JointReceiptForOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, Common
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['order'] = _models.Order.objects.get(id=self.order_id)
-        # context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -259,7 +257,6 @@ class NewOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['order'] = _models.Order.objects.get(id=self.order_id)
-        # context['MEDIA_URL'] = settings.MEDIA_URL
         context['order_items_statuses_list'] = list(OrderItemStatuses)
         context['purchase_and_delivery_types_list'] = list(PurchaseAndDeliveryTypes)
         return context
@@ -294,7 +291,6 @@ class NewJointOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonCon
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['product'] = _models.Product.objects.get(id=self.product_id)
-        # context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -332,7 +328,6 @@ class OrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextView
         context['SHOPPING_TYPES'] = ShoppingTypes
         context['child_order_item'] = getattr(self.object, 'orderitem', None)
         context['product_image'] = self.object.product.image
-        context['MEDIA_URL'] = settings.MEDIA_URL
         context['order_items_statuses_list'] = list(OrderItemStatuses)
         context['purchase_and_delivery_types_list'] = list(PurchaseAndDeliveryTypes)
         return context
@@ -365,7 +360,6 @@ class ReplacementOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, Common
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['product_image'] = self.order_item.product.image
-        context['MEDIA_URL'] = settings.MEDIA_URL
         context['order'] = self.order_item.order
         context['order_items_statuses_list'] = list(OrderItemStatuses)
         context['purchase_and_delivery_types_list'] = list(PurchaseAndDeliveryTypes)
@@ -387,7 +381,6 @@ class DeleteOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonConte
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['MEDIA_URL'] = settings.MEDIA_URL
         context['order_item'] = self.object
         return context
 
@@ -402,7 +395,6 @@ class DeleteProductView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContext
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['MEDIA_URL'] = settings.MEDIA_URL
         context['product'] = self.object
         return context
 
@@ -420,7 +412,6 @@ class CatalogOrderItems(LoginRolesRequiredViewMixin, CommonContextViewMixin, Lis
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['products'] = _models.Product.objects.get_joint_products()
-        context['MEDIA_URL'] = settings.MEDIA_URL
         context['order'] = _models.Order.objects.get(pk=self.order_id) if self.order_id else None
         return context
 
@@ -439,7 +430,6 @@ class ProductsListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, Temp
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['products'] = _models.Product.objects.get_joint_products()
-        context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
 
@@ -458,7 +448,6 @@ class ProductsAddToOrderView(LoginRolesRequiredViewMixin, CommonContextViewMixin
         context = super().get_context_data(**kwargs)
         context['product'] = _models.Product.objects.get(id=self.product_id)
         context['order'] = _models.Order.objects.get(id=self.order_id) if self.order_id else None
-        context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -501,7 +490,6 @@ class UpdateJointProductView(LoginRolesRequiredViewMixin, CommonContextViewMixin
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
 
@@ -517,7 +505,6 @@ class NewsView(CommonContextViewMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['news'] = _models.News.objects.all()
-
         return context
 
 
@@ -532,11 +519,6 @@ class SettingsView(LoginRolesRequiredViewMixin, CommonContextViewMixin, SuccessM
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['news'] = _models.News.objects.all()
-        return context
 
 
 # Resources

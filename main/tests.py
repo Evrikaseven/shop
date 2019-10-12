@@ -9,7 +9,9 @@ from main.models import (
     Order,
     OrderItem,
     Product,
-    SettingOptionHandler
+    SettingOptionHandler,
+    SettingOption,
+    SettingOptionImages,
 )
 
 
@@ -68,6 +70,13 @@ class BaseConfiguration(TestCase):
         self.extra_charge = SettingOptionHandler('extra_charge').value
 
         self.client = Client()
+
+    def tearDown(self) -> None:
+        Order.objects.all().delete()
+        OrderItem.objects.all().delete()
+        Product.objects.all().delete()
+        SettingOption.objects.all().delete()
+        SettingOptionImages.objects.all().delete()
 
     @staticmethod
     def get_image_file(name='test.png', ext='png', size=(50, 50), color=(256, 0, 0)):

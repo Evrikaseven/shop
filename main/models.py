@@ -18,9 +18,11 @@ from main.core.constants import (
     DeliveryTypes,
     DELIVERY_PRICES,
 )
+from main.core.utils import get_file_hash
 
 MEDIA_PROD_IMAGE_DIR_PREFFIX = 'product_images'
 MEDIA_ORDER_DIR_PREFFIX = 'order_'
+MEDIA_SETTINGS_IMAGES_DIR_PREFFIX = 'settings_images'
 
 
 # Create your models here.
@@ -177,10 +179,12 @@ class Order(ModelWithTimestamp, ModelWithUser):
 
 class OrderItemManager(models.Manager):
 
-    def get_list(self, **kwargs):
+    @staticmethod
+    def get_list(**kwargs):
         return OrderItem.objects.filter(state__in=(OrderItemStates.ACTIVE, OrderItemStates.USED), **kwargs)
 
-    def get_used(self, **kwargs):
+    @staticmethod
+    def get_used(**kwargs):
         return OrderItem.objects.filter(state=OrderItemStates.USED, **kwargs)
 
 
@@ -229,9 +233,18 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
         return bool(self.parent)
 
 
+def get_path_to_setting_images(instance, name):
+    return '{}/{}'.format(MEDIA_SETTINGS_IMAGES_DIR_PREFFIX, name)
+
+
+class SettingOptionImages(models.Model):
+    image = models.ImageField(upload_to=get_path_to_setting_images)
+
+
 class SettingOptionManager(models.Manager):
 
-    def get_by_name(self, name):
+    @staticmethod
+    def get_by_name(name):
         try:
             instance = SettingOption.objects.get(s_name=name)
         except ObjectDoesNotExist:
@@ -245,6 +258,13 @@ class SettingOption(models.Model):
     s_name = models.CharField(max_length=100, primary_key=True)
     s_value = models.TextField(blank=True, default='')
 
+    @property
+    def images(self):
+        if self.s_value:
+            pks = [int(pk) for pk in self.s_value.split(',')]
+            return SettingOptionImages.objects.filter(pk__in=pks)
+        return None
+
 
 class SettingOptionHandler(object):
 
@@ -256,15 +276,38 @@ class SettingOptionHandler(object):
         val = self.instance.s_value.strip()
         name = self.instance.s_name
         if name == 'extra_charge':
-            if val == '':
-                return Decimal(0)
-            return Decimal(val)
+            val = Decimal(val) if val else Decimal(0)
+        elif name == 'work_schedule':
+            val = self.instance.images
+            if val:
+                val = val[0].image
         return val
 
     @value.setter
     def value(self, value):
-        self.instance.s_value = value
-        self.instance.save()
+        if self.instance.s_name == 'work_schedule':
+            if self.instance.s_value:
+                obj = self.instance.images[0]
+                if obj.image:
+                    old_image_hash = get_file_hash(obj.image)
+                    new_image_hash = get_file_hash(value)
+                    if old_image_hash != new_image_hash:
+                        obj.image.delete()
+                        obj.image = value
+                        obj.save()
+                else:
+                    obj.image = value
+                    obj.save()
+            else:
+                if value:
+                    with transaction.atomic():
+                        image = SettingOptionImages(image=value)
+                        image.save()
+                        self.instance.s_value = str(image.pk)
+                        self.instance.save()
+        else:
+            self.instance.s_value = value
+            self.instance.save()
 
 
 class News(models.Model):

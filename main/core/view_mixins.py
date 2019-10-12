@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import AccessMixin
+from django.conf import settings
 from main.core.constants import Roles, OrderStatuses, SHOP_TITLE
 from main.models import User, Order, OrderItem
 
@@ -113,6 +114,7 @@ class CommonContextViewMixin:
             context['user_is_authenticated'] = True
             context['user_first_name'] = self.user.first_name
             context['user_last_name'] = self.user.last_name
+            context['MEDIA_URL'] = settings.MEDIA_URL
         return context
 
     def dispatch(self, request, *args, **kwargs):
