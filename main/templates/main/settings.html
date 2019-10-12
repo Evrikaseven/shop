@@ -10,250 +10,101 @@
     <hr class="mb-4">
 
     <div class="container ">
-                <div class="tab-content" id="v-pills-tabContent">
-              <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-                  <form id="noticeForm" method="post">
+        <div class="tab-content" id="v-pills-tabContent">
+            <div class="tab-pane fade show active" id="nav-home" role="tabpanel"
+                 aria-labelledby="nav-home-tab">
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="toast" data-delay="1500" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-body text-white bg-success">
+                                {{ message }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form id="noticeForm" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="id_announcement">Объявление для главной страницы сайта:</label>
                         <textarea class="form-control" id="id_announcement"
-                              name="{{ form.announcement.name }}" placeholder="заметка по товару и пр."
-                              rows="3">
-                        {{ form.announcement.initial }}</textarea>
+                                  name="{{ form.announcement.name }}" placeholder="заметка по товару и пр."
+                                  rows="3">
+                                        {{ form.announcement.initial }}
+                                    </textarea>
                     </div>
-                      <div class="form-group">
-                            <label for="id_contacts">Контакты:</label>
-                            <textarea class="form-control" id="id_contacts"
+                    <div class="form-group">
+                        <label for="id_contacts">Контакты:</label>
+                        <textarea class="form-control" id="id_contacts"
                                   name="{{ form.contacts.name }}" placeholder="заметка по товару и пр."
                                   rows="3">
-                            {{ form.contacts.initial }}</textarea>
-                      </div>
-                      <div class="form-group">
-                            <label for="id_partnership">Условия сотрудничества:</label>
-                            <textarea class="form-control" id="id_partnership"
+                                        {{ form.contacts.initial }}
+                                    </textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_partnership">Условия сотрудничества:</label>
+                        <textarea class="form-control" id="id_partnership"
                                   name="{{ form.partnership.name }}" placeholder="заметка по товару и пр."
                                   rows="3">
-                            {{ form.partnership.initial }}</textarea>
-                      </div>
+                                        {{ form.partnership.initial }}
+                                    </textarea>
+                    </div>
 
-
-                      <div class="form-group row">
-                            <label for="id_extra_charge" class="col-3 col-form-label">Наценка для всех заказов в %</label>
-                            <div class="col-9">
-                                <input class="form-control" id="id_extra_charge" type="number" name="{{ form.extra_charge.name }}"
-                                       value="{{ form.extra_charge.initial }}" required=""
-                                        {% if form.extra_charge.field.disabled %}
-                                       disabled=""
-                                        {% endif %}
-                                >
+                    <div class="form-group">
+                        <label for="id_extra_charge">Наценка для всех заказов в
+                            %</label>
+                        <input class="form-control" id="id_extra_charge" type="number"
+                               name="{{ form.extra_charge.name }}"
+                               value="{{ form.extra_charge.initial }}" required=""
+                                {% if form.extra_charge.field.disabled %}
+                               disabled=""
+                                {% endif %}
+                        >
+                        {% if form.extra_charge.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.extra_charge.errors }}
                             </div>
-                            {% if form.extra_charge.errors %}
-                                <div class="alert alert-danger">
-                                    {{ form.extra_charge.errors }}
-                                </div>
-                            {% endif %}
-                        </div>
+                        {% endif %}
+                    </div>
 
+                    <div class="form-group">
+                        <label for="id_work_schedule" class="mb-3">Загрузить изображение с графиком
+                            работы</label>
 
-
-                  {% for n in news %}
-                        <div class="flex-md-row mb-4">
-                            <a class="text-dark" href="#" data-toggle="modal" data-target="#ModalNews{{ forloop.counter }}">{{ n.published }} {{n.title }}</a>
-                        </div>
-                        <!-- Modal for News -->
-                        <div class="modal fade" id="ModalNews{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="ModalNewslLabel{{ forloop.counter }}" aria-hidden="true">
-                          <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                              <div class="modal-header">
-                                <h5 class="modal-title" id="ModalNewsLabel{{ forloop.counter }}">Изменить новость</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                  <span aria-hidden="true">&times;</span>
-                                </button>
-                              </div>
-                              <div class="modal-body">
-                                  <h3 class="mb-0">
-                                    <a class="text-dark" href="#">{{ n.title }}</a>
-                                  </h3>
-                                  <div class="mb-3 text-muted">{{ n.published|date:"d.m.Y" }}</div>
-                                  <p class="card-text mb-auto">{{ n.content }}</p>
-                              </div>
-                              <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Сохранить</button>
-                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Удалить</button>
-                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Отмена</button>
-                              </div>
+                        {% if form.work_schedule.initial %}
+                            <div class="col-md-3 m-2">
+                                <a href="{{ MEDIA_URL }}{{ form.work_schedule.initial }}">
+                                    <img src="{{ MEDIA_URL }}{{ form.work_schedule.initial }}"
+                                         alt="График работы" height="100" width="100">
+                                </a>
                             </div>
-                          </div>
+                        {% endif %}
+
+                        <div class="custom-file">
+                            <input class="custom-file-input" type="file" name="work_schedule"
+                                   id="id_work_schedule" accept="image/*"
+                                    {% if form.work_schedule.field.disabled %}
+                                   disabled=""
+                                    {% endif %}
+                            >
+                            <label class="custom-file-label text-truncate">Выберите файл</label>
                         </div>
-                    {% endfor %}
+                    </div>
 
-                  <div class="flex-md-row mb-4">
-                            <button class="btn btn-secondary btn-sm" href="#" data-toggle="modal" data-target="#ModalNew">Добавить новость</button>
-                        </div>
-                        <!-- Modal for News -->
-                        <div class="modal fade" id="ModalNew" tabindex="-1" role="dialog" aria-labelledby="ModalNewlLabel" aria-hidden="true">
-                          <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                              <div class="modal-header">
-                                <h5 class="modal-title" id="ModalNewLabel">Добавть новость на сайт</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                  <span aria-hidden="true">&times;</span>
-                                </button>
-                              </div>
-                              <div class="modal-body">
-                                  <h3 class="mb-0">
-                                    <a class="text-dark" href="#">{{ n.title }}</a>
-                                  </h3>
-                                  <div class="mb-3 text-muted">{{ n.published|date:"d.m.Y" }}</div>
-                                  <p class="card-text mb-auto">{{ n.content }}</p>
-                              </div>
-                              <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Сохранить</button>
-                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Отмена</button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                    <div class="my-3 text-center">
+                        <button type="submit" class="btn btn-secondary" form="noticeForm">Сохранить</button>
+                    </div>
 
-
-                          <div class="form-group">
-                              <label for="id_image" class="mb-3">Загрузить изображение с графиком работы</label>
-                              <div class="custom-file">
-                                  <input class="custom-file-input" type="file" name="image" accept="image/*" id="id_image">
-                                  <label class="custom-file-label text-truncate">выберите файл</label>
-                              </div>
-                          </div>
-
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-secondary" form="noticeForm">Сохранить</button>
-                        </div>
-                         {% if messages %}
-                            {% for message in messages %}
-                                 <div class="toast" data-delay="1500" role="alert" aria-live="assertive" aria-atomic="true">
-                                     <div class="toast-body text-white bg-success">
-                                         {{ message }}
-                                     </div>
-                                 </div>
-                            {% endfor %}
-                         {% endif %}
-
-                  </form>
-
-              </div>
-{#              <div class="tab-pane fade" id="nav-money" role="tabpanel" aria-labelledby="nav-money-tab">#}
-{#                        <div class="form-group row">#}
-{#                            <label for="id_extra_charge" class="col-3 col-form-label">Наценка для всех заказов в %</label>#}
-{#                            <div class="col-9">#}
-{#                                <input class="form-control" id="id_extra_charge" type="number" name="{{ form.extra_charge.name }}"#}
-{#                                       value="{{ form.extra_charge.initial }}" required=""#}
-{#                                        {% if form.extra_charge.field.disabled %}#}
-{#                                       disabled=""#}
-{#                                        {% endif %}#}
-{#                                >#}
-{#                            </div>#}
-{#                            {% if form.extra_charge.errors %}#}
-{#                                <div class="alert alert-danger">#}
-{#                                    {{ form.extra_charge.errors }}#}
-{#                                </div>#}
-{#                            {% endif %}#}
-{#                        </div>#}
-{#                        <div class="my-3 text-center">#}
-{#                            <button type="submit" class="btn btn-secondary" form="noticeForm">Сохранить</button>#}
-{#                        </div>#}
-{#                  </form>#}
-{#              </div>#}
-{#              <div class="tab-pane fade" id="nav-news" role="tabpanel" aria-labelledby="nav-news-tab">#}
-{#                    {% csrf_token %}#}
-{##}
-{#                    {% for n in news %}#}
-{#                        <div class="flex-md-row mb-4">#}
-{#                            <a class="text-dark" href="#" data-toggle="modal" data-target="#ModalNews{{ forloop.counter }}">{{ n.published }} {{n.title }}</a>#}
-{#                        </div>#}
-{#                        <!-- Modal for News -->#}
-{#                        <div class="modal fade" id="ModalNews{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="ModalNewslLabel{{ forloop.counter }}" aria-hidden="true">#}
-{#                          <div class="modal-dialog modal-dialog-centered" role="document">#}
-{#                            <div class="modal-content">#}
-{#                              <div class="modal-header">#}
-{#                                <h5 class="modal-title" id="ModalNewsLabel{{ forloop.counter }}">Изменить новость</h5>#}
-{#                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">#}
-{#                                  <span aria-hidden="true">&times;</span>#}
-{#                                </button>#}
-{#                              </div>#}
-{#                              <div class="modal-body">#}
-{#                                  <h3 class="mb-0">#}
-{#                                    <a class="text-dark" href="#">{{ n.title }}</a>#}
-{#                                  </h3>#}
-{#                                  <div class="mb-3 text-muted">{{ n.published|date:"d.m.Y" }}</div>#}
-{#                                  <p class="card-text mb-auto">{{ n.content }}</p>#}
-{#                              </div>#}
-{#                              <div class="modal-footer">#}
-{#                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Сохранить</button>#}
-{#                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Удалить</button>#}
-{#                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Отмена</button>#}
-{#                              </div>#}
-{#                            </div>#}
-{#                          </div>#}
-{#                        </div>#}
-{#                    {% endfor %}#}
-{#                        <div class="flex-md-row mb-4">#}
-{#                            <button class="btn btn-secondary btn-sm" href="#" data-toggle="modal" data-target="#ModalNew">Добавить новость</button>#}
-{#                        </div>#}
-{#                        <!-- Modal for News -->#}
-{#                        <div class="modal fade" id="ModalNew" tabindex="-1" role="dialog" aria-labelledby="ModalNewlLabel" aria-hidden="true">#}
-{#                          <div class="modal-dialog modal-dialog-centered" role="document">#}
-{#                            <div class="modal-content">#}
-{#                              <div class="modal-header">#}
-{#                                <h5 class="modal-title" id="ModalNewLabel">Добавть новость на сайт</h5>#}
-{#                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">#}
-{#                                  <span aria-hidden="true">&times;</span>#}
-{#                                </button>#}
-{#                              </div>#}
-{#                              <div class="modal-body">#}
-{#                                  <h3 class="mb-0">#}
-{#                                    <a class="text-dark" href="#">{{ n.title }}</a>#}
-{#                                  </h3>#}
-{#                                  <div class="mb-3 text-muted">{{ n.published|date:"d.m.Y" }}</div>#}
-{#                                  <p class="card-text mb-auto">{{ n.content }}</p>#}
-{#                              </div>#}
-{#                              <div class="modal-footer">#}
-{#                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Сохранить</button>#}
-{#                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Отмена</button>#}
-{#                              </div>#}
-{#                            </div>#}
-{#                          </div>#}
-{#                        </div>#}
-{#              </div>#}
-{#              <div class="tab-pane fade" id="nav-work" role="tabpanel" aria-labelledby="nav-work-tab">#}
-{#                      <form class="needs-validation" id="receipt" action="" method="POST" enctype="multipart/form-data">#}
-{#                          {% csrf_token %}#}
-{#                          <div class="form-group">#}
-{#                              <label for="id_image" class="mb-3">Загрузить изображение с графиком работы</label>#}
-{#                              <div class="custom-file">#}
-{#                                  <input class="custom-file-input" type="file" name="image" accept="image/*" id="id_image">#}
-{#                                  <label class="custom-file-label text-truncate">выберите файл</label>#}
-{#                              </div>#}
-{#                          </div>#}
-{#                      </form>#}
-{#                  <div class="form-actions text-center">#}
-{#                      <button type="submit" class="btn btn-secondary btn-sm" form="receipt">Сохранить</button>#}
-{#                  </div>#}
-{#              </div>#}
-{#              <div class="tab-pane fade" id="nav-deal" role="tabpanel" aria-labelledby="nav-deal-tab">...</div>#}
-{#              <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>#}
-              </div>
+                </form>
             </div>
-
-                {# Popup messasges #}
-
         </div>
+    </div>
 
-          </div>
-{#<script src="{% static '/js/name_to_photo.js' %}"></script>#}
-
-
+    {# Popup messasges #}
     <script>
-            $(document).ready(function(){
-                $('.toast').toast('show');
-            });
+        $(document).ready(function () {
+            $('.toast').toast('show');
+        });
     </script>
 {% endblock content %}

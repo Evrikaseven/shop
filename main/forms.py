@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
-from main.core.utils import user_data_email, order_data_email
+from main.emails import user_data_email, order_data_email
 from django.db import transaction
 from .models import (
     Provider,
@@ -438,11 +438,14 @@ class SettingsForm(forms.Form):
     announcement = forms.CharField(label='Объявление', max_length=300, widget=forms.Textarea, required=False)
     contacts = forms.CharField(label='Контакты', max_length=300, widget=forms.Textarea, required=False)
     partnership = forms.CharField(label='Сотрудничество', max_length=300, widget=forms.Textarea, required=False)
+    work_schedule = forms.ImageField(label='Фото графика работы', required=False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         for field in self.fields:
-            self.fields[field].initial = SettingOptionHandler(field).value
+            field_val = self.fields[field]
+            # if not isinstance(field_val, (forms.ImageField, forms.FileField)):
+            field_val.initial = SettingOptionHandler(field).value
 
     def clean_extra_charge(self):
         value = self.cleaned_data['extra_charge']
