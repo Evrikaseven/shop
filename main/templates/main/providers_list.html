@@ -22,7 +22,7 @@
         <tbody>
         {% for p in providers %}
         <tr>
-            <td>{{ p.space }}</td>
+            <td>{{ p.place }}</td>
             <td><img src="{{ p.picture }}" alt="ВК картинка"></td>
             <td><a href="{{p.vk_link}}">{{ p.name }}</a></td>
             <td>{{ p.description }}</td>
@@ -31,7 +31,7 @@
         {% endfor %}
         </tbody>
     </table>
-</div>
+    </div>
     {% if user_role == roles.ADMINISTRATOR %}
         <div class="form-actions text-center">
             <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#exampleModal">
@@ -50,15 +50,14 @@
         </button>
       </div>
       <div class="modal-body">
-          <form type="post" id="submitForm">
+          <form method="POST" id="submitForm">
               {% csrf_token %}
               {{ form }}
           </form>
-
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary" form="submitForm">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+        <button type="submit" class="btn btn-primary" form="submitForm">Сохранить изменения</button>
       </div>
     </div>
   </div>
