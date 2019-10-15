@@ -460,6 +460,9 @@ class SettingsForm(forms.Form):
 
 
 class NewsForm(forms.Form):
+    title = forms.CharField(label="Заголовок")
+    content = forms.CharField(label="Новость", widget=forms.Textarea)
+
     class Meta:
         model = News
         fields = ('title', 'content', 'published')

@@ -39,27 +39,50 @@
             </button>
         </div>
     {% endif %}
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-          <form method="POST" id="submitForm">
-              {% csrf_token %}
-              {{ form }}
-          </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-        <button type="submit" class="btn btn-primary" form="submitForm">Сохранить изменения</button>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form method="POST" id="submitForm">
+                  {% csrf_token %}
+                  <div class="form-group row px-1">
+                      <label class="col-3 col-form-label" for="id_name">Имя:</label>
+                      <input class="col-9 form-control" type="text" name="name" id="id_name">
+                  </div>
+                  <div class="form-group row px-1">
+                      <label class="col-3 col-form-label" for="id_vk_link">Ссылка Вконтакте:</label>
+                      <input class="col-9 form-control" type="text" name="vk_link" id="id_vk_link">
+                  </div>
+                  <div class="form-group row px-1">
+                      <label class="col-3 col-form-label" for="id_place">Место:</label>
+                      <input class="col-9 form-control" type="text" name="place" id="id_place">
+                  </div>
+                  <div class="form-group row px-1">
+                      <label class="col-3 col-form-label" for="id_description">Описание:</label>
+                      <textarea class="col-9 form-control" name="description" id="id_description"></textarea>
+                  </div>
+                  <div class="form-group row px-1">
+                      <label class="col-3 col-form-label" for="id_picture">Изображение:</label>
+                      <input class="col-9 form-control" type="text" name="picture" id="id_picture">
+                  </div>
+                  <div class="form-group row px-1">
+                      <label class="col-3 col-form-label" for="id_product_type">Чем торгует:</label>
+                      <input class="col-9 form-control" type="text" name="product_type" id="id_product_type">
+                  </div>
+              </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+            <button type="submit" class="btn btn-primary" form="submitForm">Сохранить</button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 {% endblock content %}

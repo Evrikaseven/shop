@@ -30,6 +30,7 @@ urlpatterns = [
     path('buyouts/', main_views.BuyoutsListView.as_view(), name='buyouts'),
     path('help/', main_views.HelpView.as_view(), name='help'),
     path('news/', main_views.NewsView.as_view(), name='news'),
+    path('edit_news/', main_views.EditNewsView.as_view(), name='edit_news'),
 
     # Order related
     path('new_order/', main_views.NewOrderView.as_view(), name='new_order'),

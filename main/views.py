@@ -523,6 +523,17 @@ class NewsView(CommonContextViewMixin, TemplateView):
         return context
 
 
+class EditNewsView(CommonContextViewMixin, TemplateView):
+    template_name = 'main/edit_news.html'
+    form_class = NewsForm
+    models = _models.News
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['news'] = _models.News.objects.all()
+        return context
+
+
 class SettingsView(LoginRolesRequiredViewMixin, CommonContextViewMixin, SuccessMessageMixin, FormView):
     template_name = 'main/settings.html'
     form_class = SettingsForm

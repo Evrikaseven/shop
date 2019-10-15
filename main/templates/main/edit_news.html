@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Заказы{% endblock title %}
+
+
+{% block content %}
+    <h3 class="font-weight-normal text-center text-muted" style="color: #6c757d">
+        Редактирование новостей
+    </h3>
+    <div class="container">
+              <form method="POST" id="submitForm">
+              {% csrf_token %}
+              {{ form }}
+          </form>
+    {% for n in news %}
+        <form type="post">
+            {% csrf_token %}
+
+                                <button type="button" class="btn btn-secondary btn-sm">Изменить</button>
+                                <button type="button" class="btn btn-secondary btn-sm">Удалить</button>
+
+        </form>
+    {% endfor %}
+    </div>
+{% endblock content %}
