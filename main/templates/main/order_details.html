@@ -225,12 +225,16 @@
                                             </em>
                                         </div>
                                     {% endif %}
-                                    {% if order_item.product.shopping_type == SHOPPING_TYPES.JOINT %}
-                                        {% if order_item.product.quantity == 0 %}
-                                            Выкуп собран
-                                        {% else %}
-                                            Выкуп в процессе сборки
+                                    {% if order_item.product %}
+                                        {% if order_item.product.shopping_type == SHOPPING_TYPES.JOINT %}
+                                            {% if order_item.product.quantity == 0 %}
+                                                Выкуп собран
+                                            {% else %}
+                                                Выкуп в процессе сборки
+                                            {% endif %}
                                         {% endif %}
+                                    {% else %}
+                                        Товар удалён <br>
                                     {% endif %}
 
 

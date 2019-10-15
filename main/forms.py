@@ -106,17 +106,18 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
     def pay_order(self):
         self.instance.status = OrderStatuses.PAYING_TO_BE_CONFIRMED
         user = self.instance.created_by
-        old_user_balance = user.balance
-        self.instance.save()
+        if user:
+            old_user_balance = user.balance
+            self.instance.save()
 
-        if old_user_balance != user.balance:
-            user_data_email(user=user,
-                            subject='Баланс пользователя изменен',
-                            extra_params={'balance_changed': True})
+            if old_user_balance != user.balance:
+                user_data_email(user=user,
+                                subject='Баланс пользователя изменен',
+                                extra_params={'balance_changed': True})
 
-        order_data_email(order=self.instance,
-                         subject='Новый заказ №{}'.format(self.instance.pk),
-                         extra_params={'status_changed': True})
+            order_data_email(order=self.instance,
+                             subject='Новый заказ №{}'.format(self.instance.pk),
+                             extra_params={'status_changed': True})
 
     def clean_paid_price(self):
         paid_price = self.cleaned_data['paid_price']
@@ -134,20 +135,21 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
 
     @transaction.atomic
     def save(self, commit=True):
-        if self.status_changed:
-            order_data_email(order=self.instance,
-                             subject='Статус заказа №{} изменен'.format(self.instance.pk),
-                             extra_params={'status_changed': True})
-        if self.user_balance_delta:
-            user = self.instance.created_by
-            user.balance += self.user_balance_delta
-            user.save()
-            user_data_email(user=user,
-                            subject='Баланс пользователя изменен',
-                            extra_params={'balance_changed': True})
-        if ('delivery_address' in self.cleaned_data and self.cleaned_data['delivery_address'] and
-                self.cleaned_data['delivery_address'] != self.instance.delivery_address):
-            self.instance.delivery_address = self.cleaned_data['delivery_address']
+        user = self.instance.created_by
+        if user:
+            if self.status_changed:
+                order_data_email(order=self.instance,
+                                 subject='Статус заказа №{} изменен'.format(self.instance.pk),
+                                 extra_params={'status_changed': True})
+            if self.user_balance_delta:
+                user.balance += self.user_balance_delta
+                user.save()
+                user_data_email(user=user,
+                                subject='Баланс пользователя изменен',
+                                extra_params={'balance_changed': True})
+            if ('delivery_address' in self.cleaned_data and self.cleaned_data['delivery_address'] and
+                    self.cleaned_data['delivery_address'] != self.instance.delivery_address):
+                self.instance.delivery_address = self.cleaned_data['delivery_address']
 
         return super().save(commit=True)
 

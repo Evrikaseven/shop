@@ -57,15 +57,15 @@ class IndexView(CommonContextViewMixin, TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class ProvidersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
+class ProvidersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, CreateView):
     template_name = 'main/providers_list.html'
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
     form_class = ProviderForm
     model = _models.Provider
+    success_url = reverse_lazy('main:providers')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = self.form_class
         context['providers'] = _models.Provider.objects.all()
         return context
 
@@ -101,6 +101,20 @@ class UserDetailsView(LoginRolesOwnerRequiredUpdateViewMixin, CommonContextViewM
 
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
+
+
+class DeleteUserView(LoginRolesOwnerRequiredUpdateViewMixin, CommonContextViewMixin, DeleteView):
+    template_name = "main/delete_user.html"
+    allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+    model = _models.User
+
+    def get_success_url(self):
+        return reverse_lazy('main:index')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user_to_delete'] = self.object
+        return context
 
 
 class NewOrderView(LoginRolesRequiredViewMixin, CommonContextViewMixin, CreateView):
@@ -173,7 +187,7 @@ class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
         context['update_is_allowed'] = (self.user.role == Roles.ADMINISTRATOR or
                                         (self.user.role == Roles.ZAKAZSCHIK and
                                          self.object.status == OrderStatuses.CREATED))
-        context['user_balance'] = self.object.created_by.balance
+        context['user_balance'] = self.object.created_by.balance if self.object.created_by else 0
         context['order_statuses'] = OrderStatuses
         context['order_statuses_list'] = list(OrderStatuses)
         delivery_prices = dict(DELIVERY_PRICES)
