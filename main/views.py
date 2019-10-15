@@ -80,11 +80,12 @@ class UsersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, Templat
         return context
 
 
-class UserDetailsView(LoginRolesOwnerRequiredUpdateViewMixin, CommonContextViewMixin, UpdateView):
+class UserDetailsView(LoginRolesOwnerRequiredUpdateViewMixin, CommonContextViewMixin, SuccessMessageMixin, UpdateView):
     template_name = 'main/user_details.html'
     form_class = UserForm
     allowed_roles = (Roles.UNREGISTERED, Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
     model = _models.User
+    success_message = 'Настройки сохранены'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

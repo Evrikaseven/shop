@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Заказы{% endblock title %}
 
 {% block content %}
@@ -296,9 +296,5 @@
             </div>
         </div>
     </div>
-    <script>
-            $(document).ready(function(){
-                $('.toast').toast('show');
-            });
-    </script>
+    <script src="{% static '/js/toasts_notifications.js' %}"></script>
 {% endblock content %}

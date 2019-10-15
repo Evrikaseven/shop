@@ -1,12 +1,20 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Детальная информация{% endblock title %}
 
 {% block content %}
-
     <h3 class="font-weight-normal text-center">
         Пользователь
     </h3>
+    {% if messages %}
+       {% for message in messages %}
+            <div class="toast" data-delay="1500" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-body text-white bg-success">
+                    {{ message }}
+                </div>
+            </div>
+       {% endfor %}
+    {% endif %}
     <hr class="mb-4">
         <form class="form-signin my-3 p-3 bg-white rounded shadow-sm" name="setting"  id="setting" action="" method="POST" enctype="multipart/form-data">
            {% csrf_token %}
@@ -151,4 +159,6 @@
         </div>
     </div>
 
+    <script src="{% static '/js/toasts_notifications.js' %}"></script>
+     <script src="{% static '/js/name_to_photo.js' %}"></script>
 {% endblock content %}
