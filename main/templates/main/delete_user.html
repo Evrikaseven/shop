@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Удаление пользователя{% endblock title %}
+
+{% block content %}
+
+    <div>
+        <h3 class="font-weight-normal text-center">
+            Вы точно хотите удалить аккаунт <em><b>{{ user_to_delete.email }}</b></em>?<br>
+            После удаления восстановление данных будет невозможно!
+        </h3>
+
+        <hr class="mb-4">
+
+        <div class="container my-3 p-3 bg-white rounded shadow-sm">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-4 text-center">
+                    <button class="btn btn-outline-secondary btn-sm" type="submit">Удалить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock content %}

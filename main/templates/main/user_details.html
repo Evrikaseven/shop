@@ -156,6 +156,7 @@
         <div class="form-actions text-center">
             <button form="setting" type="submit" class="btn btn-secondary">Сохранить</button>
             <a class="btn btn-secondary" href="{% url 'main:password_change' %}">Сменить пароль</a>
+            <a class="btn btn-secondary" href="{% url 'main:delete_user' pk=object.pk %}">Удалить пользователя</a>
         </div>
     </div>
 

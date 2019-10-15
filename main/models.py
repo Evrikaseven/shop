@@ -132,11 +132,17 @@ class Order(ModelWithTimestamp, ModelWithUser):
 
     @transaction.atomic
     def update_actual_price_with_user_balance(self):
-        if self.actual_price_diff:
+        # The actual price and user balance is updated only for orders in process
+        # After it is finished it is frozen for future statistic for example
+        if self.actual_price_diff and self.status in (OrderStatuses.CREATED,
+                                                      OrderStatuses.PAYING_TO_BE_CONFIRMED,
+                                                      OrderStatuses.PAID,
+                                                      OrderStatuses.IN_PROGRESS):
             # Update user balance first
             user = self.created_by
-            user.balance += self.actual_price_diff
-            user.save()
+            if user:
+                user.balance += self.actual_price_diff
+                user.save()
             self.actual_price = self.price
             super().save(update_fields=['actual_price'])
 
@@ -171,8 +177,9 @@ class Order(ModelWithTimestamp, ModelWithUser):
         if self.actual_price_diff:
             # Update user balance first
             user = self.created_by
-            user.balance += self.actual_price_diff
-            user.save()
+            if user:
+                user.balance += self.actual_price_diff
+                user.save()
             self.actual_price = self.price
         super().save(**kwargs)
 
@@ -372,33 +379,34 @@ class Product(ModelWithTimestamp, ModelWithUser):
 
 
 def remove_product_image_from_disc(sender, **kwargs):
-    instance = kwargs['instance']
-    instance.image.delete()
+    product = kwargs['instance']
+    product.image.delete()
+    for order_item in product.orderitem_set.get_list():
+        order_item.order.update_actual_price_with_user_balance()
 
 
 def remove_receipts_images_from_disc(sender, **kwargs):
-    instance = kwargs['instance']
-    order_id = instance.id
-    directory_to_be_removed = os.path.join(settings.MEDIA_ROOT, "{}{}".format(MEDIA_ORDER_DIR_PREFFIX, order_id))
+    order = kwargs['instance']
+    directory_to_be_removed = os.path.join(settings.MEDIA_ROOT, "{}{}".format(MEDIA_ORDER_DIR_PREFFIX, order.id))
     shutil.rmtree(directory_to_be_removed, ignore_errors=True)
 
 
 @transaction.atomic
 def post_remove_order_item(sender, **kwargs):
-    instance = kwargs['instance']
-    if instance.product:
-        if instance.product.shopping_type == ShoppingTypes.INDIVIDUAL:
-            instance.product.delete()
+    order_item = kwargs['instance']
+    if order_item.product:
+        if order_item.product.shopping_type == ShoppingTypes.INDIVIDUAL:
+            order_item.product.delete()
 
-        if instance.product.shopping_type == ShoppingTypes.JOINT:
-            product = instance.product
+        if order_item.product.shopping_type == ShoppingTypes.JOINT:
+            product = order_item.product
             # Return quantity back to product
-            product.quantity += instance.quantity
+            product.quantity += order_item.quantity
             product.save()
             product.update_order_price()
-    instance.order.update_actual_price_with_user_balance()
+    order_item.order.update_actual_price_with_user_balance()
 
 
-pre_delete.connect(remove_product_image_from_disc, sender=Product)
+post_delete.connect(remove_product_image_from_disc, sender=Product)
 pre_delete.connect(remove_receipts_images_from_disc, sender=Order)
 post_delete.connect(post_remove_order_item, sender=OrderItem)
