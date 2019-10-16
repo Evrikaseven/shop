@@ -523,10 +523,12 @@ class NewsView(CommonContextViewMixin, TemplateView):
         return context
 
 
-class EditNewsView(CommonContextViewMixin, TemplateView):
+class EditNewsView(LoginRolesRequiredViewMixin, CommonContextViewMixin, FormView):
     template_name = 'main/edit_news.html'
     form_class = NewsForm
-    models = _models.News
+
+    def get_success_url(self):
+        return reverse_lazy('main:edit_news')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -465,7 +465,11 @@ class NewsForm(forms.Form):
 
     class Meta:
         model = News
-        fields = ('title', 'content', 'published')
+        fields = ('title', 'content')
+
+    @transaction.atomic
+    def save(self, commit=True):
+        return super().save(commit=commit)
 
 
 class UserForm(forms.ModelForm):

@@ -10,16 +10,81 @@
     <div class="container">
               <form method="POST" id="submitForm">
               {% csrf_token %}
-              {{ form }}
+              {{ form.as_p }}
+                  <button type="submit" class="btn btn-secondary btn-sm">Save</button>
           </form>
     {% for n in news %}
-        <form type="post">
-            {% csrf_token %}
-
-                                <button type="button" class="btn btn-secondary btn-sm">Изменить</button>
-                                <button type="button" class="btn btn-secondary btn-sm">Удалить</button>
-
-        </form>
+          <div class="small lh-125 border-bottom border-gray">
+              <a class="d-flex text-dark pt-3" href="#" data-toggle="modal" data-target="#ModalNews{{ forloop.counter }}">
+                  <strong class="text-gray-dark mx-3">{{ n.published }}</strong>
+                  <p>{{n.title }}</p></a>
+          </div>
+                                <!-- Modal for News -->
+                        <div class="modal fade" id="ModalNews{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="ModalNewslLabel{{ forloop.counter }}" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="ModalNewsLabel{{ forloop.counter }}">Изменить новость</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                  <h3 class="mb-0">
+                                    <a class="text-dark" href="#">{{ n.title }}</a>
+                                  </h3>
+                                  <div class="mb-3 text-muted">{{ n.published|date:"d.m.Y" }}</div>
+                                  <p class="card-text mb-auto">{{ n.content }}</p>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Сохранить</button>
+                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Удалить</button>
+                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Отмена</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
     {% endfor %}
+        <div class="text-center mb-4">
+                            <button class="btn btn-secondary btn-sm mt-2" href="#" data-toggle="modal" data-target="#ModalNew">Добавить новость</button>
+                        </div>
+                        <!-- Modal for News -->
+                        <div class="modal fade" id="ModalNew" tabindex="-1" role="dialog" aria-labelledby="ModalNewlLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="ModalNewLabel">Добавть новость на сайт</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                  <form type="post" id="addNews">
+                                      {% csrf_token %}
+                                    <h3 class="mb-0">
+                                        <p class="text-dark" href="#">{{ form.title }}</p>
+                                    </h3>
+                                    <p class="card-text mb-auto">{{ form.content }}</p>
+                                  </form>
+
+                              </div>
+                              <div class="modal-footer">
+                                <button type="submit" class="btn btn-secondary btn-sm" form="addNews" value = "Refresh" onclick="history.go(0)">Сохранить</button>
+                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Отмена</button>
+                              </div>
+                        </div>
+                     </div>
+                    </div>
+
+            <div class="toast" data-delay="1500" data-autohide="false" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-body d-flex ">
+                    <div class="bg-success p-2"></div><p>Hello</p>
+                </div>
+            </div>
     </div>
+        <script>
+        $(document).ready(function () {
+            $('.toast').toast('show');
+        });
+    </script>
 {% endblock content %}
