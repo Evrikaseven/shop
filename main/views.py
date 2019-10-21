@@ -98,10 +98,8 @@ class UserDetailsView(LoginRolesOwnerRequiredUpdateViewMixin, CommonContextViewM
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['roles_list'] = list(Roles)
+        context['balance_update_allowed'] = self.user.role == Roles.ADMINISTRATOR
         return context
-
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
 
 
 class DeleteUserView(LoginRolesOwnerRequiredUpdateViewMixin, CommonContextViewMixin, DeleteView):

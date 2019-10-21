@@ -12,6 +12,7 @@ from .models import (
     SettingOptionHandler,
     Receipt,
     News,
+    UserBalance,
 )
 from main.core import widgets as custom_widgets, form_fields as custom_form_fields
 from main.core.constants import (
@@ -142,8 +143,7 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
                                  subject='Статус заказа №{} изменен'.format(self.instance.pk),
                                  extra_params={'status_changed': True})
             if self.user_balance_delta:
-                user.balance += self.user_balance_delta
-                user.save()
+                user.update_balance_with_delta(self.user_balance_delta)
                 user_data_email(user=user,
                                 subject='Баланс пользователя изменен',
                                 extra_params={'balance_changed': True})
@@ -467,24 +467,30 @@ class NewsForm(forms.Form):
         model = News
         fields = ('title', 'content')
 
-    @transaction.atomic
-    def save(self, commit=True):
-        return super().save(commit=commit)
-
 
 class UserForm(forms.ModelForm):
+
+    balance_delta = forms.DecimalField(label='Баланс пользователя', required=False)
 
     def __init__(self, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(**kwargs)
         self.fields['email'].disabled = True
+        # Only admins can change these fields
         if self.user.role != Roles.ADMINISTRATOR:
             self.fields['role'].disabled = True
-            self.fields['balance'].disabled = True
+            self.fields['balance_delta'].disabled = True
 
     class Meta:
         model = User
-        fields = ('email', 'first_name', 'last_name', 'role', 'balance', 'birth_date', 'phone', 'delivery_address')
+        fields = ('email', 'first_name', 'last_name', 'role', 'balance_delta', 'birth_date', 'phone', 'delivery_address')
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        delta = self.cleaned_data.get('balance_delta', 0) or 0
+        if delta and self.user.role == Roles.ADMINISTRATOR:
+            UserBalance.objects.create(user=self.instance, delta=delta)
+        return super().save(*args, **kwargs)
 
 
 class CustomUserCreationForm(UserCreationForm):

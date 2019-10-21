@@ -35,6 +35,11 @@ class Provider(models.Model):
     product_type = models.CharField(max_length=256, blank=True, default='')
 
 
+class UserBalance(ModelWithTimestamp):
+    user = models.ForeignKey('User', on_delete=models.CASCADE, blank=True, null=True)
+    delta = models.DecimalField(max_digits=10, decimal_places=2)
+
+
 class CustomUserManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifiers
@@ -80,7 +85,6 @@ class User(AbstractUser):
     delivery_address = models.CharField('Адрес доставки', max_length=255)
     birth_date = models.DateField('Дата рождения', blank=True, default='')
     role = models.PositiveSmallIntegerField('Роль', choices=tuple(Roles), default=Roles.UNREGISTERED)
-    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     objects = CustomUserManager()
 
@@ -93,6 +97,14 @@ class User(AbstractUser):
     @property
     def role_to_string(self):
         return Roles[self.role]
+
+    @property
+    def balance(self):
+        return sum(UserBalance.objects.filter(user=self).values_list('delta', flat=True))
+
+    def update_balance_with_delta(self, new_delta):
+        if new_delta:
+            UserBalance.objects.create(user=self, delta=new_delta)
 
 
 class OrderManager(models.Manager):
@@ -141,8 +153,7 @@ class Order(ModelWithTimestamp, ModelWithUser):
             # Update user balance first
             user = self.created_by
             if user:
-                user.balance += self.actual_price_diff
-                user.save()
+                user.update_balance_with_delta(self.actual_price_diff)
             self.actual_price = self.price
             super().save(update_fields=['actual_price'])
 
@@ -178,8 +189,7 @@ class Order(ModelWithTimestamp, ModelWithUser):
             # Update user balance first
             user = self.created_by
             if user:
-                user.balance += self.actual_price_diff
-                user.save()
+                user.update_balance_with_delta(self.actual_price_diff)
             self.actual_price = self.price
         super().save(**kwargs)
 
