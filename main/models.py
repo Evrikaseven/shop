@@ -83,7 +83,7 @@ class User(AbstractUser):
     email = models.EmailField('Email', unique=True)
     phone = models.CharField('Телефон', max_length=20)
     delivery_address = models.CharField('Адрес доставки', max_length=255)
-    birth_date = models.DateField('Дата рождения', blank=True, default='')
+    birth_date = models.DateField('Дата рождения', blank=True, null=True)
     role = models.PositiveSmallIntegerField('Роль', choices=tuple(Roles), default=Roles.UNREGISTERED)
 
     objects = CustomUserManager()
