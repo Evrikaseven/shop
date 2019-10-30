@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Товар{% endblock title %}
 
@@ -94,7 +95,7 @@
                     <div class="form-group row">
                         <label for="id_status" class="col-2 col-form-label">Статус</label>
                         <div class="col-10">
-                            <select class="form-control" name="status" id="id_status"
+                            <select class="custom-select" name="status" id="id_status"
                                     {% if form.status.field.disabled %}
                                     disabled=""
                                     {% endif %}
@@ -175,6 +176,7 @@
         {% endif %}
     </div>
 
+    <script src="{% static '/js/input_mask_place.js' %}"></script>
 
 
 {% endblock content %}

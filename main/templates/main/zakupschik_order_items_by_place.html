@@ -1,22 +1,24 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Заказы на место{% endblock title %}
-
 
 {% block content %}
     <h3 class="font-weight-normal text-center py-3 border-bottom" style="margin-block-start: 0;  margin-block-end: 0;">
         Список товаров для места {{ place }}
+    <div id="cash-out">0</div>
     </h3>
     <div class="container my-3 p-3 bg-white rounded shadow-sm">
         <div class="row">
             {% for p in products %}
                 <div class="col-md-4">
                      {% for item in p.items %}
+                         {{ item.total_quantity }}
                         {% include 'main/include/item_card_img_template.html' with order_item=item %}
                      {% endfor %}
                 </div>
            {% endfor %}
         </div>
     </div>
-
+    <script src="{% static '/js/cashOut_place.js' %}"></script>
 {% endblock content %}

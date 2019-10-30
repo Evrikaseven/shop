@@ -7,18 +7,35 @@
         <title>Placeholder</title>
         <rect width="100%" height="100%" fill="#55595c"></rect>
          <a href="{% url 'main:order_item_details' pk=order_item.id %}">
-            <image xlink:href="{{ MEDIA_URL }}{{ order_item.image }}" x="0" y="0" width="100%" height="100%"/>
+            <image xlink:href="{{ MEDIA_URL }}{{ order_item.product.image }}" x="0" y="0" width="100%" height="100%"/>
         </a>
 
         <text x="15%" y="10%" fill="#eceeef" dy=".3em">{{ order_item.name }}</text>
-        <text x="15%" y="20%" fill="#eceeef" dy=".3em" class="bg">Количество: {{ order_item.total_quantity }}</text>
-        <text x="15%" y="50%" fill="#eceeef" dy=".3em">Комментарий:</text>
+        <text x="15%" y="20%" fill="#eceeef" dy=".3em">Количество: {{ order_item.quantity }}</text>
         <text x="15%" y="60%" fill="#eceeef" dy=".3em">{{ order_item.order_comment }}</text>
      </svg>
-    <div class="card-body py-2">
+    <div class="card-body py-2">{{ order_item.total_quantity }}
         <div class="d-flex justify-content-between align-items-center">
-            <p class="pt-3">{{ order_item.price }} ₽</p>
-            <p class="pt-3">Статус: {{ order_item.item_status_str }}</p>
+            <p class="item pt-3">{{ order_item.price }} ₽</p>
+
+            <div class="row">
+                   <label for="id_status" class="col-form-label mr-2">Статус</label>
+                   <div>
+                      <select class="custom-select" name="status" id="id_status"
+                               {% if form.status.field.disabled %}
+                               disabled=""
+                               {% endif %}
+                       >
+                           {% for status, status_str in order_items_statuses_list %}
+                               {% if status == order_item.status %}
+                                   <option value="{{ status }}" selected>{{ status_str }}</option>
+                               {% else %}
+                                   <option value="{{ status }}">{{ status_str }}</option>
+                               {% endif %}
+                           {% endfor %}
+                       </select>
+                   </div>
+            </div>
         </div>
     </div>
 </div>

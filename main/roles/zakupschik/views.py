@@ -2,7 +2,7 @@ from django.views.generic.base import TemplateView
 from main.core.view_mixins import LoginRolesRequiredViewMixin, CommonContextViewMixin
 from django.conf import settings
 from .fetchers import ZakupschikFetcher
-from main.core.constants import Roles
+from main.core.constants import Roles, OrderItemStatuses
 
 
 class ZakupschikMainView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
@@ -35,6 +35,7 @@ class ZakupschikOrdersByPlacesView(LoginRolesRequiredViewMixin, CommonContextVie
         context['products'] = fetcher.products_by_place(self.place)
         context['MEDIA_URL'] = settings.MEDIA_URL
         context['place'] = self.place
+        context['order_items_statuses_list'] = list(OrderItemStatuses)[1:]
         return context
 
     def dispatch(self, request, *args, **kwargs):
