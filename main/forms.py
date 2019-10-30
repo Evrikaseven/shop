@@ -1,3 +1,5 @@
+import re
+import string
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
@@ -232,9 +234,16 @@ class OrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         return image
 
     def clean_place(self):
-        value = self.cleaned_data['place'].strip().replace(' ', '')
-        if not value:
-            raise ValidationError('Укажите, пожалуйста, номер места')
+        value = self.cleaned_data['place'].strip()
+        not_allowed_symbols = [c for c in string.punctuation if c not in '/-']
+        is_incorrect_data = bool(re.search("\s", value)) or any((c in value) for c in not_allowed_symbols)
+        if not value or is_incorrect_data:
+            raise ValidationError(
+                'Укажите, пожалуйста, номер места (не допускается несколько номеров!). '
+                'В номере не должно быть пробелов. '
+                'Допустимые символы: буквы, цифры, "-", "/". '
+                'Например: 22-123, 2a-23/У'
+            )
         return value
 
     def clean_price(self):
@@ -411,9 +420,16 @@ class ProductForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         return image
 
     def clean_place(self):
-        value = self.cleaned_data['place'].strip().replace(' ', '')
-        if not value:
-            raise ValidationError('Укажите, пожалуйста, номер места')
+        value = self.cleaned_data['place'].strip()
+        not_allowed_symbols = [c for c in string.punctuation if c not in '/-']
+        is_incorrect_data = bool(re.search("\s", value)) or any((c in value) for c in not_allowed_symbols)
+        if not value or is_incorrect_data:
+            raise ValidationError(
+                'Укажите, пожалуйста, номер места (не допускается несколько номеров!). '
+                'В номере не должно быть пробелов. '
+                'Допустимые символы: буквы, цифры, "-", "/". '
+                'Например: 22-123, 2a-23/У'
+            )
         return value
 
     def clean_price(self):

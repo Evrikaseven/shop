@@ -1,24 +1,7 @@
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.conf import settings
-from django.utils.html import strip_tags
+
 from main.models import User, Order
 from main.core.constants import Roles, OrderStatuses
-
-
-def shop_send_email(template: str, context: dict, subject: str, to: list):
-    html_message = render_to_string(template, context)
-    plain_message = strip_tags(html_message)
-    admins = [admin.email for admin in User.objects.get_list(role=Roles.ADMINISTRATOR)]
-    recipient_list = to + admins
-    send_mail(subject, plain_message,
-              settings.EMAIL_HOST_USER,
-              recipient_list,
-              fail_silently=False,
-              auth_user=None,
-              auth_password=None,
-              connection=None,
-              html_message=html_message)
+from main.core.utils import shop_send_email
 
 
 def user_data_email(user: User, subject: str, extra_params: dict):
@@ -34,10 +17,12 @@ def user_data_email(user: User, subject: str, extra_params: dict):
         'balance_changed': False,
     }
     email_data.update(extra_params)
+    admins = [admin.email for admin in User.objects.get_list(role=Roles.ADMINISTRATOR)]
     shop_send_email(template='main/email_user_template.html',
                     context=email_data,
                     subject=subject,
-                    to=[user.email])
+                    to=[user.email],
+                    bcc=[admins])
 
 
 def order_data_email(order: Order, subject: str, extra_params: dict):
@@ -52,7 +37,9 @@ def order_data_email(order: Order, subject: str, extra_params: dict):
         'paid_price_changed': False,
     }
     email_data.update(extra_params)
+    admins = [admin.email for admin in User.objects.get_list(role=Roles.ADMINISTRATOR)]
     shop_send_email(template='main/email_order_template.html',
                     context=email_data,
                     subject=subject,
-                    to=[user.email])
+                    to=[user.email],
+                    bcc=[admins])
