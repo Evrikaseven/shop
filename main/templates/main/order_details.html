@@ -23,8 +23,8 @@
     <div class="container">
         <div class="row">
             <div class="col-md-3 order-md-2 mb-4 table-ts">
-
-                {% if update_is_allowed %}
+                <div class="sticky-top" style="z-index: 999">
+    {% if update_is_allowed %}
                     <form class="needs-validation" id="order" action="" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                 {% endif %}
@@ -199,7 +199,7 @@
                 </form>
             </div>
          </div>
-
+        </div>
          <div class="col-md-9 order-md-1">
          {% for order_item in order.orderitem_set.all %}
             <div class="card mb-3">
@@ -306,4 +306,14 @@
         </div>
     </div>
     <script src="{% static '/js/toasts_notifications.js' %}"></script>
+        <script>
+    $('.dropdown-toggle').click(function (){
+            dropDownFixPosition($('button'),$('.dropdown-menu'));
+        });
+function dropDownFixPosition(button,dropdown){
+      var dropDownTop = button.offset().top + button.outerHeight();
+        dropdown.css('top', dropDownTop + "px");
+        dropdown.css('left', button.offset().left + "px");
+}
+    </script>
 {% endblock content %}
