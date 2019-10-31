@@ -209,15 +209,22 @@
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
-                            <h5 class="card-title">{% if order_item.name %} {{ order_item.name }} {% else %} Без
+                            <h5 class="card-title pricing-card-title">{% if order_item.name %} {{ order_item.name }} {% else %} Без
                                 названия {% endif %}</h5>
-                            <p class="card-text">Место: <small class="text-muted">{{ order_item.place }}</small></p>
-                            <p class="card-text">Количество: {{ order_item.quantity }}</p>
-                            <p class="card-text">Цена: {{ order_item.price }}</p>
-                            <p class="card-text">Статус товара: {{ order_item.status_to_string }}</p>
-                            <p class="card-text">Вид закупки: {{ order_item.product.shopping_type_to_string }}</p>
+                        <div class="d-flex justify-content-between mb-3">
+                            <div class="col-md-auto">
+                                <p class="card-text">Место: <small class="text-muted">{{ order_item.place }}</small></p>
+                                <p class="card-text">Цена: <small class="text-muted">{{ order_item.price }}</small></p>
+                                <p class="card-text">Количество: <small class="text-muted">{{ order_item.quantity }}</small></p>
+                            </div>
+
+                            <div class="col-md-auto">
+                                <p class="card-text">Статус товара: <small class="text-muted">{{ order_item.status_to_string }}</small></p>
+                                <p class="card-text">Вид закупки: <small class="text-muted">{{ order_item.product.shopping_type_to_string }}</small></p>
+                            </div>
+                        </div>
                             <p class="card-text">Коментарий к заказу:
-<small class="text-muted">
+                                <small class="text-muted">
                                     {% if not order_item.price %}
                                         <div style="color: red">
                                             <em>
@@ -237,17 +244,15 @@
                                         Товар удалён <br>
                                     {% endif %}
 
-
-                                    {{ order_item.delivery_to_string }}
-
+                                    {{ order_item.delivery_to_string }} |
                                     {{ order_item.order_comment }}
-
 
                                     {% if order_item.is_replacement %}
                                         Данный товар является заменой
                                     {% endif %}
-</small>
+                                </small>
                             </p>
+                            <p class="card-text">Коментарий для себя: <small class="text-muted">{{ order_item.customer_comment }}</small></p>
                         </div>
                     </div>
                 </div>
