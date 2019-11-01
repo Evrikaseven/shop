@@ -306,14 +306,4 @@
         </div>
     </div>
     <script src="{% static '/js/toasts_notifications.js' %}"></script>
-        <script>
-    $('.dropdown-toggle').click(function (){
-            dropDownFixPosition($('button'),$('.dropdown-menu'));
-        });
-function dropDownFixPosition(button,dropdown){
-      var dropDownTop = button.offset().top + button.outerHeight();
-        dropdown.css('top', dropDownTop + "px");
-        dropdown.css('left', button.offset().left + "px");
-}
-    </script>
 {% endblock content %}
