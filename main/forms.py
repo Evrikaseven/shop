@@ -131,7 +131,6 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         if self.instance.pk:
             paid_price = cleaned_data['paid_price']
             cleaned_data['paid_price'] = self.instance.paid_price + paid_price
-            self.user_balance_delta = paid_price
             if 'status' in self.cleaned_data and self.instance.status != cleaned_data['status']:
                 self.status_changed = True
         return cleaned_data
@@ -144,11 +143,6 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
                 order_data_email(order=self.instance,
                                  subject='Статус заказа №{} изменен'.format(self.instance.pk),
                                  extra_params={'status_changed': True})
-            if self.user_balance_delta:
-                user.update_balance_with_delta(self.user_balance_delta)
-                user_data_email(user=user,
-                                subject='Баланс пользователя изменен',
-                                extra_params={'balance_changed': True})
             if ('delivery_address' in self.cleaned_data and self.cleaned_data['delivery_address'] and
                     self.cleaned_data['delivery_address'] != self.instance.delivery_address):
                 self.instance.delivery_address = self.cleaned_data['delivery_address']
@@ -170,12 +164,6 @@ class ReceiptForOrderForm(forms.ModelForm):
     class Meta:
         model = Receipt
         fields = ('image',)
-
-    # def clean_check_image(self):
-    #     image = self.cleaned_data['check_image']
-    #     if not image and not self.instance.pk:
-    #         raise ValidationError('Добавьте фотографию чека')
-    #     return image
 
     @transaction.atomic
     def save(self, commit=True):
@@ -234,7 +222,7 @@ class OrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         return image
 
     def clean_place(self):
-        value = self.cleaned_data['place'].strip()
+        value = self.cleaned_data['place'].strip().lower()
         not_allowed_symbols = [c for c in string.punctuation if c not in '/-']
         is_incorrect_data = bool(re.search("\s", value)) or any((c in value) for c in not_allowed_symbols)
         if not value or is_incorrect_data:
@@ -420,7 +408,7 @@ class ProductForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         return image
 
     def clean_place(self):
-        value = self.cleaned_data['place'].strip()
+        value = self.cleaned_data['place'].strip().lower()
         not_allowed_symbols = [c for c in string.punctuation if c not in '/-']
         is_incorrect_data = bool(re.search("\s", value)) or any((c in value) for c in not_allowed_symbols)
         if not value or is_incorrect_data:

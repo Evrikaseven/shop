@@ -15,38 +15,57 @@
         {% if product_id %}
 
             <a class="btn btn-sm btn-outline-dark my-3"
-               href="{% url 'main:joint_item_to_product_new_order' product_pk=product_id %}" >
+               href="{% url 'main:joint_item_to_product_new_order' product_pk=product_id %}">
                 Добавить в новый заказ
             </a>
 
-{#            <a class="list-group-item list-group-item-action"#}
-{#               href="{% url 'main:joint_item_to_product_new_order' product_pk=product_id %}" >#}
-{#                Добавить в новый заказ#}
-{#            </a>#}
+            {#            <a class="list-group-item list-group-item-action"#}
+            {#               href="{% url 'main:joint_item_to_product_new_order' product_pk=product_id %}" >#}
+            {#                Добавить в новый заказ#}
+            {#            </a>#}
 
         {% endif %}
         <div class="list-group">
-            {% for o in orders %}
+            {% for o in object_list %}
                 {% if product_id %}
-                    <a href="{% url 'main:joint_item_to_product' pk=o.id product_pk=product_id %}" class="list-group-item list-group-item-action ">
+                    <a href="{% url 'main:joint_item_to_product' pk=o.id product_pk=product_id %}"
+                       class="list-group-item list-group-item-action ">
                 {% else %}
                     <a href="{% url 'main:order_details' pk=o.id %}" class="list-group-item list-group-item-action ">
                 {% endif %}
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">Заказ #{{ o.id }}</h5>
-                    <p class="mb-1">{{ o.status_to_string }}</p>
-                    <p class="mb-1">{{ o.created_by.email }} ({{ o.created_by.first_name }} {{ o.created_by.last_name }})</p>
-                    <small>Создан {{ o.created_date }}</small>
-                </div>
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">Заказ #{{ o.id }}</h5>
+                <p class="mb-1">{{ o.status_to_string }}</p>
+                <p class="mb-1">{{ o.created_by.email }}
+                    ({{ o.created_by.first_name }} {{ o.created_by.last_name }})</p>
+                <small>Создан {{ o.created_date }}</small>
 
-                <div class="d-flex w-100">
-
-                    <h6 class="mr-2">К оплате:</h6>
-                    <small>{{ o.price }}</small>
-                </div>
+                <a class="btn btn-sm btn-outline-dark my-3"
+                   href="{% url 'main:delete_order' pk=o.pk %}">
+                    Удалить заказ
                 </a>
-                {#                  <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>#}
+            </div>
+            <div class="d-flex w-100">
+
+                <h6 class="mr-2">К оплате:</h6>
+                <small>{{ o.price }}</small>
+            </div>
+            </a>
+
+            {% empty %}
+                Нет заказов
             {% endfor %}
         </div>
+
+        <div class="text-center">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">&lt; </a> &nbsp;&nbsp;|&nbsp;&nbsp;
+            {% endif %}
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }} {% if page_obj.has_next %}
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            <a href="?page={{ page_obj.next_page_number }}">&gt;</a>
+        {% endif %}
+        </div>
+
     </div>
 {% endblock content %}
