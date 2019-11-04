@@ -164,4 +164,178 @@ class OrderTestCase(BaseConfiguration):
         self.assertEqual(self.zakazschik1.balance, total_user_balance2)
 
     def test_delete_individual_products(self):
-        pass
+        order = Order.objects.create(created_by=self.zakazschik1, updated_by=self.zakazschik1)
+        self.check_for_created_objects(orders=1, order_items=0, products=0)
+        self.assertEqual(0, order.price)
+        self.assertEqual(0, self.zakazschik1.balance)
+
+        url = '/orders/{pk}/new_item/'.format(pk=order.pk)
+        prod_price1 = 100
+        prod_quantity1 = 5
+        data = {
+            'image': self.get_image_file(),
+            'name': 'Boots',
+            'price': prod_price1,
+            'quantity': prod_quantity1,
+            'place': '123-123',
+            'delivery': PurchaseAndDeliveryTypes.PURCHASE_AND_DELIVERY,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.check_for_created_objects(orders=1, order_items=1, products=1)
+        order.refresh_from_db()
+        extra_charge1 = prod_price1 * prod_quantity1 * self.extra_charge / 100
+        total_order_price1 = prod_price1 * prod_quantity1 + extra_charge1
+        self.assertEqual(order.price, total_order_price1)
+        total_user_balance1 = -(prod_price1 * prod_quantity1 + extra_charge1)
+        self.zakazschik1.refresh_from_db()
+        self.assertEqual(self.zakazschik1.balance, total_user_balance1)
+
+        prod_price2 = 60
+        prod_quantity2 = 7
+        data = {
+            'image': self.get_image_file(),
+            'name': 'Boots2',
+            'price': prod_price2,
+            'quantity': prod_quantity2,
+            'place': '222-222',
+            'delivery': PurchaseAndDeliveryTypes.PURCHASE_AND_DELIVERY,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.check_for_created_objects(orders=1, order_items=2, products=2)
+        order.refresh_from_db()
+        extra_charge2 = prod_price2 * prod_quantity2 * self.extra_charge / 100
+        total_order_price2 = total_order_price1 + prod_price2 * prod_quantity2 + extra_charge2
+        self.assertEqual(order.price, total_order_price2)
+        total_user_balance2 = total_user_balance1 - (prod_price2 * prod_quantity2 + extra_charge2)
+        self.zakazschik1.refresh_from_db()
+        self.assertEqual(self.zakazschik1.balance, total_user_balance2)
+
+        # Remove one order item
+        order_item_to_delete = order.orderitem_set.last()
+        url = '/order_item/{pk}/delete/'.format(pk=order_item_to_delete.pk)
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.check_for_created_objects(orders=1, order_items=1, products=1)
+        order.refresh_from_db()
+        self.assertEqual(order.price, total_order_price1)
+        self.zakazschik1.refresh_from_db()
+        self.assertEqual(self.zakazschik1.balance, total_user_balance1)
+
+        # Remove the latest order item
+        order_item_to_delete = order.orderitem_set.last()
+        url = '/order_item/{pk}/delete/'.format(pk=order_item_to_delete.pk)
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.check_for_created_objects(orders=1, order_items=0, products=0)
+        order.refresh_from_db()
+        self.assertEqual(order.price, 0)
+        self.zakazschik1.refresh_from_db()
+        self.assertEqual(self.zakazschik1.balance, 0)
+
+    def test_add_replacement(self):
+        order = Order.objects.create(created_by=self.zakazschik1, updated_by=self.zakazschik1)
+        self.check_for_created_objects(orders=1, order_items=0, products=0)
+        self.assertEqual(0, order.price)
+        self.assertEqual(0, self.zakazschik1.balance)
+
+        url = '/orders/{pk}/new_item/'.format(pk=order.pk)
+        prod_price1 = 100
+        prod_quantity1 = 5
+        data = {
+            'image': self.get_image_file(),
+            'name': 'Boots',
+            'price': prod_price1,
+            'quantity': prod_quantity1,
+            'place': '123-123',
+            'delivery': PurchaseAndDeliveryTypes.PURCHASE_AND_DELIVERY,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.check_for_created_objects(orders=1, order_items=1, products=1)
+        order.refresh_from_db()
+        extra_charge1 = prod_price1 * prod_quantity1 * self.extra_charge / 100
+        total_order_price1 = prod_price1 * prod_quantity1 + extra_charge1
+        self.assertEqual(order.price, total_order_price1)
+        total_user_balance1 = -(prod_price1 * prod_quantity1 + extra_charge1)
+        self.zakazschik1.refresh_from_db()
+        self.assertEqual(self.zakazschik1.balance, total_user_balance1)
+
+        prod_price2 = 60
+        prod_quantity2 = 7
+        parent_order_item = order.orderitem_set.last()
+        url = '/order_item/{pk}/new_replacement/'.format(pk=parent_order_item.pk)
+        data = {
+            'image': self.get_image_file(),
+            'name': 'Boots2',
+            'price': prod_price2,
+            'quantity': prod_quantity2,
+            'place': '222-222',
+            'delivery': PurchaseAndDeliveryTypes.PURCHASE_AND_DELIVERY,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.check_for_created_objects(orders=1, order_items=2, products=2)
+        order.refresh_from_db()
+        self.assertEqual(order.price, total_order_price1)
+        self.zakazschik1.refresh_from_db()
+        self.assertEqual(self.zakazschik1.balance, total_user_balance1)
+
+    def remove_order_item_with_replacement(self):
+        order = Order.objects.create(created_by=self.zakazschik1, updated_by=self.zakazschik1)
+        self.check_for_created_objects(orders=1, order_items=0, products=0)
+        self.assertEqual(0, order.price)
+        self.assertEqual(0, self.zakazschik1.balance)
+
+        url = '/orders/{pk}/new_item/'.format(pk=order.pk)
+        prod_price1 = 100
+        prod_quantity1 = 5
+        data = {
+            'image': self.get_image_file(),
+            'name': 'Boots',
+            'price': prod_price1,
+            'quantity': prod_quantity1,
+            'place': '123-123',
+            'delivery': PurchaseAndDeliveryTypes.PURCHASE_AND_DELIVERY,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.check_for_created_objects(orders=1, order_items=1, products=1)
+        order.refresh_from_db()
+        extra_charge1 = prod_price1 * prod_quantity1 * self.extra_charge / 100
+        total_order_price1 = prod_price1 * prod_quantity1 + extra_charge1
+        self.assertEqual(order.price, total_order_price1)
+        total_user_balance1 = -(prod_price1 * prod_quantity1 + extra_charge1)
+        self.zakazschik1.refresh_from_db()
+        self.assertEqual(self.zakazschik1.balance, total_user_balance1)
+
+        prod_price2 = 60
+        prod_quantity2 = 7
+        parent_order_item = order.orderitem_set.last()
+        url = '/order_item/{pk}/new_replacement/'.format(pk=parent_order_item.pk)
+        data = {
+            'image': self.get_image_file(),
+            'name': 'Boots2',
+            'price': prod_price2,
+            'quantity': prod_quantity2,
+            'place': '222-222',
+            'delivery': PurchaseAndDeliveryTypes.PURCHASE_AND_DELIVERY,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.check_for_created_objects(orders=1, order_items=2, products=2)
+        order.refresh_from_db()
+        self.assertEqual(order.price, total_order_price1)
+        self.zakazschik1.refresh_from_db()
+        self.assertEqual(self.zakazschik1.balance, total_user_balance1)
+
+        # Delete order item with replacement
+        url = '/order_item/{pk}/delete/'.format(pk=parent_order_item.pk)
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.check_for_created_objects(orders=1, order_items=0, products=0)
+        order.refresh_from_db()
+        self.assertEqual(order.price, 0)
+        self.zakazschik1.refresh_from_db()
+        self.assertEqual(self.zakazschik1.balance, 0)

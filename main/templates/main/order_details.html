@@ -297,6 +297,8 @@
                         Добавить товар</a>
                     <a class="btn btn-secondary btn-sm" href="{% url 'main:catalog' pk=order.id %}">
                         Добавить товар из совместной закупки</a>
+                    <a class="btn btn-secondary btn-sm" href="{% url 'main:delete_order' pk=order.id %}">
+                        Удалить заказ</a>
                 {% else %}
                     <a class="btn btn-secondary btn-sm" href="{% url 'main:orders' %}">
                         Вернуться на список заказов</a>
