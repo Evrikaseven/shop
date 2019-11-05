@@ -3,7 +3,7 @@ from io import BytesIO
 from PIL import Image
 from django.test import TestCase, Client
 from django.core.files.base import File
-from main.core.constants import Roles, PurchaseAndDeliveryTypes
+from main.core.constants import Roles, PurchaseAndDeliveryTypes, OrderStatuses
 from main.models import (
     User,
     Order,
@@ -138,9 +138,8 @@ class OrderTestCase(BaseConfiguration):
         extra_charge1 = prod_price1 * prod_quantity1 * self.extra_charge / 100
         total_order_price1 = prod_price1 * prod_quantity1 + extra_charge1
         self.assertEqual(order.price, total_order_price1)
-        total_user_balance1 = -(prod_price1 * prod_quantity1 + extra_charge1)
         self.zakazschik1.refresh_from_db()
-        self.assertEqual(self.zakazschik1.balance, total_user_balance1)
+        self.assertEqual(self.zakazschik1.balance, 0)
 
         prod_price2 = 60
         prod_quantity2 = 7
@@ -159,9 +158,21 @@ class OrderTestCase(BaseConfiguration):
         extra_charge2 = prod_price2 * prod_quantity2 * self.extra_charge / 100
         total_order_price2 = total_order_price1 + extra_charge2     # extra_charge only due to DELIVERY_ONLY
         self.assertEqual(order.price, total_order_price2)
-        total_user_balance2 = total_user_balance1 - extra_charge2
         self.zakazschik1.refresh_from_db()
-        self.assertEqual(self.zakazschik1.balance, total_user_balance2)
+        self.assertEqual(self.zakazschik1.balance, 0)
+
+        url = '/orders/{pk}/paying/'.format(pk=order.pk)
+        data = {
+            'image': self.get_image_file(name='test_receipt.png'),
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.check_for_created_objects(orders=1, order_items=2, products=2)
+        order.refresh_from_db()
+        self.assertEqual(order.status, OrderStatuses.PAYING_TO_BE_CONFIRMED)
+        total_user_balance = -(prod_price1 * prod_quantity1 + extra_charge1 + extra_charge2)
+        self.zakazschik1.refresh_from_db()
+        self.assertEqual(self.zakazschik1.balance, total_user_balance)
 
     def test_delete_individual_products(self):
         order = Order.objects.create(created_by=self.zakazschik1, updated_by=self.zakazschik1)
@@ -187,9 +198,9 @@ class OrderTestCase(BaseConfiguration):
         extra_charge1 = prod_price1 * prod_quantity1 * self.extra_charge / 100
         total_order_price1 = prod_price1 * prod_quantity1 + extra_charge1
         self.assertEqual(order.price, total_order_price1)
-        total_user_balance1 = -(prod_price1 * prod_quantity1 + extra_charge1)
+        # total_user_balance1 = -(prod_price1 * prod_quantity1 + extra_charge1)
         self.zakazschik1.refresh_from_db()
-        self.assertEqual(self.zakazschik1.balance, total_user_balance1)
+        self.assertEqual(self.zakazschik1.balance, 0)
 
         prod_price2 = 60
         prod_quantity2 = 7
@@ -208,9 +219,9 @@ class OrderTestCase(BaseConfiguration):
         extra_charge2 = prod_price2 * prod_quantity2 * self.extra_charge / 100
         total_order_price2 = total_order_price1 + prod_price2 * prod_quantity2 + extra_charge2
         self.assertEqual(order.price, total_order_price2)
-        total_user_balance2 = total_user_balance1 - (prod_price2 * prod_quantity2 + extra_charge2)
+        # total_user_balance2 = total_user_balance1 - (prod_price2 * prod_quantity2 + extra_charge2)
         self.zakazschik1.refresh_from_db()
-        self.assertEqual(self.zakazschik1.balance, total_user_balance2)
+        self.assertEqual(self.zakazschik1.balance, 0)
 
         # Remove one order item
         order_item_to_delete = order.orderitem_set.last()
@@ -221,7 +232,7 @@ class OrderTestCase(BaseConfiguration):
         order.refresh_from_db()
         self.assertEqual(order.price, total_order_price1)
         self.zakazschik1.refresh_from_db()
-        self.assertEqual(self.zakazschik1.balance, total_user_balance1)
+        self.assertEqual(self.zakazschik1.balance, 0)
 
         # Remove the latest order item
         order_item_to_delete = order.orderitem_set.last()
@@ -258,9 +269,9 @@ class OrderTestCase(BaseConfiguration):
         extra_charge1 = prod_price1 * prod_quantity1 * self.extra_charge / 100
         total_order_price1 = prod_price1 * prod_quantity1 + extra_charge1
         self.assertEqual(order.price, total_order_price1)
-        total_user_balance1 = -(prod_price1 * prod_quantity1 + extra_charge1)
+        # total_user_balance1 = -(prod_price1 * prod_quantity1 + extra_charge1)
         self.zakazschik1.refresh_from_db()
-        self.assertEqual(self.zakazschik1.balance, total_user_balance1)
+        self.assertEqual(self.zakazschik1.balance, 0)
 
         prod_price2 = 60
         prod_quantity2 = 7
@@ -280,7 +291,7 @@ class OrderTestCase(BaseConfiguration):
         order.refresh_from_db()
         self.assertEqual(order.price, total_order_price1)
         self.zakazschik1.refresh_from_db()
-        self.assertEqual(self.zakazschik1.balance, total_user_balance1)
+        self.assertEqual(self.zakazschik1.balance, 0)
 
     def remove_order_item_with_replacement(self):
         order = Order.objects.create(created_by=self.zakazschik1, updated_by=self.zakazschik1)
@@ -306,9 +317,9 @@ class OrderTestCase(BaseConfiguration):
         extra_charge1 = prod_price1 * prod_quantity1 * self.extra_charge / 100
         total_order_price1 = prod_price1 * prod_quantity1 + extra_charge1
         self.assertEqual(order.price, total_order_price1)
-        total_user_balance1 = -(prod_price1 * prod_quantity1 + extra_charge1)
+        # total_user_balance1 = -(prod_price1 * prod_quantity1 + extra_charge1)
         self.zakazschik1.refresh_from_db()
-        self.assertEqual(self.zakazschik1.balance, total_user_balance1)
+        self.assertEqual(self.zakazschik1.balance, 0)
 
         prod_price2 = 60
         prod_quantity2 = 7
@@ -328,7 +339,7 @@ class OrderTestCase(BaseConfiguration):
         order.refresh_from_db()
         self.assertEqual(order.price, total_order_price1)
         self.zakazschik1.refresh_from_db()
-        self.assertEqual(self.zakazschik1.balance, total_user_balance1)
+        self.assertEqual(self.zakazschik1.balance, 0)
 
         # Delete order item with replacement
         url = '/order_item/{pk}/delete/'.format(pk=parent_order_item.pk)

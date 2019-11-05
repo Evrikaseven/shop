@@ -207,37 +207,12 @@ class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
         return context
 
 
-class DeleteOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, DeleteView):
-    template_name = "main/delete_order.html"
-    allowed_roles = (Roles.ZAKAZSCHIK,)
-    model = _models.Order
-
-    def get_success_url(self):
-        return reverse_lazy('main:orders')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['order_to_delete'] = self.object
-        return context
-
-
 class OrderPayingView(LoginRolesOwnerRequiredUpdateViewMixin, CommonContextViewMixin, UpdateView):
     template_name = 'main/order_paying.html'
     form_class = OrderForm
     allowed_roles = (Roles.ZAKAZSCHIK,)
     allowed_non_owner_roles = (Roles.ZAKAZSCHIK,)
     model = _models.Order
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.user
-        return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        form = self.get_form()
-        form.pay_order()
-        return context
 
 
 class JointReceiptForOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, CreateView):
@@ -247,26 +222,31 @@ class JointReceiptForOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, Common
 
     def __init__(self):
         self.user = None
-        self.order_id = None
+        self.order = None
 
     def get_success_url(self):
         return reverse_lazy('main:order_paying', kwargs={'pk': self.kwargs['pk']})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['order_id'] = self.order_id
+        kwargs['order_id'] = self.order.pk
         kwargs['user'] = self.user
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['order'] = _models.Order.objects.get(id=self.order_id)
+        context['order'] = self.order
         return context
 
     def dispatch(self, request, *args, **kwargs):
         self.user = request.user
-        self.order_id = kwargs['pk']
+        order_id = kwargs['pk']
+        self.order = _models.Order.objects.get(id=order_id)
         return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.order.pay_order()
+        return super().form_valid(form)
 
 
 class NewOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, CreateView):
@@ -422,6 +402,7 @@ class DeleteOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextVi
     template_name = "main/delete_order.html"
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ADMINISTRATOR)
     model = _models.Order
+    permission_denied_message = 'Заказ может быть удален только в момент создания или когда закрыт'
 
     def get_success_url(self):
         return reverse_lazy('main:orders')
@@ -430,6 +411,13 @@ class DeleteOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextVi
         context = super().get_context_data(**kwargs)
         context['order'] = self.object
         return context
+
+    def post(self, *args, **kwargs):
+        order_id = kwargs['pk']
+        order_status = _models.Order.objects.get(pk=order_id).status
+        if order_status not in (OrderStatuses.CREATED, OrderStatuses.CLOSED):
+            return self.handle_no_permission()
+        return super().post(*args, **kwargs)
 
 
 class DeleteProductView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, DeleteView):
