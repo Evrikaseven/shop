@@ -159,9 +159,9 @@ class OrdersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, ListVi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['order_statuses'] = OrderStatuses
 
         if self.product_id:
-            context['order_statuses'] = OrderStatuses
             context['product_id'] = self.product_id
 
         return context
