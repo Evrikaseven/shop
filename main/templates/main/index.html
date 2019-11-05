@@ -5,16 +5,18 @@
 
 {% block content %}
 
-    <div class="container">
-    <div class="nav-scroller py-1 mb-2">
-        <nav class="nav d-flex justify-content-between">
-          <a class="p-2 text-muted" href="{% url 'main:catalog' %}">Каталог товаров</a>
-          <a class="p-2 text-muted" href="{% url 'main:news' %}">Новости</a>
-          <a class="p-2 text-muted" data-toggle="modal" data-target="#ModalWork" href="#">Рабочие графики</a>
-          <a class="p-2 text-muted" data-toggle="modal" data-target="#ModalContacts" href="#">Контакты</a>
-          <a class="p-2 text-muted" data-toggle="modal" data-target="#ModalPartnership" href="#">Условия сотрудничества</a>
-          <a class="p-2 text-muted" href="{% url 'main:providers' %}">Наши поставщики</a>
-        </nav>
+
+    <div class="nav-scroller bg-white shadow-sm">
+        <div class="container">
+            <nav class="nav nav-underline d-flex justify-content-between">
+              <a class="p-2 text-muted" href="{% url 'main:catalog' %}">Каталог товаров</a>
+              <a class="p-2 text-muted" href="{% url 'main:news' %}">Новости</a>
+              <a class="p-2 text-muted" data-toggle="modal" data-target="#ModalWork" href="#">Рабочие графики</a>
+              <a class="p-2 text-muted" data-toggle="modal" data-target="#ModalContacts" href="#">Контакты</a>
+              <a class="p-2 text-muted" data-toggle="modal" data-target="#ModalPartnership" href="#">Условия сотрудничества</a>
+              <a class="p-2 text-muted" href="{% url 'main:providers' %}">Наши поставщики</a>
+            </nav>
+        </div>
       </div>
 
         {% include 'main/include/modal_window_template.html' with title="Рабочие графики" modal_lable="ModalWork" modal_body="<img class=\"d-block w-100\" src=\"https://sun9-54.userapi.com/c851236/v851236800/1c9ee8/eZePSOebxUs.jpg\">" %}
@@ -22,7 +24,7 @@
         {% include 'main/include/modal_window_template.html' with title="Контакты" modal_lable="ModalContacts" modal_body=contacts %}
 
         {% include 'main/include/modal_window_template.html' with title="Условия сотрудничества" modal_lable="ModalPartnership" modal_body="sadfgasf {{ announcement }} <p>" %}
-
+    <div class="container">
         {# Announcement#}
          <div class="jumbotron jumbotron-fluid mt-3 p-md-3 text-secondary rounded bg-lg">
             <div class="col-md-6 px-0">

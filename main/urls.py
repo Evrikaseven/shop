@@ -40,6 +40,7 @@ urlpatterns = [
     path('orders/<int:pk>/pay_done/', main_views.OrderPayingView.as_view(), name='order_paying'),
     path('orders/<int:pk>/new_item/', main_views.NewOrderItemView.as_view(), name='new_order_item'),
     path('orders/<int:pk>/new_joint_item/', main_views.NewJointOrderItemView.as_view(), name='new_joint_order_item'),
+    path('orders/<int:pk>/delete/', main_views.DeleteOrderView.as_view(), name='delete_order'),
 
     path('orders/joint_item_to_product/<int:product_pk>', main_views.NewJointOrderItemView.as_view(),
          name='joint_item_to_product_new_order'),

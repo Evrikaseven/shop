@@ -146,6 +146,7 @@ class OrdersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, Templa
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['order_statuses'] = OrderStatuses
 
         if self.product_id:
             context['product_id'] = self.product_id
@@ -395,6 +396,20 @@ class DeleteOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonConte
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['order_item'] = self.object
+        return context
+
+
+class DeleteOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, DeleteView):
+    template_name = "main/delete_order.html"
+    allowed_roles = (Roles.ZAKAZSCHIK, Roles.ADMINISTRATOR)
+    model = _models.Order
+
+    def get_success_url(self):
+        return reverse_lazy('main:orders')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['order'] = self.object
         return context
 
 

@@ -3,50 +3,61 @@
 {% block title %}Заказы{% endblock title %}
 
 {% block content %}
-    <h3 class="font-weight-normal text-center text-muted" style="color: #6c757d">
+    <h3 class="font-weight-normal text-center text-muted nav-scroller bg-white shadow-sm" >
         {% if product_id %}
             Укажите заказ куда добавить товар
         {% else %}
             Список ваших заказов
         {% endif %}
     </h3>
-    <hr class="mb-4">
-    <div class="container my-3 p-3 bg-white rounded shadow-sm">
-        {% if product_id %}
 
-            <a class="btn btn-sm btn-outline-dark my-3"
+    <div class="container my-3 p-3 bg-white rounded shadow-sm">
+        <div class="border-bottom border-gray pb-2 mb-0">
+        {% if product_id %}
+            <a class="btn btn-sm btn-secondary my-1"
                href="{% url 'main:joint_item_to_product_new_order' product_pk=product_id %}" >
                 Добавить в новый заказ
             </a>
-
-{#            <a class="list-group-item list-group-item-action"#}
-{#               href="{% url 'main:joint_item_to_product_new_order' product_pk=product_id %}" >#}
-{#                Добавить в новый заказ#}
-{#            </a>#}
-
         {% endif %}
-        <div class="list-group">
-            {% for o in orders %}
-                {% if product_id %}
-                    <a href="{% url 'main:joint_item_to_product' pk=o.id product_pk=product_id %}" class="list-group-item list-group-item-action ">
-                {% else %}
-                    <a href="{% url 'main:order_details' pk=o.id %}" class="list-group-item list-group-item-action ">
-                {% endif %}
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">Заказ #{{ o.id }}</h5>
-                    <p class="mb-1">{{ o.status_to_string }}</p>
-                    <p class="mb-1">{{ o.created_by.email }} ({{ o.created_by.first_name }} {{ o.created_by.last_name }})</p>
-                    <small>Создан {{ o.created_date }}</small>
-                </div>
-
-                <div class="d-flex w-100">
-
-                    <h6 class="mr-2">К оплате:</h6>
-                    <small>{{ o.price }}</small>
-                </div>
-                </a>
-                {#                  <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>#}
-            {% endfor %}
         </div>
+        {% for o in orders %}
+            <div class="media text-muted pt-3">
+                {% if o.status == order_statuses.CREATED %}
+                        <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
+                {% endif %}
+                {% if o.status == order_statuses.PAYING_TO_BE_CONFIRMED %}
+                        <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#e83e8c"></rect><text x="50%" y="50%" fill="#e83e8c" dy=".3em">32x32</text></svg>
+                {% endif %}
+                {% if o.status == order_statuses.PAID %}
+                        <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#28a745"></rect><text x="50%" y="50%" fill="#28a745" dy=".3em">32x32</text></svg>
+                {% endif %}
+                {% if o.status == order_statuses.IN_PROGRESS %}
+                        <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#6f42c1"></rect><text x="50%" y="50%" fill="#6f42c1" dy=".3em">32x32</text></svg>
+                {% endif %}
+                        <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                        <div class="d-flex justify-content-between align-items-center w-100">
+                        {% if product_id %}
+                            <a href="{% url 'main:joint_item_to_product' pk=o.id product_pk=product_id %}">
+                        {% else %}
+                            <a href="{% url 'main:order_details' pk=o.id %}" >
+                        {% endif %}
+                                <strong class="text-gray-dark">Заказ #{{ o.id }}</strong>
+                            </a>
+                        <strong>{{ o.status_to_string }}</strong>
+                        {% if user_role == roles.ZAKAZSCHIK and o.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
+                            <small class="text-muted">Создан {{ o.created_date }}</small>
+                        {% else %}
+                            <small class="text-muted">Создан {{ o.created_date }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <span class="d-block">{{ o.created_by.email }} ({{ o.created_by.first_name }} {{ o.created_by.last_name }})</span>
+                        {% if user_role == roles.ZAKAZSCHIK and o.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
+                            <a href="{% url 'main:delete_order' pk=o.id %}">Удалить</a>
+                        {% endif %}
+                    </div>
+                  </div>
+                </div>
+        {% endfor %}
     </div>
 {% endblock content %}
