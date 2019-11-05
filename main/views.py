@@ -70,12 +70,15 @@ class ProvidersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, Cre
         return context
 
 
-class UsersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
+class UsersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, ListView):
     template_name = 'main/users_list.html'
+    paginate_by = 20
+
+    def get_queryset(self):
+        return _models.User.objects.all() if self.user.is_superuser else _models.User.objects.get_list()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['users'] = _models.User.objects.all() if self.user.is_superuser else _models.User.objects.get_list()
         context['roles'] = Roles
         return context
 
@@ -136,13 +139,23 @@ class NewOrderView(LoginRolesRequiredViewMixin, CommonContextViewMixin, CreateVi
         return context
 
 
-class OrdersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
+class OrdersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, ListView):
     template_name = 'main/orders.html'
+    paginate_by = 20
     allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
 
     def __init__(self, *args, **kwargs):
         self.product_id = None
         super().__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        if self.user.role in (Roles.ZAKUPSCHIK, Roles.ADMINISTRATOR):
+            order_qs = _models.Order.objects.get_list()
+        elif self.product_id:
+            order_qs = _models.Order.objects.get_list(created_by=self.user, status=OrderStatuses.CREATED)
+        else:
+            order_qs = _models.Order.objects.get_list(created_by=self.user)
+        return order_qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -150,13 +163,6 @@ class OrdersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, Templa
         if self.product_id:
             context['product_id'] = self.product_id
 
-        if self.user.role in (Roles.ZAKUPSCHIK, Roles.ADMINISTRATOR):
-            order_qs = _models.Order.objects.get_list()
-        elif self.product_id:
-            order_qs = _models.Order.objects.get_list(created_by=self.user, status=OrderStatuses.CREATED)
-        else:
-            order_qs = _models.Order.objects.get_list(created_by=self.user)
-        context['orders'] = order_qs
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -198,6 +204,20 @@ class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
         context['order'] = self.object
         context['SHOPPING_TYPES'] = ShoppingTypes
         context['receipts'] = _models.Receipt.objects.filter(order=self.object.id)
+        return context
+
+
+class DeleteOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, DeleteView):
+    template_name = "main/delete_order.html"
+    allowed_roles = (Roles.ZAKAZSCHIK,)
+    model = _models.Order
+
+    def get_success_url(self):
+        return reverse_lazy('main:orders')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['order_to_delete'] = self.object
         return context
 
 
@@ -437,13 +457,12 @@ class BuyoutsListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, Templ
     template_name = 'main/buyouts_list.html'
 
 
-class ProductsListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
+class ProductsListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, ListView):
     template_name = 'main/products_list.html'
+    paginate_by = 10
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['products'] = _models.Product.objects.get_joint_products()
-        return context
+    def get_queryset(self):
+        return _models.Product.objects.get_joint_products()
 
 
 class ProductsAddToOrderView(LoginRolesRequiredViewMixin, CommonContextViewMixin, FormView):

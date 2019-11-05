@@ -9,7 +9,7 @@
     <hr class="mb-4">
 
     <div class="container">
-      {% for p in products %}
+      {% for p in object_list %}
           <div class="card my-3 rounded shadow-sm">
           <div class="card-header d-flex justify-content-between"  style="background-color: #e9ecef">
               <h5>{{ p.name }}</h5>
@@ -55,6 +55,16 @@
     <div class="text-center small mb-3">
         <a class="btn btn-secondary btn-sm text-center" href="{% url 'main:new_joint_product' %}">
             Добавить товар</a>
+    </div>
+
+    <div class="text-center">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">&lt; </a> &nbsp;&nbsp;|&nbsp;&nbsp;
+        {% endif %}
+        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }} {% if page_obj.has_next %}
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href="?page={{ page_obj.next_page_number }}">&gt;</a>
+    {% endif %}
     </div>
 
 {% endblock content %}

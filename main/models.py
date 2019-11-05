@@ -72,7 +72,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
     def get_list(self, **kwargs):
-        return User.objects.filter(is_staff=False, is_superuser=False, **kwargs)
+        return self.filter(is_staff=False, is_superuser=False, **kwargs)
 
 
 class User(AbstractUser):
@@ -104,13 +104,17 @@ class User(AbstractUser):
 
     def update_balance_with_delta(self, new_delta):
         if new_delta:
+            from main.emails import user_data_email
             UserBalance.objects.create(user=self, delta=new_delta)
+            user_data_email(user=self,
+                            subject='Баланс пользователя изменен',
+                            extra_params={'balance_changed': True})
 
 
 class OrderManager(models.Manager):
 
     def get_list(self, **kwargs):
-        return Order.objects.filter(**kwargs)
+        return self.filter(**kwargs)
 
 
 class Order(ModelWithTimestamp, ModelWithUser):
@@ -140,6 +144,8 @@ class Order(ModelWithTimestamp, ModelWithUser):
 
     @property
     def actual_price_diff(self):
+        if self.pk:
+            self.refresh_from_db()
         return self.actual_price - self.price
 
     @transaction.atomic
@@ -155,7 +161,7 @@ class Order(ModelWithTimestamp, ModelWithUser):
             if user:
                 user.update_balance_with_delta(self.actual_price_diff)
             self.actual_price = self.price
-            super().save(update_fields=['actual_price'])
+            super().save(update_fields=['actual_price'],)
 
     @property
     def status_to_string(self):
@@ -196,13 +202,11 @@ class Order(ModelWithTimestamp, ModelWithUser):
 
 class OrderItemManager(models.Manager):
 
-    @staticmethod
-    def get_list(**kwargs):
-        return OrderItem.objects.filter(state__in=(OrderItemStates.ACTIVE, OrderItemStates.USED), **kwargs)
+    def get_list(self, **kwargs):
+        return self.filter(state__in=(OrderItemStates.ACTIVE, OrderItemStates.USED), **kwargs)
 
-    @staticmethod
-    def get_used(**kwargs):
-        return OrderItem.objects.filter(state=OrderItemStates.USED, **kwargs)
+    def get_used(self, **kwargs):
+        return self.filter(state=OrderItemStates.USED, **kwargs)
 
 
 class OrderItem(ModelWithTimestamp, ModelWithUser):
@@ -377,22 +381,15 @@ class Product(ModelWithTimestamp, ModelWithUser):
         if self.shopping_type == ShoppingTypes.JOINT:
             if self.quantity == 0:
                 self.orderitem_set.all().update(state=OrderItemStates.USED)
-                for oi in self.orderitem_set.all():
-                    oi.order.update_actual_price_with_user_balance()
             else:  # product.quantity > 0
                 self.orderitem_set.all().update(state=OrderItemStates.NOT_ACTIVE)
-                for oi in self.orderitem_set.all():
-                    oi.order.update_actual_price_with_user_balance()
-        else:
-            for oi in self.orderitem_set.all():
-                oi.order.update_actual_price_with_user_balance()
+        for oi in self.orderitem_set.all():
+            oi.order.update_actual_price_with_user_balance()
 
 
 def remove_product_image_from_disc(sender, **kwargs):
     product = kwargs['instance']
     product.image.delete()
-    for order_item in product.orderitem_set.get_list():
-        order_item.order.update_actual_price_with_user_balance()
 
 
 def remove_receipts_images_from_disc(sender, **kwargs):
@@ -401,8 +398,7 @@ def remove_receipts_images_from_disc(sender, **kwargs):
     shutil.rmtree(directory_to_be_removed, ignore_errors=True)
 
 
-@transaction.atomic
-def post_remove_order_item(sender, **kwargs):
+def pre_remove_order_item(sender, **kwargs):
     order_item = kwargs['instance']
     if order_item.product:
         if order_item.product.shopping_type == ShoppingTypes.INDIVIDUAL:
@@ -414,9 +410,14 @@ def post_remove_order_item(sender, **kwargs):
             product.quantity += order_item.quantity
             product.save()
             product.update_order_price()
+
+
+def post_remove_order_item(sender, **kwargs):
+    order_item = kwargs['instance']
     order_item.order.update_actual_price_with_user_balance()
 
 
-post_delete.connect(remove_product_image_from_disc, sender=Product)
+pre_delete.connect(remove_product_image_from_disc, sender=Product)
 pre_delete.connect(remove_receipts_images_from_disc, sender=Order)
+pre_delete.connect(pre_remove_order_item, sender=OrderItem)
 post_delete.connect(post_remove_order_item, sender=OrderItem)
