@@ -3,22 +3,24 @@
 {% block title %}Удаление заказа{% endblock title %}
 
 {% block content %}
-    <h3 class="font-weight-normal text-center">
-        Вы точно хотите удалить заказ № {{ order_to_delete.pk }}?
-    </h3>
+    {% include 'main/include/main_title_template.html' with title='Вы точно хотите удалить заказ?' %}
 
-    <hr class="mb-4">
+    <div class="container mt-5 text-center">
+        <div class="jumbotron bg-white rounded shadow-sm">
+            <h1 class="display-4">Выбранный заказ будет удален.</h1>
+            <p class="lead">После подтверждения на удаление, все данные будут удалены.</p>
+            <hr class="mb-4">
+            <p class="h3">Номер заказа: {{ object.pk }}</p>
+            <p class="">Сумма заказа: {{ object.price }}</p>
+        </div>
 
-    <div class="container">
-        <div class="bg-white shadow-sm">
-            <form method="post" enctype="multipart/form-data" id="DeleteForm">
-                {% csrf_token %}
-            </form>
-        </div>
-        <div class="mb-4 text-center">
-            <button class="btn btn-secondary btn-sm" type="submit" form="DeleteForm">Удалить</button>
-            <a class="btn btn-secondary btn-sm" href="{% url 'main:orders' %}">Отмена</a>
-        </div>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-4 text-center">
+                <button class="btn btn-secondary btn-sm" type="submit">Удалить</button>
+                <a class="btn btn-secondary btn-sm" href="{% url 'main:orders' %}">Отмена</a>
+            </div>
+        </form>
     </div>
 
 {% endblock content %}

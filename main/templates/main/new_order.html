@@ -3,16 +3,16 @@
 {% block title %}Новый заказ{% endblock title %}
 
 {% block content %}
+{% include 'main/include/main_title_template.html' with title='Сделать новый заказ' %}
 
-    <div class="container">
-       <h2 class="text-center">Сделать новый заказ</h2>
-       <hr class="mb-4">
+    <div class="container my-3 p-3 bg-white rounded shadow-sm">
+
        <button class="btn btn-outline-secondary btn-sm" type="button" data-toggle="collapse" data-target="#roles" aria-expanded="false" aria-controls="roles">Правила оформления заказа</button>
 
-        <div class="row">
-          <div class="col">
+        <div class="d-flex border-bottom">
+          <div class="col my-3">
             <div class="collapse multi-collapse" id="roles">
-              <div class="my-3 p-3 bg-white rounded shadow-sm">
+
                   <p>В поле 'Фото товара' выберите одну или несколько фотографий товаров,
                      далее нажмите 'Заказать', автоматически фотографии будут добавлены к заказу.<br>
                   Далее Вы можете изменить данные по каждому товару.<br>
@@ -20,10 +20,8 @@
               </div>
             </div>
           </div>
-        </div>
 
-       <div class="my-3 p-3 bg-white rounded shadow-sm">
-            <form class="needs-validation" id="order" action="" method="POST" enctype="multipart/form-data">
+            <form class="my-3" id="order" action="" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="form-group row">
                     <label for="photo-input" class="col-2 col-form-label">Фото товара</label>
@@ -33,7 +31,7 @@
                         <label class="custom-file-label text-truncate">выберите файл</label>
                     </div>
                 </div>
-            </form></div>
+            </form>
     </div>
     <div class="mb-4 text-center">
         <button class="btn btn-secondary btn-sm" type="submit" form="order">Заказать</button>
