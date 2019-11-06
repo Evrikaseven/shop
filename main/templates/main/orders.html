@@ -11,83 +11,101 @@
     {% endif %}
 
     <div class="container">
-{#        <div class="my-3 p-3 bg-white rounded shadow-sm">#}
-{##}
-{#            <h6 class="border-bottom border-gray pb-2 mb-0">Заказы в обработке: 3</h6>#}
-{#            <div class="media text-muted pt-3">#}
-{#              <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>#}
-{#              <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">#}
-{#                <div class="d-flex justify-content-between align-items-center w-100">#}
-{#                  <strong class="text-gray-dark"></strong>#}
-{#                  <a href="#">Follow</a>#}
-{#                </div>#}
-{#                <span class="d-block">@username</span>#}
-{#              </div>#}
-{#            </div>#}
-{#            <small class="d-block text-right mt-3">#}
-{#              <a href="#">All suggestions</a>#}
-{#            </small>#}
-{#        </div>#}
+    {#        <div class="my-3 p-3 bg-white rounded shadow-sm">#}
+    {##}
+    {#            <h6 class="border-bottom border-gray pb-2 mb-0">Заказы в обработке: 3</h6>#}
+    {#            <div class="media text-muted pt-3">#}
+    {#              <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>#}
+    {#              <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">#}
+    {#                <div class="d-flex justify-content-between align-items-center w-100">#}
+    {#                  <strong class="text-gray-dark"></strong>#}
+    {#                  <a href="#">Follow</a>#}
+    {#                </div>#}
+    {#                <span class="d-block">@username</span>#}
+    {#              </div>#}
+    {#            </div>#}
+    {#            <small class="d-block text-right mt-3">#}
+    {#              <a href="#">All suggestions</a>#}
+    {#            </small>#}
+    {#        </div>#}
 
     <div class="my-3 p-3 bg-white rounded shadow-sm">
         <div class="border-bottom border-gray pb-2 mb-0">
-        {% if product_id %}
-            <a class="btn btn-sm btn-secondary my-1"
-               href="{% url 'main:joint_item_to_product_new_order' product_pk=product_id %}" >
-                Добавить в новый заказ
-            </a>
-        {% endif %}
+            {% if product_id %}
+                <a class="btn btn-sm btn-secondary my-1"
+                   href="{% url 'main:joint_item_to_product_new_order' product_pk=product_id %}">
+                    Добавить в новый заказ
+                </a>
+            {% endif %}
         </div>
         {% for o in object_list %}
             <div class="media text-muted pt-3">
                 {% if o.status == order_statuses.CREATED %}
-                        <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
+                    <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32"
+                         xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false"
+                         role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#007bff"></rect>
+                        <text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text>
+                    </svg>
                 {% endif %}
                 {% if o.status == order_statuses.PAYING_TO_BE_CONFIRMED %}
-                        <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#e83e8c"></rect><text x="50%" y="50%" fill="#e83e8c" dy=".3em">32x32</text></svg>
+                    <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32"
+                         xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false"
+                         role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#e83e8c"></rect>
+                        <text x="50%" y="50%" fill="#e83e8c" dy=".3em">32x32</text>
+                    </svg>
                 {% endif %}
                 {% if o.status == order_statuses.PAID %}
-                        <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#28a745"></rect><text x="50%" y="50%" fill="#28a745" dy=".3em">32x32</text></svg>
+                    <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32"
+                         xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false"
+                         role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#28a745"></rect>
+                        <text x="50%" y="50%" fill="#28a745" dy=".3em">32x32</text>
+                    </svg>
                 {% endif %}
                 {% if o.status == order_statuses.IN_PROGRESS %}
-                        <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#6f42c1"></rect><text x="50%" y="50%" fill="#6f42c1" dy=".3em">32x32</text></svg>
+                    <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32"
+                         xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false"
+                         role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#6f42c1"></rect>
+                        <text x="50%" y="50%" fill="#6f42c1" dy=".3em">32x32</text>
+                    </svg>
                 {% endif %}
-                        <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-                        <div class="d-flex justify-content-between align-items-center w-100">
+                <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                    <div class="d-flex justify-content-between align-items-center w-100">
                         {% if product_id %}
                             <a href="{% url 'main:joint_item_to_product' pk=o.id product_pk=product_id %}">
                         {% else %}
-                            <a href="{% url 'main:order_details' pk=o.id %}" >
+                            <a href="{% url 'main:order_details' pk=o.id %}">
                         {% endif %}
-                                <strong class="text-gray-dark">Заказ #{{ o.id }}</strong>
-                            </a>
+                        <strong class="text-gray-dark">Заказ #{{ o.id }}</strong>
+                        </a>
                         <strong>{{ o.status_to_string }}</strong>
                         <strong>К оплате: {{ o.price }}</strong>
                     </div>
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <span class="d-block">{{ o.created_by.email }} ({{ o.created_by.first_name }} {{ o.created_by.last_name }}) </span>
                         {% if user_role == roles.ZAKAZSCHIK and o.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
-                             <a href="{% url 'main:delete_order' pk=o.id %}">Удалить</a>
+                            <a href="{% url 'main:delete_order' pk=o.id %}">Удалить</a>
                         {% else %}
                             <small class="text-muted">Создан {{ o.created_date }}</small>
                         {% endif %}
                     </div>
-                  </div>
                 </div>
+            </div>
         {% endfor %}
 
         <div class="text-right mt-2">
             <small class="text-muted">
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}">&lt; </a> &nbsp;&nbsp;|&nbsp;&nbsp;
-            {% endif %}
-            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }} {% if page_obj.has_next %}
-            &nbsp;&nbsp;|&nbsp;&nbsp;
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}">&lt; </a> &nbsp;&nbsp;|&nbsp;&nbsp;
+                {% endif %}
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }} {% if page_obj.has_next %}
+                &nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="?page={{ page_obj.next_page_number }}">&gt;</a>
             {% endif %}
             </small>
         </div>
-    </div>
-
     </div>
 {% endblock content %}

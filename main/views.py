@@ -163,7 +163,6 @@ class OrdersListView(LoginRolesRequiredViewMixin, CommonContextViewMixin, ListVi
 
         if self.product_id:
             context['product_id'] = self.product_id
-
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -205,6 +204,20 @@ class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
         context['order'] = self.object
         context['SHOPPING_TYPES'] = ShoppingTypes
         context['receipts'] = _models.Receipt.objects.filter(order=self.object.id)
+        return context
+
+
+class DeleteOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, DeleteView):
+    template_name = "main/delete_order.html"
+    allowed_roles = (Roles.ZAKAZSCHIK,)
+    model = _models.Order
+
+    def get_success_url(self):
+        return reverse_lazy('main:orders')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['order_to_delete'] = self.object
         return context
 
 
