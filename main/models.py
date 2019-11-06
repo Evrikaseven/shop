@@ -144,24 +144,7 @@ class Order(ModelWithTimestamp, ModelWithUser):
 
     @property
     def actual_price_diff(self):
-        if self.pk:
-            self.refresh_from_db()
         return self.actual_price - self.price
-
-    @transaction.atomic
-    def update_actual_price_with_user_balance(self):
-        # The actual price and user balance is updated only for orders in process
-        # After it is finished it is frozen for future statistic for example
-        if self.actual_price_diff and self.status in (OrderStatuses.CREATED,
-                                                      OrderStatuses.PAYING_TO_BE_CONFIRMED,
-                                                      OrderStatuses.PAID,
-                                                      OrderStatuses.IN_PROGRESS):
-            # Update user balance first
-            user = self.created_by
-            if user:
-                user.update_balance_with_delta(self.actual_price_diff)
-            self.actual_price = self.price
-            super().save(update_fields=['actual_price'],)
 
     @property
     def status_to_string(self):
@@ -189,14 +172,45 @@ class Order(ModelWithTimestamp, ModelWithUser):
             return False
         return True
 
+    def _update_price_and_balance(self):
+        # The actual price and user balance is updated only for orders in process
+        # After it is finished it is frozen for future statistic for example
+        price_delta = self.actual_price_diff
+        if price_delta:
+            if self.status in (OrderStatuses.PAYING_TO_BE_CONFIRMED,
+                               OrderStatuses.PAID,
+                               OrderStatuses.IN_PROGRESS):
+                # Update user balance first
+                user = self.created_by
+                if user:
+                    user.update_balance_with_delta(price_delta)
+            self.actual_price = self.price
+            return True
+        return False
+
+    def pay_order(self):
+        self.status = OrderStatuses.PAYING_TO_BE_CONFIRMED
+        user = self.created_by
+        if user:
+            with transaction.atomic():
+                super().save()
+                user.update_balance_with_delta(-self.actual_price)
+            from main.emails import user_data_email, order_data_email
+            user_data_email(user=user,
+                            subject='Баланс пользователя изменен',
+                            extra_params={'balance_changed': True})
+            order_data_email(order=self,
+                             subject='Новый заказ №{}'.format(self.pk),
+                             extra_params={'status_changed': True})
+
+    @transaction.atomic
+    def update_actual_price_with_user_balance(self):
+        if self._update_price_and_balance():
+            super().save(update_fields=['actual_price'],)
+
     @transaction.atomic
     def save(self, **kwargs):
-        if self.actual_price_diff:
-            # Update user balance first
-            user = self.created_by
-            if user:
-                user.update_balance_with_delta(self.actual_price_diff)
-            self.actual_price = self.price
+        self._update_price_and_balance()
         super().save(**kwargs)
 
 

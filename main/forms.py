@@ -105,23 +105,6 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
             self.fields.pop('delivery')
             self.fields.pop('delivery_address')
 
-    @transaction.atomic
-    def pay_order(self):
-        self.instance.status = OrderStatuses.PAYING_TO_BE_CONFIRMED
-        user = self.instance.created_by
-        if user:
-            old_user_balance = user.balance
-            self.instance.save()
-
-            if old_user_balance != user.balance:
-                user_data_email(user=user,
-                                subject='Баланс пользователя изменен',
-                                extra_params={'balance_changed': True})
-
-            order_data_email(order=self.instance,
-                             subject='Новый заказ №{}'.format(self.instance.pk),
-                             extra_params={'status_changed': True})
-
     def clean_paid_price(self):
         paid_price = self.cleaned_data['paid_price']
         return paid_price if paid_price else 0
@@ -146,8 +129,7 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
             if ('delivery_address' in self.cleaned_data and self.cleaned_data['delivery_address'] and
                     self.cleaned_data['delivery_address'] != self.instance.delivery_address):
                 self.instance.delivery_address = self.cleaned_data['delivery_address']
-
-        return super().save(commit=True)
+        return super().save(commit=commit)
 
 
 class ReceiptForOrderForm(forms.ModelForm):
