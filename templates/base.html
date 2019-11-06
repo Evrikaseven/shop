@@ -57,6 +57,7 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             {% if user_role == roles.ADMINISTRATOR %}
                                 <a class="dropdown-item" href="{% url 'main:orders' %}">Заказы</a>
+                                <a class="dropdown-item" href="{% url 'main:zakupschik_orders_places' %}">Заказы на выкуп</a>
                                 <a class="dropdown-item" href="{% url 'main:products' %}">Выкупы</a>
                                 <a class="dropdown-item" href="{% url 'main:users' %}">Пользователи</a>
                                 <a class="dropdown-item" href="{% url 'main:providers' %}">Поставщики</a>

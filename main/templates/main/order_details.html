@@ -255,7 +255,7 @@
                 <div class="card-footer text-right bg-lg">
                     {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
                             <div class="btn-group-sm">
-                                <a class="btn btn-secondary "
+                                <a class="btn btn-secondary"
                                    href="{% url 'main:order_item_details' pk=order_item.id %}">
                                     Изменить</a>
                                     {% if order_item.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL %}

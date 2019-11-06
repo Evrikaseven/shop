@@ -1,13 +1,18 @@
-
-$('.custom-file-input').on('change', function() {
-   let fileName = $('.custom-file-input')[0].files;
-   console.log(fileName);
-   $(this).next('.custom-file-label').addClass("selected").html(fileName);
+$(document).ready(function() {
+  $('input[type="file"]').on("change", function() {
+    let filenames = [];
+    let files = document.getElementById("photo-input").files;
+    if (files.length > 1) {
+      filenames.push("Выбранно фотографий (" + files.length + ")");
+    } else {
+      for (let i in files) {
+        if (files.hasOwnProperty(i)) {
+          filenames.push(files[i].name);
+        }
+      }
+    }
+    $(this)
+      .next(".custom-file-label")
+      .html(filenames.join(","));
+  });
 });
-
-// $(function() {
-//   $('#order').change(function(){
-//     let sum =  parseInt($("#price-input").val(), 10) * parseInt($("#count-input").val(), 10);
-//     $('#check_sum').html( sum + sum / 10);
-//   });
-// });

@@ -19,19 +19,19 @@
                   Заказ возможно редактировать только, пока он в статусе '{{ STATUS_CREATED_STR }}'</p>
               </div>
             </div>
-          </div>
+        </div>
 
-            <form class="my-3" id="order" action="" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="form-group row">
-                    <label for="photo-input" class="col-2 col-form-label">Фото товара</label>
-                    <div class="col-10 custom-file">
-                        <input class="custom-file-input" type="file" name="{{ form.images.name }}" multiple=""
-                               id="photo-input">
-                        <label class="custom-file-label text-truncate">выберите файл</label>
-                    </div>
+        <form class="my-3" id="order" action="" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group col-sm-auto mr-auto ml-auto p-4">
+{#                <label for="photo-input" class="col-3 col-form-label">Фото товара</label>#}
+                <div class="custom-file">
+                    <input class="custom-file-input" type="file" multiple name="{{ form.images.name }}"
+                           id="photo-input">
+                    <label class="custom-file-label text-truncate">выберите одну или несколько фото товара</label>
                 </div>
-            </form>
+            </div>
+        </form>
     </div>
     <div class="mb-4 text-center">
         <button class="btn btn-secondary btn-sm" type="submit" form="order">Заказать</button>
