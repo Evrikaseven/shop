@@ -196,40 +196,40 @@
          </div>
         </div>
          <div class="col-md-9 order-md-1">
-         {% for order_item in order.orderitem_set.all %}
+         {% for replacement in order.top_order_items %}
             <div class="card mb-3 bg-white rounded shadow-sm">
                 <div class="row no-gutters">
                     <div class="col-md-3 m-2">
-                        <img src="{{ MEDIA_URL }}{{ order_item.product.image }}" class="card-img" alt="...">
+                        <img src="{{ MEDIA_URL }}{{ replacement.product.image }}" class="card-img" alt="...">
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
-                            <h5 class="card-title pricing-card-title">{% if order_item.name %} {{ order_item.name }} {% else %} Без
+                            <h5 class="card-title pricing-card-title">{% if replacement.name %} {{ replacement.name }} {% else %} Без
                                 названия {% endif %}</h5>
                         <div class="d-flex justify-content-between mb-3">
                             <div class="col-md-auto">
-                                <p class="card-text">Место: <small class="text-muted">{{ order_item.place }}</small></p>
-                                <p class="card-text">Цена: <small class="text-muted">{{ order_item.price }}</small></p>
-                                <p class="card-text">Количество: <small class="text-muted">{{ order_item.quantity }}</small></p>
+                                <p class="card-text">Место: <small class="text-muted">{{ replacement.place }}</small></p>
+                                <p class="card-text">Цена: <small class="text-muted">{{ replacement.price }}</small></p>
+                                <p class="card-text">Количество: <small class="text-muted">{{ replacement.quantity }}</small></p>
                             </div>
 
                             <div class="col-md-auto">
-                                <p class="card-text">Статус товара: <small class="text-muted">{{ order_item.status_to_string }}</small></p>
-                                <p class="card-text">Вид закупки: <small class="text-muted">{{ order_item.product.shopping_type_to_string }}</small></p>
+                                <p class="card-text">Статус товара: <small class="text-muted">{{ replacement.status_to_string }}</small></p>
+                                <p class="card-text">Вид закупки: <small class="text-muted">{{ replacement.product.shopping_type_to_string }}</small></p>
                             </div>
                         </div>
                             <p class="card-text">Коментарий к заказу:
                                 <small class="text-muted">
-                                    {% if not order_item.price %}
+                                    {% if not replacement.price %}
                                         <div style="color: red">
                                             <em>
                                                 Укажите цену
                                             </em>
                                         </div>
                                     {% endif %}
-                                    {% if order_item.product %}
-                                        {% if order_item.product.shopping_type == SHOPPING_TYPES.JOINT %}
-                                            {% if order_item.product.quantity == 0 %}
+                                    {% if replacement.product %}
+                                        {% if replacement.product.shopping_type == SHOPPING_TYPES.JOINT %}
+                                            {% if replacement.product.quantity == 0 %}
                                                 Выкуп собран
                                             {% else %}
                                                 Выкуп в процессе сборки
@@ -239,15 +239,15 @@
                                         Товар удалён <br>
                                     {% endif %}
 
-                                    {{ order_item.delivery_to_string }} |
-                                    {{ order_item.order_comment }}
+                                    {{ replacement.delivery_to_string }} |
+                                    {{ replacement.order_comment }}
 
-                                    {% if order_item.is_replacement %}
+                                    {% if replacement.is_replacement %}
                                         Данный товар является заменой
                                     {% endif %}
                                 </small>
                             </p>
-                            <p class="card-text">Коментарий для себя: <small class="text-muted">{{ order_item.customer_comment }}</small></p>
+                            <p class="card-text">Коментарий для себя: <small class="text-muted">{{ replacement.customer_comment }}</small></p>
                         </div>
                     </div>
                 </div>
@@ -256,12 +256,12 @@
                     {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
                             <div class="btn-group-sm">
                                 <a class="btn btn-secondary"
-                                   href="{% url 'main:order_item_details' pk=order_item.id %}">
+                                   href="{% url 'main:order_item_details' pk=replacement.id %}">
                                     Изменить</a>
-                                    {% if order_item.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL %}
-                                        {% if order_item.parent %}
+                                    {% if replacement.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL %}
+                                        {% if replacement.parent %}
                                             <a class="btn btn-secondary"
-                                               href="{% url 'main:order_item_details' pk=order_item.parent.pk %}">
+                                               href="{% url 'main:order_item_details' pk=replacement.parent.pk %}">
                                                 Заменяемый товар
                                             </a>
                                         {% endif %}
@@ -272,19 +272,131 @@
                                                 Замена</a>
                                         {% else %}
                                             <a class="btn btn-secondary"
-                                               href="{% url 'main:replacement_order_item' pk=order_item.pk %}">
+                                               href="{% url 'main:replacement_order_item' pk=replacement.pk %}">
                                                 Добавить замену</a>
                                         {% endif %}
                                     {% endif %}
                                 {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
                                     <a class="btn btn-secondary"
-                                       href="{% url 'main:delete_order_item' pk=order_item.id %}">
+                                       href="{% url 'main:delete_order_item' pk=replacement.id %}">
                                         Удалить</a>
                                 {% endif %}
                             </div>
                     {% endif %}
                 </div>
             </div>
+             
+
+
+
+
+
+{#             TODO: Should be updated    #}
+{#             TODO: Should be updated    #}
+{#             TODO: Should be updated    #}
+{#             TODO: Should be updated    #}
+{#             TODO: Should be updated    #}
+             {% for replacement in replacement.replacements %}
+             
+             <div class="card mb-3 bg-white rounded shadow-sm">
+                <div class="row no-gutters">
+                    <div class="col-md-3 m-2" style="background-color: yellow">
+                        <img src="{{ MEDIA_URL }}{{ replacement.product.image }}" class="card-img" alt="...">
+                    </div>
+                    <div class="col-md-8" style="background-color: yellow">
+                        <div class="card-body">
+                            <h5 class="card-title pricing-card-title">{% if replacement.name %} {{ replacement.name }} {% else %} Без
+                                названия {% endif %}</h5>
+                        <div class="d-flex justify-content-between mb-3">
+                            <div class="col-md-auto">
+                                <p class="card-text">Место: <small class="text-muted">{{ replacement.place }}</small></p>
+                                <p class="card-text">Цена: <small class="text-muted">{{ replacement.price }}</small></p>
+                                <p class="card-text">Количество: <small class="text-muted">{{ replacement.quantity }}</small></p>
+                            </div>
+
+                            <div class="col-md-auto">
+                                <p class="card-text">Статус товара: <small class="text-muted">{{ replacement.status_to_string }}</small></p>
+                                <p class="card-text">Вид закупки: <small class="text-muted">{{ replacement.product.shopping_type_to_string }}</small></p>
+                            </div>
+                        </div>
+                            <p class="card-text">Коментарий к заказу:
+                                <small class="text-muted">
+                                    {% if not replacement.price %}
+                                        <div style="color: red">
+                                            <em>
+                                                Укажите цену
+                                            </em>
+                                        </div>
+                                    {% endif %}
+                                    {% if replacement.product %}
+                                        {% if replacement.product.shopping_type == SHOPPING_TYPES.JOINT %}
+                                            {% if replacement.product.quantity == 0 %}
+                                                Выкуп собран
+                                            {% else %}
+                                                Выкуп в процессе сборки
+                                            {% endif %}
+                                        {% endif %}
+                                    {% else %}
+                                        Товар удалён <br>
+                                    {% endif %}
+
+                                    {{ replacement.delivery_to_string }} |
+                                    {{ replacement.order_comment }}
+
+                                    {% if replacement.is_replacement %}
+                                        Данный товар является заменой
+                                    {% endif %}
+                                </small>
+                            </p>
+                            <p class="card-text">Коментарий для себя: <small class="text-muted">{{ replacement.customer_comment }}</small></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer text-right bg-lg">
+                    {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
+                            <div class="btn-group-sm">
+                                <a class="btn btn-secondary"
+                                   href="{% url 'main:order_item_details' pk=replacement.id %}">
+                                    Изменить</a>
+                                    {% if replacement.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL %}
+                                        {% if replacement.parent %}
+                                            <a class="btn btn-secondary"
+                                               href="{% url 'main:order_item_details' pk=replacement.parent.pk %}">
+                                                Заменяемый товар
+                                            </a>
+                                        {% endif %}
+
+                                        {% if child_order_item %}
+                                            <a class="btn btn-secondary"
+                                               href="{% url 'main:order_item_details' pk=child_order_item.pk %}">
+                                                Замена</a>
+                                        {% else %}
+                                            <a class="btn btn-secondary"
+                                               href="{% url 'main:replacement_order_item' pk=replacement.pk %}">
+                                                Добавить замену</a>
+                                        {% endif %}
+                                    {% endif %}
+                                {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
+                                    <a class="btn btn-secondary"
+                                       href="{% url 'main:delete_order_item' pk=replacement.id %}">
+                                        Удалить</a>
+                                {% endif %}
+                            </div>
+                    {% endif %}
+                </div>
+            </div>
+             
+             {% endfor %}
+
+             {# End of TODO: #}
+             {# End of TODO: #}
+             {# End of TODO: #}
+             {# End of TODO: #}
+
+
+
+             
          {%  endfor  %}
             <div class="text-center small mb-3">
                 {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
