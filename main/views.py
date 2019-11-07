@@ -339,7 +339,7 @@ class OrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextView
         context = super().get_context_data(**kwargs)
         context['order_item'] = self.object
         context['SHOPPING_TYPES'] = ShoppingTypes
-        context['child_order_item'] = getattr(self.object, 'orderitem', None)
+        context['child_order_item'] = getattr(self.object, 'replacement', None)
         context['product_image'] = self.object.product.image
         context['order_items_statuses_list'] = list(OrderItemStatuses)
         context['purchase_and_delivery_types_list'] = list(PurchaseAndDeliveryTypes)
@@ -415,7 +415,7 @@ class DeleteOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextVi
     def post(self, *args, **kwargs):
         order_id = kwargs['pk']
         order_status = _models.Order.objects.get(pk=order_id).status
-        if order_status not in (OrderStatuses.CREATED, OrderStatuses.CLOSED):
+        if order_status != OrderStatuses.CREATED:
             return self.handle_no_permission()
         return super().post(*args, **kwargs)
 

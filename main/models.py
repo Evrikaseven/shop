@@ -202,6 +202,7 @@ class Order(ModelWithTimestamp, ModelWithUser):
 
     @transaction.atomic
     def update_actual_price_with_user_balance(self):
+        self.refresh_from_db()
         if self._update_price_and_balance():
             super().save(update_fields=['actual_price'],)
 
@@ -235,7 +236,7 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
                                              default=OrderItemStates.USED,
                                              choices=tuple(OrderItemStates))
     parent = models.OneToOneField('self', verbose_name='Заменяемый товар',
-                                  on_delete=models.CASCADE, null=True, blank=True)
+                                  on_delete=models.DO_NOTHING, null=True, blank=True, related_name='replacement')
     delivery = models.PositiveSmallIntegerField(verbose_name='Тип доставки',
                                                 default=PurchaseAndDeliveryTypes.PURCHASE_AND_DELIVERY,
                                                 choices=tuple(PurchaseAndDeliveryTypes))
@@ -425,7 +426,17 @@ def pre_remove_order_item(sender, **kwargs):
 
 def post_remove_order_item(sender, **kwargs):
     order_item = kwargs['instance']
-    order_item.order.update_actual_price_with_user_balance()
+    with transaction.atomic():
+        if hasattr(order_item, 'replacement'):
+            replacement = order_item.replacement
+            if order_item.parent:
+                replacement.parent = order_item.parent
+            else:
+                replacement.parent = None
+                replacement.status = OrderItemStatuses.CREATED
+                replacement.state = OrderItemStates.USED
+            replacement.save()
+        order_item.order.update_actual_price_with_user_balance()
 
 
 pre_delete.connect(remove_product_image_from_disc, sender=Product)
