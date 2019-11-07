@@ -196,9 +196,6 @@ class Order(ModelWithTimestamp, ModelWithUser):
                 super().save()
                 user.update_balance_with_delta(-self.actual_price)
             from main.emails import user_data_email, order_data_email
-            user_data_email(user=user,
-                            subject='Баланс пользователя изменен',
-                            extra_params={'balance_changed': True})
             order_data_email(order=self,
                              subject='Новый заказ №{}'.format(self.pk),
                              extra_params={'status_changed': True})
