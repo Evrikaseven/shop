@@ -114,10 +114,13 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         if self.instance.pk:
             paid_price = cleaned_data['paid_price']
             cleaned_data['paid_price'] = self.instance.paid_price + paid_price
+            if paid_price:
+                self.user_balance_delta = paid_price
             if 'status' in self.cleaned_data and self.instance.status != cleaned_data['status']:
                 self.status_changed = True
         return cleaned_data
 
+    @transaction.atomic
     def save(self, commit=True):
         user = self.instance.created_by
         if user:
@@ -128,6 +131,8 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
             if ('delivery_address' in self.cleaned_data and self.cleaned_data['delivery_address'] and
                     self.cleaned_data['delivery_address'] != self.instance.delivery_address):
                 self.instance.delivery_address = self.cleaned_data['delivery_address']
+            if self.user_balance_delta:
+                user.update_balance_with_delta(self.user_balance_delta)
         return super().save(commit=commit)
 
 
@@ -273,8 +278,8 @@ class OrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
             self.instance.state = OrderItemStates.USED
 
             def _update_replacement_state(parent):
-                if hasattr(parent, 'orderitem'):
-                    replacement = parent.orderitem
+                if hasattr(parent, 'replacement'):
+                    replacement = parent.replacement
                     if replacement.status != OrderItemStatuses.BAUGHT_OUT:
                         replacement.state = OrderItemStates.NOT_ACTIVE
                         replacement.status = OrderItemStatuses.CREATED
@@ -285,8 +290,8 @@ class OrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
 
         if self.instance.status == OrderItemStatuses.NOT_BAUGHT_OUT:
             self.instance.state = OrderItemStates.ACTIVE
-            if hasattr(self.instance, 'orderitem'):
-                replacement_item = self.instance.orderitem
+            if hasattr(self.instance, 'replacement'):
+                replacement_item = self.instance.replacement
                 replacement_item.state = OrderItemStates.USED
                 replacement_item.save()
 
