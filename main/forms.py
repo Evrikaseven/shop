@@ -118,7 +118,6 @@ class OrderForm(WithUserDataUpdateFormMixin, forms.ModelForm):
                 self.status_changed = True
         return cleaned_data
 
-    @transaction.atomic
     def save(self, commit=True):
         user = self.instance.created_by
         if user:
@@ -147,7 +146,6 @@ class ReceiptForOrderForm(forms.ModelForm):
         model = Receipt
         fields = ('image',)
 
-    @transaction.atomic
     def save(self, commit=True):
         if not self.instance.pk:
             self.instance.order = Order.objects.get(pk=self.order_id)
