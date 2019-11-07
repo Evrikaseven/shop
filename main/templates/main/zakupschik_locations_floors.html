@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Заказы{% endblock title %}
+
+
+{% block content %}
+    {% include 'main/include/main_title_template.html' with title='Список мест с новыми заказами' %}
+
+    <div class="container my-3 p-3 bg-white rounded shadow-sm">
+        <div class="list-group">
+        {% for floor in floors %}
+            <a class="list-group-item list-group-item-action"  href="{% url 'main:zakupschik_locations_lines' location=location floor=floor %}">Этаж: {{ floor }} </a>
+        {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

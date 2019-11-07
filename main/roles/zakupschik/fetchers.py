@@ -29,16 +29,48 @@ class ZakupschikFetcher(object):
         return products_dict.values()
 
     @staticmethod
-    def places_to_dict():
-        places = OrderItem.objects.get_list(
+    def get_orderitems_qs(regex_tmpl: str = r''):
+        return OrderItem.objects.get_list(
             order__status__in=(
                 OrderStatuses.PAID,
                 OrderStatuses.IN_PROGRESS,
                 OrderStatuses.READY_TO_ISSUE
             ),
-            status__in=(OrderItemStatuses.CREATED, OrderItemStatuses.NOT_BAUGHT_OUT)
-        ).values_list('product__place', flat=True)
+            status__in=(OrderItemStatuses.CREATED, OrderItemStatuses.NOT_BAUGHT_OUT),
+            product__place__iregex=regex_tmpl
+        )
+
+    @staticmethod
+    def get_places_list():
+        places = __class__.get_orderitems_qs().values_list('product__place', flat=True)
         return sorted(set(places))
+
+    @staticmethod
+    def get_places_tree():
+        places = __class__.get_places_list()
+        inside_places = defaultdict(dict)
+        outside_places = {}
+        other_places = []
+        for place in places:
+            splitted_place = [i for i in place.split('-') if i]
+            if len(splitted_place) == 2:
+                if splitted_place[0] not in outside_places:
+                    outside_places[splitted_place[0]] = [place]
+                else:
+                    outside_places[splitted_place[0]].append(place)
+            elif len(splitted_place) == 3:
+                if (splitted_place[0] not in inside_places or
+                        splitted_place[1] not in inside_places[splitted_place[0]]):
+                    inside_places[splitted_place[0]][splitted_place[1]] = [place]
+                else:
+                    inside_places[splitted_place[0]][splitted_place[1]].append(place)
+            else:
+                other_places.append(place)
+        return {
+            'inside_places': inside_places,
+            'outside_places': outside_places,
+            'other_places': other_places
+        }
 
     @staticmethod
     def users_with_ready_to_deliver_products():
