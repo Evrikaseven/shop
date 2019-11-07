@@ -172,6 +172,10 @@ class Order(ModelWithTimestamp, ModelWithUser):
             return False
         return True
 
+    @property
+    def top_order_items(self):
+        return self.orderitem_set.filter(parent__isnull=True)
+
     def _update_price_and_balance(self):
         # The actual price and user balance is updated only for orders in process
         # After it is finished it is frozen for future statistic for example
@@ -264,6 +268,19 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
     @property
     def is_replacement(self):
         return bool(self.parent)
+
+    @property
+    def replacements(self):
+        replacements = []
+
+        def _get_replacements_chain(parent):
+            replacement = getattr(parent, 'replacement', None)
+            if replacement:
+                replacements.append(replacement)
+                _get_replacements_chain(replacement)
+
+        _get_replacements_chain(self)
+        return replacements
 
 
 def get_path_to_setting_images(instance, name):
