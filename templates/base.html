@@ -25,77 +25,65 @@
     <nav class="navbar navbar-expand-lg navbar-light mt-2 bg-lg">
     <div class="container">
         <a class="navbar-brand" href="{% url 'main:index' %}">{{ shop_title }}</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
-                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbars" aria-controls="navbars" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div id="navbarNavDropdown" class="navbar-collapse collapse">
-            <ul class="navbar-nav mr-auto">
-                {#    <li class="nav-item active">#}
-                {#        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>#}
-                {#    </li>#}
-                {#    <li class="nav-item">#}
-                {#        <a class="nav-link" href="#">Features</a>#}
-                {#    </li>#}
-                {#    <li class="nav-item">#}
-                {#        <a class="nav-link" href="#">Pricing</a>#}
-                {#    </li>#}
 
-            </ul>
-            <ul class="navbar-nav">
-                {% if user_is_authenticated %}
-                    <li class="nav-item">
-                        <div class="nav-link active">Привет,
-                            <a href="{% url 'main:user_details' pk=user_pk %}">{{ user_first_name }}</a>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
-                           aria-haspopup="true" aria-expanded="false">
-                            Личный кабинет
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            {% if user_role == roles.ADMINISTRATOR %}
-                                <a class="dropdown-item" href="{% url 'main:orders' %}">Заказы</a>
-                                <a class="dropdown-item" href="{% url 'main:zakupschik_orders_places' %}">Заказы на выкуп</a>
-                                <a class="dropdown-item" href="{% url 'main:products' %}">Выкупы</a>
-                                <a class="dropdown-item" href="{% url 'main:users' %}">Пользователи</a>
-                                <a class="dropdown-item" href="{% url 'main:providers' %}">Поставщики</a>
-                                <a class="dropdown-item" href="{% url 'main:edit_news' %}">Раздел новостей</a>
-                                <a class="dropdown-item" href="{% url 'main:settings' %}">Настройки сайта</a>
-                                <a class="dropdown-item" href="{% url 'main:user_details' pk=user_pk %}">Настройки
-                                    профиля</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
-                            {% elif user_role == roles.ZAKUPSCHIK %}
-                                <a class="dropdown-item" href="{% url 'main:zakupschik_orders_places' %}">Заказы на
-                                    выкуп</a>
-                                <a class="dropdown-item" href="{% url 'main:zakupschik_products_ready_to_delivery' %}">Выдача
-                                    товаров</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
-                            {% else %} {# 'ZAKAZSCHIK' #}
-                                <a class="dropdown-item" href="{% url 'main:new_order' %}">Новый заказ</a>
-                                <a class="dropdown-item" href="{% url 'main:orders' %}">Мои заказы</a>
-                                <a class="dropdown-item" href="{% url 'main:catalog' %}">Выкупы</a>
-                                <a class="dropdown-item" href="{% url 'main:user_details' pk=user_pk %}">Настройки</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
-                            {% endif %}
-
-                        </div>
-                    </li>
-                {% else %}
+        <div class="collapse navbar-collapse justify-content-end" id="navbars">
+        <ul class="navbar-nav">
+            {% if user_is_authenticated %}
+                <li class="nav-item">
+                    <div class="d-flex mr-auto col-sm-auto">
+                        <a class="nav-link disabled text-dark" aria-disabled="true">Привет, </a>
+                        <a class="nav-link text-primary" href="{% url 'main:user_details' pk=user_pk %}">{{ user_first_name }}</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled text-dark" tabindex="-1" aria-disabled="true">Баланс: {{ user_balance }}</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Личный кабинет</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        {% if user_role == roles.ADMINISTRATOR %}
+                            <a class="dropdown-item" href="{% url 'main:orders' %}">Заказы</a>
+                            <a class="dropdown-item" href="{% url 'main:zakupschik_orders_places' %}">Заказы на выкуп</a>
+                            <a class="dropdown-item" href="{% url 'main:products' %}">Выкупы</a>
+                            <a class="dropdown-item" href="{% url 'main:users' %}">Пользователи</a>
+                            <a class="dropdown-item" href="{% url 'main:providers' %}">Поставщики</a>
+                            <a class="dropdown-item" href="{% url 'main:edit_news' %}">Раздел новостей</a>
+                            <a class="dropdown-item" href="{% url 'main:settings' %}">Настройки сайта</a>
+                            <a class="dropdown-item" href="{% url 'main:user_details' pk=user_pk %}">Настройки
+                                профиля</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
+                        {% elif user_role == roles.ZAKUPSCHIK %}
+                            <a class="dropdown-item" href="{% url 'main:zakupschik_orders_places' %}">Заказы на
+                                выкуп</a>
+                            <a class="dropdown-item" href="{% url 'main:zakupschik_products_ready_to_delivery' %}">Выдача
+                                товаров</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
+                        {% else %} {# 'ZAKAZSCHIK' #}
+                            <a class="dropdown-item" href="{% url 'main:new_order' %}">Новый заказ</a>
+                            <a class="dropdown-item" href="{% url 'main:orders' %}">Мои заказы</a>
+                            <a class="dropdown-item" href="{% url 'main:catalog' %}">Выкупы</a>
+                            <a class="dropdown-item" href="{% url 'main:user_details' pk=user_pk %}">Настройки</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
+                        {% endif %}
+                    </div>
+                </li>
+            {% else %}
                     <div class="btn-group my-2">
                         <a class="btn btn-sm btn-outline-secondary " href="{% url 'main:signup' %}">Регистрация</a>
                         <a class="btn btn-sm btn-outline-secondary" href="{% url 'main:login' %}">Войти</a>
                     </div>
-                {% endif %}
-            </ul>
+            {% endif %}
+        </ul>
         </div>
     </div>
 </nav>
-
 
 {% block content %}
     No content

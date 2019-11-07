@@ -108,6 +108,7 @@ class CommonContextViewMixin:
         context['shop_title'] = SHOP_TITLE
         if self.user.is_authenticated:
             context['user_pk'] = self.user.pk
+            context['user_balance'] = self.user.balance
             context['email'] = self.user.email
             context['user_role'] = self.user.role
             context['roles'] = Roles

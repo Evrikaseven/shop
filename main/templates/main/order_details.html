@@ -42,13 +42,6 @@
                         </div>
                         <span class="text-muted">{{ order.paid_price }}</span>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between lh-condensed">
-                        <div>
-                            <h6 class="my-0">Баланс пользователя:</h6>
-                        </div>
-                        <span class="text-muted">{{ user_balance }}</span>
-                    </li>
-
                     {% if update_is_allowed %}
                         {% if user_role == roles.ADMINISTRATOR %}
                             <li class="list-group-item d-flex justify-content-between lh-condensed">

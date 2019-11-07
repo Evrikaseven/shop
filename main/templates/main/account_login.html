@@ -3,28 +3,23 @@
 {% block title %}Вход на сайт{% endblock title %}
 
 {% block content %}
-    <h3 class="font-weight-normal text-center text-muted" style="color: #6c757d">
-        Пожалуйста войдите
-    </h3>
-    <hr class="mb-4">
+    {% include 'main/include/main_title_template.html' with title='Пожалуйста войдите' %}
     <form class="form-signin my-3 p-3 bg-white rounded shadow-sm" id="login" name="login" method="post">
 
             {% csrf_token %}
             {% if form.errors %}
-                <div class="alert alert-danger">
-                    Проверьте, пожалуйста, email и пароль
-                </div>
+                <p class="alert alert-danger">Проверьте, пожалуйста, email и пароль</p>
             {% endif %}
             <div class="form-group row">
-                <label for="id_username" class="col-5 col-form-label">Email пользователя</label>
-                <div class="col-7">
+                <label for="id_username" class="col col-form-label">Email пользователя</label>
+                <div class="col-md-7 ml-md-auto">
                     <input class="form-control" id="id_username" type="text" name="{{ form.username.name }}"
                            autofocus="" required="">
                 </div>
             </div>
             <div class="form-group row">
-                <label for="id_password" class="col-5 col-form-label">Пароль</label>
-                <div class="col-7">
+            <label for="id_password" class="col ml-md-auto col-form-label">Пароль</label>
+                <div class="col-md-7 ml-md-auto">
                     <input class="form-control" id="id_password" type="password" name="{{ form.password.name }}"
                            required="">
                 </div>
@@ -33,7 +28,9 @@
     <div class="form-actions text-center">
         <button type="submit" class="btn btn-secondary btn-sm" form="login">Войти</button>
         <a class="btn btn-secondary btn-sm" href="{% url 'main:signup' %}">Регистрация</a>
-        <a class="btn btn-secondary btn-sm" href="{% url 'main:password_reset' %}">Восстановить пароль</a>
+        {% if form.errors %}
+            <a class="btn btn-link btn-sm" href="{% url 'main:password_reset' %}">Не помню пароль</a>
+        {% endif %}
     </div>
     <p class="mt-5 mb-3 text-muted text-center">© 2017-2019</p>
 
