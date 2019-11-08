@@ -3,15 +3,9 @@
 {% block title %}Новый товар{% endblock title %}
 
 {% block content %}
-
-    <h3 class="font-weight-normal text-center text-muted" style="color: #6c757d">
-         Выкуп
-    </h3>
-
-    <hr class="mb-4">
+{% include 'main/include/main_title_template.html' with title='Товар для совместной закупки' %}
 
     <div class="container my-3 p-3 bg-white rounded shadow-sm">
-        <div class="row">
             {% if product.image %}
                 <div class="col-3 text-center">
                     <a href="{{ MEDIA_URL }}{{ product.image }}">
@@ -19,13 +13,15 @@
                     </a><br>
                 </div>
             {% endif %}
-            <div class="col">
+
+                <img class="card-img shadow-sm" id="output"/>
+
                 <form class="needs-validation" id="form_order" action="" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="form-group row">
                         <label for="id_image" class="col-2 col-form-label">Фото товара</label>
                         <div class="col-10 custom-file">
-                            <input class="custom-file-input" type="file" name="image" accept="image/*" id="id_image"
+                            <input class="custom-file-input" type="file" name="image" accept="image/*" id="photo-input"
                                    value="{{ MEDIA_URL }}{{ form.image.initial }}"
                                     {% if form.image.field.disabled %}
                                    disabled=""
@@ -134,4 +130,5 @@
     </div>
 
     <script src="{% static '/js/name_to_photo.js' %}"></script>
+    <script src="{% static '/js/image_preview.js' %}"></script>
 {% endblock content %}

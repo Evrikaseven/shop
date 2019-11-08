@@ -283,16 +283,15 @@
 
          <div class="collapse" id="collapse_replace{{ forloop.counter }}">
 
-
 {#             TODO: Should be updated    #}
              {% for replacement in replacement.replacements %}
-             <div class="card mb-3 bg-white rounded shadow-sm">
+             <div class="card mb-3 rounded shadow-sm" style="background-color: #e6effe;">
                 <div class="row no-gutters">
                     <div class="col-md-3 m-2">
                         <img src="{{ MEDIA_URL }}{{ replacement.product.image }}" class="card-img" alt="...">
                     </div>
                     <div class="col-md-8">
-                        <div class="card-body bg-white">
+                        <div class="card-body">
                             <h5 class="card-title pricing-card-title">{% if replacement.name %} {{ replacement.name }} {% else %} Без
                                 названия {% endif %}</h5>
                             <div class="d-flex justify-content-between mb-3">

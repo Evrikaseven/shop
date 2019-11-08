@@ -4,14 +4,9 @@
 {% block title %}Товар{% endblock title %}
 
 {% block content %}
+{% include 'main/include/main_title_template.html' with title='Товар #' id=order_item.id %}
 
-    <h3 class="font-weight-normal text-center">
-        Товар #{{ order_item.id }}
-    </h3>
-
-    <hr class="mb-4">
-
-    <div class="container">
+    <div class="container my-3 p-3 bg-white rounded shadow-sm">
         <div class="row">
             <div class="col-md-3 mb-3">
                 <a href="{{ MEDIA_URL }}{{ product_image }}">
@@ -166,7 +161,7 @@
             </div>
         </div>
     </div>
-    <hr>
+
     <div class="mb-4 text-center">
         <button class="btn btn-secondary btn-sm" type="submit" form="form_order">Сохранить</button>
         {% if user_role == roles.ZAKUPSCHIK %}
