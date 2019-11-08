@@ -10,18 +10,92 @@ class ZakupschikMainView(LoginRolesRequiredViewMixin, CommonContextViewMixin, Te
     allowed_roles = (Roles.ZAKUPSCHIK,)
 
 
-class ZakupschikOrdersPlacesView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
-    template_name = 'main/zakupschik_orders.html'
+class ZakupschikLocationsView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
+    template_name = 'main/zakupschik_locations.html'
     allowed_roles = (Roles.ZAKUPSCHIK,)
+
+
+class ZakupschikLocationsFloorsView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
+    template_name = 'main/zakupschik_locations_floors.html'
+    allowed_roles = (Roles.ZAKUPSCHIK,)
+
+    def __init__(self, *args, **kwargs):
+        self.location = None
+        super().__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         fetcher = ZakupschikFetcher()
-        context['places'] = fetcher.places_to_dict()
+        floors = {}
+        if self.location == 'inside':
+            floors = fetcher.get_places_tree()['inside_places']
+        context['location'] = self.location
+        context['floors'] = floors.keys()
         return context
 
+    def dispatch(self, request, *args, **kwargs):
+        self.location = kwargs['location']
+        return super().dispatch(request, *args, **kwargs)
 
-class ZakupschikOrdersByPlacesView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
+
+class ZakupschikLocationsLinesView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
+    template_name = 'main/zakupschik_locations_lines.html'
+    allowed_roles = (Roles.ZAKUPSCHIK,)
+
+    def __init__(self, *args, **kwargs):
+        self.location = None
+        self.floor = None
+        super().__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        fetcher = ZakupschikFetcher()
+        if self.location == 'outside':
+            lines = fetcher.get_places_tree()['outside_places']
+        elif self.location == 'inside':
+            lines = fetcher.get_places_tree()['inside_places'][self.floor]
+        context['location'] = self.location
+        context['floor'] = self.floor
+        context['lines'] = lines.keys()
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.location = kwargs['location']
+        self.floor = kwargs['floor']
+        return super().dispatch(request, *args, **kwargs)
+
+
+class ZakupschikPlacesView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
+    template_name = 'main/zakupschik_places.html'
+    allowed_roles = (Roles.ZAKUPSCHIK,)
+
+    def __init__(self, *args, **kwargs):
+        self.location = None
+        self.floor = None
+        self.line = None
+        super().__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        fetcher = ZakupschikFetcher()
+        if self.location == 'other':
+            context['places'] = fetcher.get_places_tree()['other_places']
+        elif self.location == 'inside':
+            context['places'] = fetcher.get_places_tree()['inside_places'][self.floor][self.line]
+        elif self.location == 'outside':
+            context['places'] = fetcher.get_places_tree()['outside_places'][self.line]
+        else:
+            context['places'] = fetcher.get_places_list()
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        self.location = kwargs['location']
+        self.floor = kwargs['floor']
+        self.line = kwargs['line']
+        return super().dispatch(request, *args, **kwargs)
+
+
+class ZakupschikOrderItemsByPlaceView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/zakupschik_order_items_by_place.html'
     allowed_roles = (Roles.ZAKUPSCHIK,)
 

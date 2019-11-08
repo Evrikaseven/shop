@@ -192,7 +192,6 @@ class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
         context['update_is_allowed'] = (self.user.role == Roles.ADMINISTRATOR or
                                         (self.user.role == Roles.ZAKAZSCHIK and
                                          self.object.status == OrderStatuses.CREATED))
-        context['user_balance'] = self.object.created_by.balance if self.object.created_by else 0
         context['order_statuses'] = OrderStatuses
         context['order_statuses_list'] = list(OrderStatuses)
         delivery_prices = dict(DELIVERY_PRICES)
