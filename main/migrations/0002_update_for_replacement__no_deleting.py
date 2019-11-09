@@ -16,4 +16,8 @@ class Migration(migrations.Migration):
             name='parent',
             field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='replacement', to='main.OrderItem', verbose_name='Заменяемый товар'),
         ),
+        migrations.AlterModelOptions(
+            name='order',
+            options={},
+        ),
     ]

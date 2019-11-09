@@ -27,8 +27,10 @@ class ZakupschikLocationsFloorsView(LoginRolesRequiredViewMixin, CommonContextVi
         context = super().get_context_data(**kwargs)
         fetcher = ZakupschikFetcher()
         floors = {}
-        if self.location == 'inside':
-            floors = fetcher.get_places_tree()['inside_places']
+        if self.location == 'building1':
+            floors = fetcher.get_places_tree()['building1_places']
+        if self.location == 'tdb':
+            floors = fetcher.get_places_tree()['tdb_places']
         context['location'] = self.location
         context['floors'] = floors.keys()
         return context
@@ -52,8 +54,10 @@ class ZakupschikLocationsLinesView(LoginRolesRequiredViewMixin, CommonContextVie
         fetcher = ZakupschikFetcher()
         if self.location == 'outside':
             lines = fetcher.get_places_tree()['outside_places']
-        elif self.location == 'inside':
-            lines = fetcher.get_places_tree()['inside_places'][self.floor]
+        elif self.location == 'building1':
+            lines = fetcher.get_places_tree()['building1_places'][self.floor]
+        elif self.location == 'tdb':
+            lines = fetcher.get_places_tree()['tdb_places'][self.floor]
         context['location'] = self.location
         context['floor'] = self.floor
         context['lines'] = lines.keys()
@@ -80,10 +84,12 @@ class ZakupschikPlacesView(LoginRolesRequiredViewMixin, CommonContextViewMixin, 
         fetcher = ZakupschikFetcher()
         if self.location == 'other':
             context['places'] = fetcher.get_places_tree()['other_places']
-        elif self.location == 'inside':
-            context['places'] = fetcher.get_places_tree()['inside_places'][self.floor][self.line]
+        elif self.location == 'building1':
+            context['places'] = fetcher.get_places_tree()['building1_places'][self.floor][self.line]
         elif self.location == 'outside':
             context['places'] = fetcher.get_places_tree()['outside_places'][self.line]
+        elif self.location == 'tdb':
+            context['places'] = fetcher.get_places_tree()['tdb_places'][self.floor][self.line]
         else:
             context['places'] = fetcher.get_places_list()
         return context

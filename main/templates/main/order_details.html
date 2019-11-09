@@ -189,40 +189,40 @@
          </div>
         </div>
          <div class="col-md-9 order-md-1">
-         {% for replacement in order.top_order_items %}
+         {% for top_order_item in order.top_order_items %}
             <div class="card mb-3 bg-white rounded shadow-sm">
                 <div class="row no-gutters">
                     <div class="col-md-3 m-2">
-                        <img src="{{ MEDIA_URL }}{{ replacement.product.image }}" class="card-img" alt="...">
+                        <img src="{{ MEDIA_URL }}{{ top_order_item.product.image }}" class="card-img" alt="...">
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
-                            <h5 class="card-title pricing-card-title">{% if replacement.name %} {{ replacement.name }} {% else %} Без
+                            <h5 class="card-title pricing-card-title">{% if top_order_item.name %} {{ top_order_item.name }} {% else %} Без
                                 названия {% endif %}</h5>
                         <div class="d-flex justify-content-between mb-3">
                             <div class="col-md-auto">
-                                <p class="card-text">Место: <small class="text-muted">{{ replacement.place }}</small></p>
-                                <p class="card-text">Цена: <small class="text-muted">{{ replacement.price }}</small></p>
-                                <p class="card-text">Количество: <small class="text-muted">{{ replacement.quantity }}</small></p>
+                                <p class="card-text">Место: <small class="text-muted">{{ top_order_item.place }}</small></p>
+                                <p class="card-text">Цена: <small class="text-muted">{{ top_order_item.price }}</small></p>
+                                <p class="card-text">Количество: <small class="text-muted">{{ top_order_item.quantity }}</small></p>
                             </div>
 
                             <div class="col-md-auto">
-                                <p class="card-text">Статус товара: <small class="text-muted">{{ replacement.status_to_string }}</small></p>
-                                <p class="card-text">Вид закупки: <small class="text-muted">{{ replacement.product.shopping_type_to_string }}</small></p>
+                                <p class="card-text">Статус товара: <small class="text-muted">{{ top_order_item.status_to_string }}</small></p>
+                                <p class="card-text">Вид закупки: <small class="text-muted">{{ top_order_item.product.shopping_type_to_string }}</small></p>
                             </div>
                         </div>
                             <p class="card-text">Коментарий к заказу:
                                 <small class="text-muted">
-                                    {% if not replacement.price %}
+                                    {% if not top_order_item.price %}
                                         <div style="color: red">
                                             <em>
                                                 Укажите цену
                                             </em>
                                         </div>
                                     {% endif %}
-                                    {% if replacement.product %}
-                                        {% if replacement.product.shopping_type == SHOPPING_TYPES.JOINT %}
-                                            {% if replacement.product.quantity == 0 %}
+                                    {% if top_order_item.product %}
+                                        {% if top_order_item.product.shopping_type == SHOPPING_TYPES.JOINT %}
+                                            {% if top_order_item.product.quantity == 0 %}
                                                 Выкуп собран
                                             {% else %}
                                                 Выкуп в процессе сборки
@@ -232,15 +232,15 @@
                                         Товар удалён <br>
                                     {% endif %}
 
-                                    {{ replacement.delivery_to_string }} |
-                                    {{ replacement.order_comment }}
+                                    {{ top_order_item.delivery_to_string }} |
+                                    {{ top_order_item.order_comment }}
 
-                                    {% if replacement.is_replacement %}
+                                    {% if top_order_item.is_replacement %}
                                         Данный товар является заменой
                                     {% endif %}
                                 </small>
                             </p>
-                            <p class="card-text">Коментарий для себя: <small class="text-muted">{{ replacement.customer_comment }}</small></p>
+                            <p class="card-text">Коментарий для себя: <small class="text-muted">{{ top_order_item.customer_comment }}</small></p>
                         </div>
                     </div>
                 </div>
@@ -248,32 +248,34 @@
                 <div class="card-footer text-right bg-lg">
                     {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR or user_role == roles.ZAKUPSCHIK %}
                         <div class="btn-group-sm">
+                            {% if top_order_item.replacement %}
                             <button class="btn btn-sm btn-link"  type="button" data-toggle="collapse" data-target="#collapse_replace{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse_replace{{ forloop.counter }}">
-                                Посмотреть замену для этого товара
+                                Посмотреть замены для этого товара
                             </button>
-                                <a class="btn btn-secondary" href="{% url 'main:order_item_details' pk=replacement.id %}">
+                                {% endif %}
+                                <a class="btn btn-secondary" href="{% url 'main:order_item_details' pk=top_order_item.id %}">
                                     Изменить</a>
-                                    {% if replacement.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL %}
-                                        {% if replacement.parent %}
+                                    {% if top_order_item.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL %}
+                                        {% if top_order_item.parent %}
                                             <a class="btn btn-secondary"
-                                               href="{% url 'main:order_item_details' pk=replacement.parent.pk %}">
+                                               href="{% url 'main:order_item_details' pk=top_order_item.parent.pk %}">
                                                 Заменяемый товар
                                             </a>
                                         {% endif %}
 
-                                        {% if child_order_item %}
-                                            <a class="btn btn-secondary"
-                                               href="{% url 'main:order_item_details' pk=child_order_item.pk %}">
-                                                Замена</a>
+                                        {% if top_order_item.replacement %}
+{#                                            <a class="btn btn-secondary"#}
+{#                                               href="{% url 'main:order_item_details' pk=top_order_item.replacement.pk %}">#}
+{#                                                Замена</a>#}
                                         {% else %}
                                             <a class="btn btn-secondary"
-                                               href="{% url 'main:replacement_order_item' pk=replacement.pk %}">
+                                               href="{% url 'main:replacement_order_item' pk=top_order_item.pk %}">
                                                 Добавить замену</a>
                                         {% endif %}
                                     {% endif %}
                                 {% if user_role == roles.ZAKAZSCHIK and order.status == order_statuses.CREATED or user_role == roles.ADMINISTRATOR %}
                                     <a class="btn btn-secondary"
-                                       href="{% url 'main:delete_order_item' pk=replacement.id %}">
+                                       href="{% url 'main:delete_order_item' pk=top_order_item.id %}">
                                         Удалить</a>
                                 {% endif %}
                             </div>
@@ -284,7 +286,7 @@
          <div class="collapse" id="collapse_replace{{ forloop.counter }}">
 
 {#             TODO: Should be updated    #}
-             {% for replacement in replacement.replacements %}
+             {% for replacement in top_order_item.replacements %}
              <div class="card mb-3 rounded shadow-sm" style="background-color: #e6effe;">
                 <div class="row no-gutters">
                     <div class="col-md-3 m-2">
@@ -347,17 +349,17 @@
                                    href="{% url 'main:order_item_details' pk=replacement.id %}">
                                     Изменить</a>
                                     {% if replacement.product.shopping_type == SHOPPING_TYPES.INDIVIDUAL %}
-                                        {% if replacement.parent %}
-                                            <a class="btn btn-secondary"
-                                               href="{% url 'main:order_item_details' pk=replacement.parent.pk %}">
-                                                Заменяемый товар
-                                            </a>
-                                        {% endif %}
+{#                                        {% if replacement.parent %}#}
+{#                                            <a class="btn btn-secondary"#}
+{#                                               href="{% url 'main:order_item_details' pk=replacement.parent.pk %}">#}
+{#                                                Заменяемый товар#}
+{#                                            </a>#}
+{#                                        {% endif %}#}
 
-                                        {% if child_order_item %}
-                                            <a class="btn btn-secondary"
-                                               href="{% url 'main:order_item_details' pk=child_order_item.pk %}">
-                                                Замена</a>
+                                        {% if replacement.replacement %}
+{#                                            <a class="btn btn-secondary"#}
+{#                                               href="{% url 'main:order_item_details' pk=replacement.replacement.pk %}">#}
+{#                                                Замена</a>#}
                                         {% else %}
                                             <a class="btn btn-secondary"
                                                href="{% url 'main:replacement_order_item' pk=replacement.pk %}">

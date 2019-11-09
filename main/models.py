@@ -114,7 +114,7 @@ class User(AbstractUser):
 class OrderManager(models.Manager):
 
     def get_list(self, **kwargs):
-        return self.filter(**kwargs)
+        return self.filter(**kwargs).order_by('status')
 
 
 class Order(ModelWithTimestamp, ModelWithUser):
@@ -124,9 +124,6 @@ class Order(ModelWithTimestamp, ModelWithUser):
     paid_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True)
     actual_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True)
     delivery = models.PositiveSmallIntegerField(default=DeliveryTypes.PICKUP, choices=tuple(DeliveryTypes))
-
-    class Meta:
-        ordering = ('created_date',)
 
     @property
     def price(self):
