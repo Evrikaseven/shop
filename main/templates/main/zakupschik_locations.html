@@ -8,7 +8,8 @@
 
     <div class="container my-3 p-3 bg-white rounded shadow-sm">
         <div class="list-group">
-        <a class="list-group-item list-group-item-action"  href="{% url 'main:zakupschik_locations_floors' location='inside' %}">В здании</a>
+        <a class="list-group-item list-group-item-action"  href="{% url 'main:zakupschik_locations_floors' location='building1' %}">В здании</a>
+        <a class="list-group-item list-group-item-action"  href="{% url 'main:zakupschik_locations_floors' location='tdb' %}">ТДБ</a>
         <a class="list-group-item list-group-item-action"  href="{% url 'main:zakupschik_locations_lines' location='outside' floor='_' %}">На улице</a>
         <a class="list-group-item list-group-item-action"  href="{% url 'main:zakupschik_places' location='other' floor='_' line='_' %}">Оставшиеся</a>
         <a class="list-group-item list-group-item-action"  href="{% url 'main:zakupschik_places' location='all' floor='_' line='_' %}">Все места</a>

@@ -1,9 +1,17 @@
 from main.models import OrderItem
 from main.core.constants import OrderStatuses, OrderItemStatuses
 from collections import defaultdict
+import re
 
 
 class ZakupschikFetcher(object):
+
+    LOCATIONS = {
+        'building1': 0,
+        'tbd': 1,
+        'outside': 2,
+        'other': 3
+    }
 
     @staticmethod
     def products_by_place(place):
@@ -40,36 +48,67 @@ class ZakupschikFetcher(object):
             product__place__iregex=regex_tmpl
         )
 
-    @staticmethod
-    def get_places_list():
-        places = __class__.get_orderitems_qs().values_list('product__place', flat=True)
+    @classmethod
+    def get_places_list(cls):
+        places = cls.get_orderitems_qs().values_list('product__place', flat=True)
         return sorted(set(places))
 
-    @staticmethod
-    def get_places_tree():
-        places = __class__.get_places_list()
-        inside_places = defaultdict(dict)
+    @classmethod
+    def _get_splitted_place(cls, place):
+        splitted_place = [i for i in place.split('-') if i]
+        if len(splitted_place) == 2:
+            # check for 2d-123 | 1g-444 examples
+            m = re.search(r'^([1,2])(\w+)', splitted_place[0])
+            if m and m.group(2).isalpha():
+                splitted_place = m.group(1), m.group(2), splitted_place[1]
+                return cls.LOCATIONS['building1'], splitted_place
+            # check for tdb examples
+            m = re.search(r'^(tdb|тдб)(\w+)', splitted_place[0])
+            if m and m.group(2).isnumeric():
+                splitted_place = m.group(1), m.group(2), splitted_place[1]
+                return cls.LOCATIONS['tbd'], splitted_place
+            return cls.LOCATIONS['outside'], splitted_place
+        elif len(splitted_place) == 3:
+            return cls.LOCATIONS['building1'], splitted_place
+        return cls.LOCATIONS['other'], splitted_place
+
+    @classmethod
+    def get_places_tree(cls):
+        places = cls.get_places_list()
+        building1_places = defaultdict(dict)
+        tdb_places = defaultdict(dict)
         outside_places = {}
         other_places = []
         for place in places:
-            splitted_place = [i for i in place.split('-') if i]
-            if len(splitted_place) == 2:
+            location, splitted_place = cls._get_splitted_place(place)
+
+            if location == cls.LOCATIONS['building1']:
+                if (splitted_place[0] not in building1_places or
+                        splitted_place[1] not in building1_places[splitted_place[0]]):
+                    building1_places[splitted_place[0]][splitted_place[1]] = [place]
+                else:
+                    building1_places[splitted_place[0]][splitted_place[1]].append(place)
+
+            elif location == cls.LOCATIONS['tbd']:
+                if (splitted_place[0] not in tdb_places or
+                        splitted_place[1] not in tdb_places[splitted_place[0]]):
+                    tdb_places[splitted_place[1]][splitted_place[2]] = [place]
+                else:
+                    tdb_places[splitted_place[1]][splitted_place[2]].append(place)
+
+            elif location == cls.LOCATIONS['outside']:
                 if splitted_place[0] not in outside_places:
                     outside_places[splitted_place[0]] = [place]
                 else:
                     outside_places[splitted_place[0]].append(place)
-            elif len(splitted_place) == 3:
-                if (splitted_place[0] not in inside_places or
-                        splitted_place[1] not in inside_places[splitted_place[0]]):
-                    inside_places[splitted_place[0]][splitted_place[1]] = [place]
-                else:
-                    inside_places[splitted_place[0]][splitted_place[1]].append(place)
+
             else:
                 other_places.append(place)
         return {
-            'inside_places': inside_places,
+            'building1_places': building1_places,
             'outside_places': outside_places,
-            'other_places': other_places
+            'other_places': other_places,
+            'tdb_places': tdb_places,
         }
 
     @staticmethod
