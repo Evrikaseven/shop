@@ -107,16 +107,79 @@
     {% include 'main/include/main_title_template.html' with title='Список товаров для места ' id=place %}
 
     <div class="container my-3">
-        <div class="text-center h5 bg-white shadow-sm rounded" id="cash-out">0</div>
-        <div class="row">
-            {% for p in products %}
-                <div class="col-md-4">
-                     {% for item in p.items %}
-                         {{ item.total_quantity }}
-                        {% include 'main/include/item_card_img_template.html' with order_item=item %}
-                     {% endfor %}
-                </div>
-           {% endfor %}
+        <div class="text-center h5 bg-white shadow-sm rounded">Общая сумма: {{ total_sum }}</div>
+        <form id="form_zakupschik_products" class="needs-validation" action="" method="POST"
+              enctype="multipart/form-data">
+            <div class="row">
+                {% csrf_token %}
+                {{ formset.management_form }}
+                {% for form in formset %}
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    <div class="col-md-4">
+                        <div class="card mb-3 shadow-sm">
+                            <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
+                                 xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
+                                 focusable="false" role="img" aria-label="Placeholder: Thumbnail">
+
+                                <title>Placeholder</title>
+                                <rect width="100%" height="100%" fill="#55595c"></rect>
+                                <a href="{% url 'main:update_product' pk=form.instance.pk %}">
+                                    <image xlink:href="{{ MEDIA_URL }}{{ form.instance.image }}" x="0" y="0"
+                                           width="100%" height="100%"/>
+                                </a>
+
+                                <text x="5%" y="10%" fill="#eceeef" dy=".3em">{{ form.instance.name }}</text>
+                                <text x="5%" y="30%" font-size="20" fill="#eceeef" dy=".3em">
+                                    Количество: {{ form.quantity }}</text>
+                                <text x="5%" y="40%" fill="#eceeef" dy=".3em">Цена {{ form.instance.price }} ₽ шт.
+                                </text>
+                                <text x="5%" y="60%" fill="#eceeef" dy=".3em">{{ form.instance.comment }}</text>
+                                {% for oi in  form.instance.orderitems_for_baught_out %}
+                                    <text x="5%" y="70%" fill="#eceeef" dy=".3em">{{ oi.order_comment }}</text>
+                                    <text x="5%" y="80%" fill="#eceeef" dy=".3em">{{ oi.customer_comment }}</text>
+                                {% endfor %}
+                            </svg>
+                            <div class="card-body py-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    {#            <p class="item pt-3">{% widthratio item.product.price 1 item.product.quantity %} ₽</p>#}
+                                    <div class="row">
+                                        <div>
+                                            <input type="checkbox"
+                                                   name="form-{{ forloop.counter0 }}-status_baught_out"
+                                                   id="id_form-{{ forloop.counter0 }}-status"
+                                                    {% if form.status_baught_out.initial == True %}
+                                                   checked {% endif %}
+                                                    {% if form.status_baught_out.field.disabled %}
+                                                   disabled=""
+                                                    {% endif %}
+                                            >
+                                            <label for="id_form-{{ forloop.counter0 }}-status_baught_out">
+                                                Выкуплен </label>
+
+                                            <input type="checkbox"
+                                                   name="form-{{ forloop.counter0 }}-status_not_baught_out"
+                                                   id="id_form-{{ forloop.counter0 }}-status"
+                                                    {% if form.status_not_baught_out.initial == True %}
+                                                   checked {% endif %}
+                                                    {% if form.status_not_baught_out.field.disabled %}
+                                                   disabled=""
+                                                    {% endif %}
+                                            >
+                                            <label for="id_form-{{ forloop.counter0 }}-status_not_baught_out">
+                                                Не выкуплен </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </form>
+        <div class="mb-4 text-center">
+            <button class="btn btn-secondary btn-sm" type="submit" form="form_zakupschik_products">Сохранить</button>
         </div>
     </div>
     <script src="{% static 'PhotoSwipe/photoswipe.min.js' %}"></script>

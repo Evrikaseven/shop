@@ -11,7 +11,7 @@
           <div class="card-header d-flex justify-content-between"  style="background-color: #e9ecef">
               <h5>{{ p.name }}</h5>
               <div class="btn-group">
-                  <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:update_joint_product' pk=p.id %}">
+                  <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:update_product' pk=p.id %}">
                       Изменить
                   </a>
                   <a class="btn btn-outline-secondary btn-sm" href="{% url 'main:delete_product' pk=p.id %}">
@@ -27,7 +27,7 @@
 
                       <title>Placeholder</title>
                       <rect width="100%" height="100%" fill="#55595c"></rect>
-                      <a href="{% url 'main:update_joint_product' pk=p.id %}">
+                      <a href="{% url 'main:update_product' pk=p.id %}">
                         <image xlink:href="{{ MEDIA_URL }}{{ p.image }}" x="0" y="0" width="100%" height="100%"/>
                       </a>
                   </svg>

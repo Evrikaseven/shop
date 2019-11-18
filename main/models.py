@@ -241,6 +241,7 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
     delivery = models.PositiveSmallIntegerField(verbose_name='Тип доставки',
                                                 default=PurchaseAndDeliveryTypes.PURCHASE_AND_DELIVERY,
                                                 choices=tuple(PurchaseAndDeliveryTypes))
+    _price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     @property
     def status_to_string(self):
@@ -260,7 +261,16 @@ class OrderItem(ModelWithTimestamp, ModelWithUser):
 
     @property
     def price(self):
-        return self.product.price if self.product else 0
+        if self.order_id and self.order.status in (OrderStatuses.PAYING_TO_BE_CONFIRMED,
+                                                   OrderStatuses.PAID,
+                                                   OrderStatuses.IN_PROGRESS,
+                                                   OrderStatuses.READY_TO_ISSUE,
+                                                   OrderStatuses.CLOSED) or not self.product:
+            return self._price
+        if self.product.price != self._price:
+            self._price = self.product.price
+            self.save()
+        return self.product.price
 
     @property
     def is_replacement(self):
@@ -411,6 +421,14 @@ class Product(ModelWithTimestamp, ModelWithUser):
                 self.orderitem_set.all().update(state=OrderItemStates.NOT_ACTIVE)
         for oi in self.orderitem_set.all():
             oi.order.update_actual_price_with_user_balance()
+
+    @property
+    def orderitems_for_baught_out(self):
+        return self.orderitem_set.filter(order__status__in=(OrderStatuses.PAID,
+                                                            OrderStatuses.IN_PROGRESS,
+                                                            OrderStatuses.READY_TO_ISSUE),
+                                         status__in=(OrderItemStatuses.CREATED,
+                                                     OrderItemStatuses.NOT_BAUGHT_OUT))
 
 
 def remove_product_image_from_disc(sender, **kwargs):

@@ -490,7 +490,7 @@ class ProductsAddToOrderView(LoginRolesRequiredViewMixin, CommonContextViewMixin
 
 
 class NewJointProductView(LoginRolesRequiredViewMixin, CommonContextViewMixin, CreateView):
-    template_name = 'main/joint_product.html'
+    template_name = 'main/product_details.html'
     form_class = ProductForm
     # allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
 
@@ -507,11 +507,11 @@ class NewJointProductView(LoginRolesRequiredViewMixin, CommonContextViewMixin, C
         return kwargs
 
 
-class UpdateJointProductView(LoginRolesRequiredViewMixin, CommonContextViewMixin, UpdateView):
-    template_name = 'main/joint_product.html'
+class UpdateProductView(LoginRolesRequiredViewMixin, CommonContextViewMixin, UpdateView):
+    template_name = 'main/product_details.html'
     form_class = ProductForm
     model = _models.Product
-    # allowed_roles = (Roles.ZAKAZSCHIK, Roles.ZAKUPSCHIK)
+    allowed_roles = (Roles.ZAKUPSCHIK, )
 
     def get_success_url(self):
         return reverse_lazy('main:products')

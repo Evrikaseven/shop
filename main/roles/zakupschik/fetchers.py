@@ -25,16 +25,11 @@ class ZakupschikFetcher(object):
         products_dict = defaultdict(dict)
         for item in order_items_qs:
             if item.product.pk not in products_dict:
-                products_dict[item.product.pk]['items'] = [item]
-                products_dict[item.product.pk]['item_status_str'] = item.status_to_string
-                # first added, other statuses and prices should be the same
                 products_dict[item.product.pk]['total_quantity'] = item.quantity
                 products_dict[item.product.pk]['price'] = item.price
-                products_dict[item.product.pk]['product'] = item.product
             else:
-                products_dict[item.product.pk]['items'].append(item)
                 products_dict[item.product.pk]['total_quantity'] += item.quantity
-        return products_dict.values()
+        return products_dict
 
     @staticmethod
     def get_orderitems_qs(regex_tmpl: str = r''):

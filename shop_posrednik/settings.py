@@ -174,7 +174,23 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # SERVER_EMAIL = EMAIL_HOST_USER
 
+
+# LOGGING = {
+#     'handlers': {
+#         'file': {
+#             'class': 'logging.handlers.SMTPHandler',
+#             'mailhost': EMAIL_HOST,
+#             'fromfddr': EMAIL_HOST_USER,
+#             'toaddr': [],
+#             'subject': 'Site issues!',
+#             'credentials': ('login', 'password'),
+#             'secure': (),   # support SSL
+#         }
+#     }
+# }
+
 try:
     from .dev_settings import *
 except ImportError:
     pass
+

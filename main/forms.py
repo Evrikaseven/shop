@@ -250,6 +250,7 @@ class OrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
                 price = self.cleaned_data.get('price')
                 if price:
                     product.price = price
+                    self.instance._price = price
                 if product.shopping_type == ShoppingTypes.JOINT:
                     product.quantity -= self.joint_quantity_delta
                     product.save(update_fields=('place', 'name', 'price', 'quantity'))
@@ -266,6 +267,7 @@ class OrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
                               price=self.cleaned_data.get('price', 0))
             product.save()
             self.instance.product = product
+            self.instance._price = self.cleaned_data.get('price', 0)
 
         if self.parent_item:
             self.instance.parent = self.parent_item
@@ -385,6 +387,13 @@ class ProductForm(WithUserDataUpdateFormMixin, forms.ModelForm):
         super().__init__(**kwargs)
         # TODO: remove if another shopping_type is necessary
         self.fields.pop('shopping_type')
+        if self.user and self.user.role == Roles.ZAKUPSCHIK:
+            self.fields['image'].disabled = True
+            self.fields['name'].disabled = True
+            self.fields['place'].disabled = True
+            self.fields['price'].disabled = True
+            self.fields['quantity'].disabled = True
+            self.fields['comment'].disabled = True
 
     def clean_image(self):
         image = self.cleaned_data['image']

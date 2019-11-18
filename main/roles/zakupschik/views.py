@@ -1,8 +1,13 @@
 from django.views.generic.base import TemplateView
+from django.urls import reverse_lazy
 from main.core.view_mixins import LoginRolesRequiredViewMixin, CommonContextViewMixin
 from django.conf import settings
+from django.shortcuts import redirect
 from .fetchers import ZakupschikFetcher
+from .forms import ZakupschikProductForm, ZakupschikProductBaseFormSet
+from django.forms import modelformset_factory
 from main.core.constants import Roles, OrderItemStatuses
+from main.models import Product
 
 
 class ZakupschikMainView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
@@ -104,19 +109,33 @@ class ZakupschikPlacesView(LoginRolesRequiredViewMixin, CommonContextViewMixin, 
 class ZakupschikOrderItemsByPlaceView(LoginRolesRequiredViewMixin, CommonContextViewMixin, TemplateView):
     template_name = 'main/zakupschik_order_items_by_place.html'
     allowed_roles = (Roles.ZAKUPSCHIK,)
+    ZakupschikProductFormSet = modelformset_factory(Product, ZakupschikProductForm,
+                                                    formset=ZakupschikProductBaseFormSet, extra=0)
 
     def __init__(self, *args, **kwargs):
         self.place = None
         super().__init__(*args, **kwargs)
 
+    def get_success_url(self):
+        return reverse_lazy('main:zakupschik_order_details_by_place', kwargs={'place': self.place})
+
     def get_context_data(self, **kwargs):
+        products = ZakupschikFetcher.products_by_place(self.place)
+        formset = self.ZakupschikProductFormSet(queryset=Product.objects.get_list(pk__in=products.keys()))
         context = super().get_context_data(**kwargs)
-        fetcher = ZakupschikFetcher()
-        context['products'] = fetcher.products_by_place(self.place)
+        context['formset'] = formset
+        context['products_list'] = products.values()
+        context['order_items_statuses_list'] = list(OrderItemStatuses)
+        context['total_sum'] = sum(p['total_quantity'] * p['price'] for p in products.values())
         context['MEDIA_URL'] = settings.MEDIA_URL
-        context['place'] = self.place
-        context['order_items_statuses_list'] = list(OrderItemStatuses)[1:]
         return context
+
+    def post(self, *args, **kwargs):
+        products = ZakupschikFetcher.products_by_place(self.place)
+        formset = self.ZakupschikProductFormSet(self.request.POST, queryset=Product.objects.get_list(pk__in=products.keys()))
+        if formset.is_valid():
+            pass
+        return redirect(self.get_success_url())
 
     def dispatch(self, request, *args, **kwargs):
         self.place = kwargs.pop('place', None)
