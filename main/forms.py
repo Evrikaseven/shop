@@ -3,7 +3,7 @@ import string
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
-from main.emails import user_data_email, order_data_email
+from main.emails import order_data_email
 from django.db import transaction
 from .models import (
     Provider,
@@ -209,7 +209,7 @@ class OrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
     def clean_place(self):
         value = self.cleaned_data['place'].strip().lower()
         not_allowed_symbols = [c for c in string.punctuation if c not in '/-']
-        is_incorrect_data = bool(re.search("\s", value)) or any((c in value) for c in not_allowed_symbols)
+        is_incorrect_data = bool(re.search(r"\s", value)) or any((c in value) for c in not_allowed_symbols)
         if not value or is_incorrect_data:
             raise ValidationError(
                 'Укажите, пожалуйста, номер места (не допускается несколько номеров!). '
@@ -404,7 +404,7 @@ class ProductForm(WithUserDataUpdateFormMixin, forms.ModelForm):
     def clean_place(self):
         value = self.cleaned_data['place'].strip().lower()
         not_allowed_symbols = [c for c in string.punctuation if c not in '/-']
-        is_incorrect_data = bool(re.search("\s", value)) or any((c in value) for c in not_allowed_symbols)
+        is_incorrect_data = bool(re.search(r"\s", value)) or any((c in value) for c in not_allowed_symbols)
         if not value or is_incorrect_data:
             raise ValidationError(
                 'Укажите, пожалуйста, номер места (не допускается несколько номеров!). '
