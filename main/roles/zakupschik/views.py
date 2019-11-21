@@ -125,7 +125,7 @@ class ZakupschikOrderItemsByPlaceView(LoginRolesRequiredViewMixin, CommonContext
         context = super().get_context_data(**kwargs)
         context['formset'] = formset
         context['products_list'] = products.values()
-        context['order_items_statuses_list'] = list(OrderItemStatuses)
+        context['order_items_statuses'] = OrderItemStatuses
         context['total_sum'] = sum(p['total_quantity'] * p['price'] for p in products.values())
         context['MEDIA_URL'] = settings.MEDIA_URL
         return context

@@ -2,6 +2,7 @@ from django.forms import (
     ModelForm,
     BaseModelFormSet,
     BooleanField,
+    ChoiceField,
 )
 from django.forms import ValidationError
 from django.db import transaction
@@ -10,45 +11,26 @@ from main.core.constants import OrderItemStatuses
 
 
 class ZakupschikProductForm(ModelForm):
-    status_baught_out = BooleanField(required=False)
-    status_not_baught_out = BooleanField(required=False)
+    status = ChoiceField(choices=tuple(OrderItemStatuses), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.orderitem_set.count():
             orderitem = self.instance.orderitem_set.first()
-            if orderitem.status == OrderItemStatuses.BAUGHT_OUT:
-                self.fields['status_baught_out'].initial = True
-                self.fields['status_not_baught_out'].initial = False
-            elif orderitem.status == OrderItemStatuses.NOT_BAUGHT_OUT:
-                self.fields['status_baught_out'].initial = False
-                self.fields['status_not_baught_out'].initial = True
-            else:
-                self.fields['status_baught_out'].initial = False
-                self.fields['status_not_baught_out'].initial = False
+            self.fields['status'].initial = orderitem.status
 
-    def clean(self):
-        cleaned_data = super().clean()
-        if ('status_baught_out' in cleaned_data and 'status_not_baught_out' in cleaned_data and
-                cleaned_data['status_baught_out'] and cleaned_data['status_not_baught_out']):
-            raise ValidationError('Только одна галочка должна быть выбрана')
-        return cleaned_data
+    def clean_status(self):
+        value = int(self.cleaned_data.get('status'), OrderItemStatuses.CREATED)
+        if value not in (OrderItemStatuses.CREATED, OrderItemStatuses.NOT_BAUGHT_OUT, OrderItemStatuses.BAUGHT_OUT):
+            raise ValidationError('Статус имеет некорректное значение {value}'.format(value=value))
+        return value
 
     @transaction.atomic
     def save(self, *args, **kwargs):
-        if self.cleaned_data.get('status_baught_out'):
-            for orderitem in self.instance.orderitems_for_baught_out:
-                orderitem.status = OrderItemStatuses.BAUGHT_OUT
-                orderitem.save()
-        elif self.cleaned_data.get('status_not_baught_out'):
-            for orderitem in self.instance.orderitems_for_baught_out:
-                orderitem.status = OrderItemStatuses.NOT_BAUGHT_OUT
-                orderitem.save()
-        else:
-            for orderitem in self.instance.orderitems_for_baught_out:
-                orderitem.status = OrderItemStatuses.CREATED
-                orderitem.save()
-        return super().save(*args, **kwargs)
+        status = self.cleaned_data.get('status')
+        for orderitem in self.instance.orderitems_for_baught_out:
+            orderitem.status = status
+            orderitem.save()
 
     @property
     def quantity(self):
@@ -56,7 +38,7 @@ class ZakupschikProductForm(ModelForm):
 
     class Meta:
         model = Product
-        fields = ('status_baught_out', 'status_not_baught_out')
+        fields = ('status', )
 
 
 class ZakupschikProductBaseFormSet(BaseModelFormSet):
