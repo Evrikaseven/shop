@@ -203,6 +203,7 @@ class OrderDetailsView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextV
         context['order'] = self.object
         context['SHOPPING_TYPES'] = ShoppingTypes
         context['receipts'] = _models.Receipt.objects.filter(order=self.object.id)
+        context['extra_charge'] = _models.SettingOptionHandler('extra_charge').value
         return context
 
 
