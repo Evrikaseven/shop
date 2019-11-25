@@ -4,6 +4,7 @@ from django.views.generic.edit import CreateView, UpdateView, FormView, DeleteVi
 from django.views.generic.list import ListView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
+from django.core.exceptions import ObjectDoesNotExist
 from main.core.view_mixins import (
     LoginRolesRequiredViewMixin,
     LoginRolesOwnerRequiredUpdateViewMixin,
@@ -396,6 +397,17 @@ class DeleteOrderItemView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonConte
         context = super().get_context_data(**kwargs)
         context['order_item'] = self.object
         return context
+
+    def post(self, *args, **kwargs):
+        try:
+            order_item = _models.OrderItem.objects.get(pk=kwargs.get('pk'))
+        except ObjectDoesNotExist:
+            return self.handle_no_permission()
+        if (self.user.role == Roles.ZAKAZSCHIK and
+                order_item.product.shopping_type == ShoppingTypes.JOINT and
+                order_item.product.quantity == 0):
+            return self.handle_no_permission()
+        return super().post(*args, **kwargs)
 
 
 class DeleteOrderView(OrderCreateStatusOnlyAllowUpdateViewMixin, CommonContextViewMixin, DeleteView):

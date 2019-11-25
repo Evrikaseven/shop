@@ -19,22 +19,23 @@
         <div class="d-flex justify-content-between align-items-center">
             <p class="item pt-3">{% widthratio order_item.price 1 order_item.quantity %} ₽</p>
             <div class="row">
-                   <label for="id_status" class="col-form-label mr-2">Статус</label>
-                   <div>
-                      <select class="custom-select" name="status" id="id_status"
-                               {% if form.status.field.disabled %}
-                               disabled=""
-                               {% endif %}
-                       >
-                           {% for status, status_str in order_items_statuses_list %}
-                               {% if status == order_item.status %}
-                                   <option value="{{ status }}" selected>{{ status_str }}</option>
-                               {% else %}
-                                   <option value="{{ status }}">{{ status_str }}</option>
-                               {% endif %}
-                           {% endfor %}
-                       </select>
-                   </div>
+{#                   <label for="id_status" class="col-form-label mr-2">Статус</label>#}
+{#                   <div>#}
+
+{#                      <select class="custom-select" name="status" id="id_status"#}
+{#                               {% if form.status.field.disabled %}#}
+{#                               disabled=""#}
+{#                               {% endif %}#}
+{#                       >#}
+{#                           {% for status, status_str in order_items_statuses_list %}#}
+{#                               {% if status == order_item.status %}#}
+{#                                   <option value="{{ status }}" selected>{{ status_str }}</option>#}
+{#                               {% else %}#}
+{#                                   <option value="{{ status }}">{{ status_str }}</option>#}
+{#                               {% endif %}#}
+{#                           {% endfor %}#}
+{#                       </select>#}
+{#                   </div>#}
             </div>
         </div>
     </div>
