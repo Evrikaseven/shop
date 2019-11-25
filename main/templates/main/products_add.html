@@ -28,7 +28,8 @@
             <div class="card-footer d-flex justify-content-between align-items-center">
                 {% if product.quantity > 0 %}
                     {% if order %}
-                        <a class="btn btn-sm btn-outline-dark" href="{% url 'main:joint_item_to_product' pk=order.id product_pk=product.id %}">
+                        <a class="btn btn-sm btn-outline-dark"
+                           href="{% url 'main:joint_item_to_product' pk=order.id product_pk=product.id %}">
                             Добавить в заказ
                         </a>
                     {% else %}
@@ -37,6 +38,25 @@
                         </a>
                     {% endif %}
                 {% endif %}
+            </div>
+            <div class="container my-3 p-3 bg-white rounded shadow-sm">
+                <div>
+                    <h4 class="col-md-3">Комментарии</h4>
+                </div>
+                {% for item in product.orderitems_joint_product_comments %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="col-md-3">
+                            <h5>{{ item.order.created_by.email }}</h5>
+                        </div>
+                        <div class="col-md-3">
+                            {% if item.order_comment %}
+                                {{ item.order_comment }}
+                            {% else %}
+                                Нет записей
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>

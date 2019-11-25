@@ -187,6 +187,8 @@ class OrderItemForm(WithUserDataUpdateFormMixin, forms.ModelForm):
                 self.fields['place'].disabled = True
                 self.fields['name'].disabled = True
                 self.fields['price'].disabled = True
+                if self.instance.product.quantity == 0:
+                    self.fields['quantity'].disabled = True
 
     class Meta:
         model = OrderItem

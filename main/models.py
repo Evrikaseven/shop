@@ -429,6 +429,12 @@ class Product(ModelWithTimestamp, ModelWithUser):
                                                             OrderStatuses.READY_TO_ISSUE),
                                          status__in=(OrderItemStatuses.CREATED,
                                                      OrderItemStatuses.NOT_BAUGHT_OUT))
+    @property
+    def orderitems_joint_product_comments(self):
+        return self.orderitem_set.filter(order__status__in=(OrderStatuses.PAYING_TO_BE_CONFIRMED,
+                                                            OrderStatuses.PAID,
+                                                            OrderStatuses.IN_PROGRESS,
+                                                            OrderStatuses.READY_TO_ISSUE))
 
 
 def remove_product_image_from_disc(sender, **kwargs):

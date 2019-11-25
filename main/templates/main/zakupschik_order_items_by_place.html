@@ -136,10 +136,10 @@
                                 <text x="5%" y="40%" fill="#eceeef" dy=".3em">Цена {{ form.instance.price }} ₽ шт.
                                 </text>
                                 <text x="5%" y="60%" fill="#eceeef" dy=".3em">{{ form.instance.comment }}</text>
-                                {% for oi in  form.instance.orderitems_for_baught_out %}
-                                    <text x="5%" y="70%" fill="#eceeef" dy=".3em">{{ oi.order_comment }}</text>
-                                    <text x="5%" y="80%" fill="#eceeef" dy=".3em">{{ oi.customer_comment }}</text>
-                                {% endfor %}
+{#                                {% for oi in  form.instance.orderitems_for_baught_out %}#}
+{#                                    <text x="5%" y="70%" fill="#eceeef" dy=".3em">{{ oi.order_comment }}</text>#}
+{#                                    <text x="5%" y="80%" fill="#eceeef" dy=".3em">{{ oi.customer_comment }}</text>#}
+{#                                {% endfor %}#}
                             </svg>
                             <div class="card-body py-3">
                                 <p class="item text-center">{% widthratio form.instance.price 1 form.quantity %} ₽</p>
