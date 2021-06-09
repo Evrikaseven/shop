@@ -2,7 +2,7 @@ appnope==0.1.0
 astroid==2.2.5
 backcall==0.1.0
 decorator==4.4.0
-Django==2.2.3
+Django==2.2.22
 djangorestframework==3.9.4
 entrypoints==0.3
 flake8==3.7.8
